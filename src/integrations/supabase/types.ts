@@ -296,7 +296,7 @@ export type Database = {
           salary: number | null
           telegram_username: string | null
           updated_at: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -312,7 +312,7 @@ export type Database = {
           salary?: number | null
           telegram_username?: string | null
           updated_at?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -328,7 +328,7 @@ export type Database = {
           salary?: number | null
           telegram_username?: string | null
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
