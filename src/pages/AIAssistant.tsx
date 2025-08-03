@@ -26,35 +26,75 @@ const AIAssistant = () => {
   const demoEmployees = [
     {
       id: '1',
-      full_name: 'Александр Петров',
-      position: 'Senior Frontend Developer',
-      department: 'Разработка',
-      role: 'developer',
-      skills: ['React', 'TypeScript', 'UI/UX']
+      full_name: 'Александр Петров (Алпи)',
+      position: 'COO / Operation Director',
+      department: 'Управление',
+      role: 'coo',
+      skills: ['Operations', 'Strategy', 'Leadership']
     },
     {
       id: '2', 
-      full_name: 'Мария Сидорова',
-      position: 'Backend Developer',
-      department: 'Разработка',
-      role: 'developer',
-      skills: ['Node.js', 'PostgreSQL', 'API Design']
+      full_name: 'Мария Сидорова (Мики)',
+      position: 'Marketing Director',
+      department: 'Маркетинг',
+      role: 'marketing_director',
+      skills: ['Digital Marketing', 'Brand Strategy', 'Analytics']
     },
     {
       id: '3',
-      full_name: 'Дмитрий Козлов',
-      position: 'Project Manager',
-      department: 'Управление',
-      role: 'manager',
-      skills: ['Agile', 'Scrum', 'Team Management']
+      full_name: 'Дмитрий Козлов (Жан)',
+      position: 'Top Specialist',
+      department: 'Экспертиза',
+      role: 'specialist',
+      skills: ['Technical Expertise', 'Problem Solving', 'Innovation']
     },
     {
       id: '4',
-      full_name: 'Елена Новикова', 
-      position: 'QA Engineer',
-      department: 'Тестирование',
-      role: 'qa',
-      skills: ['Automated Testing', 'Manual Testing', 'Bug Tracking']
+      full_name: 'Елена Новикова (Алекс)', 
+      position: 'Factory Manager',
+      department: 'Производство',
+      role: 'factory_manager',
+      skills: ['Production Management', 'Quality Control', 'Team Leadership']
+    },
+    {
+      id: '5',
+      full_name: 'Брат',
+      position: 'Factory Director',
+      department: 'Производство',
+      role: 'factory_director',
+      skills: ['Industrial Operations', 'Strategic Planning', 'Resource Management']
+    },
+    {
+      id: '6',
+      full_name: 'Дани',
+      position: 'CEO',
+      department: 'Руководство',
+      role: 'ceo',
+      skills: ['Executive Leadership', 'Business Strategy', 'Vision']
+    },
+    {
+      id: '7',
+      full_name: 'Ило',
+      position: 'Founder',
+      department: 'Руководство',
+      role: 'founder',
+      skills: ['Entrepreneurship', 'Innovation', 'Company Culture']
+    },
+    {
+      id: '8',
+      full_name: 'Питер',
+      position: 'IT Manager',
+      department: 'IT',
+      role: 'it_manager',
+      skills: ['Technology Strategy', 'System Architecture', 'Team Management']
+    },
+    {
+      id: '9',
+      full_name: 'Шеф',
+      position: 'Senior Advisor',
+      department: 'Консультации',
+      role: 'advisor',
+      skills: ['Strategic Consulting', 'Mentorship', 'Business Development']
     }
   ];
 
