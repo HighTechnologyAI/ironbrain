@@ -22,6 +22,7 @@ import {
   Play
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { TerminalInterface } from '@/components/TerminalInterface';
 
 const AdminPanel = () => {
   const [adminKey, setAdminKey] = useState('');
@@ -469,12 +470,22 @@ const AdminPanel = () => {
           </TabsContent>
 
           <TabsContent value="terminal" className="mt-6">
-            <Card>
+            <TerminalInterface 
+              title="Admin API Terminal"
+              endpoint="/functions/v1/admin-api"
+              onExecute={async (command) => {
+                // Handle admin commands through API
+                if (command.startsWith('admin ')) {
+                  const adminCmd = command.substring(6);
+                  return await adminApiCall(adminCmd);
+                }
+                return `Command executed: ${command}`;
+              }}
+            />
+
+            <Card className="mt-6">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Terminal className="h-5 w-5" />
-                  API Terminal
-                </CardTitle>
+                <CardTitle>Внешний API доступ</CardTitle>
               </CardHeader>
               <CardContent>
                 <Alert className="mb-4">

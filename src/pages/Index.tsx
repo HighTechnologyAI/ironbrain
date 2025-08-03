@@ -153,6 +153,14 @@ const Index = () => {
       badge: "24", 
       color: "text-accent",
       description: "Награды и достижения"
+    },
+    { 
+      title: "Админ-панель", 
+      icon: Settings, 
+      badge: "SYS", 
+      color: "text-accent",
+      description: "Управление системой и внешний контроль",
+      route: "/admin"
     }
   ];
 
