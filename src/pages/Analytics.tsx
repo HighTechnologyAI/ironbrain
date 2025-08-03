@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,14 +15,17 @@ import {
   Download,
   ArrowLeft,
   PieChart,
-  LineChart
+  LineChart,
+  Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { usePerformanceData } from "@/hooks/use-performance-data";
 
 const Analytics = () => {
   const [dateRange, setDateRange] = useState("30d");
   const [department, setDepartment] = useState("all");
   const navigate = useNavigate();
+  const { data: performanceData, loading } = usePerformanceData();
 
   const stats = [
     {
@@ -67,7 +70,7 @@ const Analytics = () => {
     { name: "Маркетинг", tasks: 98, members: 2, efficiency: 78 }
   ];
 
-  const performanceData = [
+  const weeklyPerformance = [
     { week: "Нед 1", completed: 45, planned: 50 },
     { week: "Нед 2", completed: 52, planned: 55 },
     { week: "Нед 3", completed: 48, planned: 52 },
@@ -194,7 +197,7 @@ const Analytics = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {performanceData.map((week, index) => (
+              {weeklyPerformance.map((week, index) => (
                 <div key={index} className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">{week.week}</span>

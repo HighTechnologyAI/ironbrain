@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,16 +17,47 @@ import {
   Plus,
   Filter,
   ArrowLeft,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Projects = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const projects = [
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const { data: companies, error } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('status', 'active');
+      
+      if (error) throw error;
+      setProjects(companies || []);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить проекты",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const mockProjects = [
     {
       id: 1,
       name: "Tiger CRM v2.0",
@@ -133,7 +164,7 @@ const Projects = () => {
     }
   };
 
-  const filteredProjects = projects.filter(project => {
+  const filteredProjects = (projects.length > 0 ? projects : mockProjects).filter(project => {
     const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          project.manager.toLowerCase().includes(searchTerm.toLowerCase());
