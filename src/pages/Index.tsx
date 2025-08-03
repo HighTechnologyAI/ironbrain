@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +20,9 @@ import {
   Activity,
   Wifi,
   Cpu,
-  Database
+  Database,
+  Bot,
+  Sparkles
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -29,6 +32,7 @@ const Index = () => {
   const [systemStatus, setSystemStatus] = useState('online');
   const [progress, setProgress] = useState(75);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -258,6 +262,42 @@ const Index = () => {
             </div>
           </div>
         </CardContent>
+      </Card>
+
+      {/* AI Assistant Special Card */}
+      <Card 
+        className="mb-6 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5 border-primary/30 cyber-glow hover:border-primary transition-all duration-500 cursor-pointer group"
+        onClick={() => navigate('/ai-assistant')}
+      >
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3 text-xl group-hover:cyber-text transition-colors">
+            <div className="relative">
+              <Bot className="h-6 w-6 text-primary animate-pulse cyber-glow" />
+              <Sparkles className="h-3 w-3 text-accent absolute -top-1 -right-1 animate-bounce" />
+            </div>
+            Tiger AI Assistant
+            <Badge variant="outline" className="bg-accent/20 text-accent border-accent/30 animate-pulse">
+              NEW
+            </Badge>
+          </CardTitle>
+          <CardDescription className="text-muted-foreground">
+            🤖 Персональный помощник для создания задач с учетом навыков каждого сотрудника
+          </CardDescription>
+          <div className="flex items-center gap-4 mt-2 text-xs">
+            <div className="flex items-center gap-1 text-primary">
+              <Sparkles className="h-3 w-3" />
+              <span>Персонализация</span>
+            </div>
+            <div className="flex items-center gap-1 text-primary">
+              <Target className="h-3 w-3" />
+              <span>Умные задачи</span>
+            </div>
+            <div className="flex items-center gap-1 text-primary">
+              <BarChart3 className="h-3 w-3" />
+              <span>Анализ нагрузки</span>
+            </div>
+          </div>
+        </CardHeader>
       </Card>
 
       {/* Menu Grid */}
