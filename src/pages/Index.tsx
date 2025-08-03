@@ -23,31 +23,27 @@ import {
   Database,
   Bot,
   Sparkles,
-  LogOut
+  LogOut,
+  Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { usePerformanceData } from "@/hooks/use-performance-data";
 
 const Index = () => {
   const [language, setLanguage] = useState<'ru' | 'en'>('ru');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [systemStatus, setSystemStatus] = useState('online');
-  const [progress, setProgress] = useState(75);
   const { toast } = useToast();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { data: performanceData, loading: performanceLoading } = usePerformanceData();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    const progressTimer = setInterval(() => {
-      setProgress(prev => prev >= 100 ? 0 : prev + 1);
-    }, 100);
-    return () => clearInterval(progressTimer);
-  }, []);
 
   const translations = {
     ru: {
@@ -105,16 +101,34 @@ const Index = () => {
   };
 
   const stats = [
-    { value: 23, label: t.activeTasks, icon: CheckSquare, trend: "+5", color: "text-primary" },
-    { value: 12, label: t.teamMembers, icon: Users, trend: "+2", color: "text-primary" },
-    { value: 187, label: t.achievements, icon: Award, trend: "+23", color: "text-accent" }
+    { 
+      value: performanceData.pendingTasks, 
+      label: t.activeTasks, 
+      icon: CheckSquare, 
+      trend: `+${performanceData.weeklyGrowth.tasks}`, 
+      color: "text-primary" 
+    },
+    { 
+      value: performanceData.activeTeamMembers, 
+      label: t.teamMembers, 
+      icon: Users, 
+      trend: `+${performanceData.weeklyGrowth.team}`, 
+      color: "text-primary" 
+    },
+    { 
+      value: performanceData.totalAchievements, 
+      label: t.achievements, 
+      icon: Award, 
+      trend: `+${performanceData.weeklyGrowth.achievements}`, 
+      color: "text-accent" 
+    }
   ];
 
   const menuItems = [
     { 
       title: t.myTasks, 
       icon: CheckSquare, 
-      badge: "8", 
+      badge: performanceData.pendingTasks > 0 ? performanceData.pendingTasks.toString() : null, 
       color: "text-primary",
       description: "Управление личными задачами",
       route: "/tasks"
@@ -122,7 +136,7 @@ const Index = () => {
     { 
       title: t.team, 
       icon: Users, 
-      badge: "12", 
+      badge: performanceData.activeTeamMembers > 0 ? performanceData.activeTeamMembers.toString() : null, 
       color: "text-primary",
       description: "Команда и сотрудники",
       route: "/team"
@@ -146,7 +160,7 @@ const Index = () => {
     { 
       title: t.problems, 
       icon: Shield, 
-      badge: "3", 
+      badge: performanceData.overdueTasks > 0 ? performanceData.overdueTasks.toString() : null, 
       color: "text-destructive",
       description: "Проблемы требующие внимания",
       route: "/issues"
@@ -154,7 +168,7 @@ const Index = () => {
     { 
       title: t.achievements_page, 
       icon: Award, 
-      badge: "24", 
+      badge: performanceData.totalAchievements > 0 ? performanceData.totalAchievements.toString() : null, 
       color: "text-accent",
       description: "Награды и достижения",
       route: "/awards"
@@ -237,9 +251,13 @@ const Index = () => {
               <div className="flex items-center gap-2 text-sm">
                 <Activity className="h-4 w-4 text-primary" />
                 <span className="text-muted-foreground">{t.performance}:</span>
-                <span className="text-primary font-mono">{progress}%</span>
+                {performanceLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                ) : (
+                  <span className="text-primary font-mono">{performanceData.performance}%</span>
+                )}
               </div>
-              <Progress value={progress} className="flex-1 max-w-[200px]" />
+              <Progress value={performanceData.performance} className="flex-1 max-w-[200px]" />
             </div>
           </div>
         </CardHeader>
@@ -287,7 +305,7 @@ const Index = () => {
               <div className="flex items-center gap-2">
                 <Activity className="h-4 w-4 text-primary" />
                 <span className="text-muted-foreground">Активных:</span>
-                <span className="text-primary font-mono">8 пользователей</span>
+                <span className="text-primary font-mono">{performanceData.activeTeamMembers} пользователей</span>
               </div>
             </div>
             <div className="text-xs text-muted-foreground">

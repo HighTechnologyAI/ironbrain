@@ -22,7 +22,8 @@ import {
   Play
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { TerminalInterface } from '@/components/TerminalInterface';
+import TerminalInterface from '@/components/TerminalInterface';
+import TeamManagement from '@/components/TeamManagement';
 
 const AdminPanel = () => {
   const [adminKey, setAdminKey] = useState('');
@@ -233,7 +234,7 @@ const AdminPanel = () => {
         </div>
 
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="dashboard">
               <Activity className="h-4 w-4 mr-2" />
               Дашборд
@@ -245,6 +246,10 @@ const AdminPanel = () => {
             <TabsTrigger value="users">
               <Users className="h-4 w-4 mr-2" />
               Пользователи
+            </TabsTrigger>
+            <TabsTrigger value="team">
+              <Users className="h-4 w-4 mr-2" />
+              Команда
             </TabsTrigger>
             <TabsTrigger value="analytics">
               <BarChart3 className="h-4 w-4 mr-2" />
@@ -415,6 +420,10 @@ const AdminPanel = () => {
                 </p>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="team" className="mt-6">
+            <TeamManagement />
           </TabsContent>
 
           <TabsContent value="analytics" className="mt-6">

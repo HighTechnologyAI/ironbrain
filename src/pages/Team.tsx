@@ -15,81 +15,22 @@ import {
   Calendar,
   Plus,
   Settings,
-  ArrowLeft
+  ArrowLeft,
+  Loader2,
+  MessageCircle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTeamData } from "@/hooks/use-team-data";
 
 const Team = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
-  const teamMembers = [
-    {
-      id: 1,
-      name: "Александр Петров",
-      role: "Senior Developer",
-      department: "Разработка",
-      email: "a.petrov@company.com",
-      phone: "+7 (999) 123-45-67",
-      location: "Москва",
-      avatar: "/placeholder.svg",
-      status: "online",
-      tasksCompleted: 24,
-      totalTasks: 28,
-      achievements: 15,
-      joinDate: "2023-01-15"
-    },
-    {
-      id: 2,
-      name: "Мария Иванова",
-      role: "Project Manager",
-      department: "Управление проектами",
-      email: "m.ivanova@company.com",
-      phone: "+7 (999) 234-56-78",
-      location: "Санкт-Петербург",
-      avatar: "/placeholder.svg",
-      status: "away",
-      tasksCompleted: 31,
-      totalTasks: 35,
-      achievements: 22,
-      joinDate: "2022-08-20"
-    },
-    {
-      id: 3,
-      name: "Дмитрий Сидоров",
-      role: "UI/UX Designer",
-      department: "Дизайн",
-      email: "d.sidorov@company.com",
-      phone: "+7 (999) 345-67-89",
-      location: "Екатеринбург",
-      avatar: "/placeholder.svg",
-      status: "offline",
-      tasksCompleted: 18,
-      totalTasks: 22,
-      achievements: 8,
-      joinDate: "2023-05-10"
-    },
-    {
-      id: 4,
-      name: "Елена Козлова",
-      role: "QA Engineer",
-      department: "Тестирование",
-      email: "e.kozlova@company.com",
-      phone: "+7 (999) 456-78-90",
-      location: "Новосибирск",
-      avatar: "/placeholder.svg",
-      status: "online",
-      tasksCompleted: 27,
-      totalTasks: 30,
-      achievements: 12,
-      joinDate: "2023-03-01"
-    }
-  ];
+  const { teamMembers, loading, error } = useTeamData();
 
   const filteredMembers = teamMembers.filter(member =>
-    member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.department.toLowerCase().includes(searchTerm.toLowerCase())
+    member.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (member.position && member.position.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (member.department && member.department.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const getStatusColor = (status: string) => {
@@ -157,10 +98,16 @@ const Team = () => {
             <Users className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary font-mono">{teamMembers.length}</div>
-            <p className="text-xs text-muted-foreground">
-              +2 за последний месяц
-            </p>
+            {loading ? (
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-primary font-mono">{teamMembers.length}</div>
+                <p className="text-xs text-muted-foreground">
+                  Активных сотрудников
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -170,96 +117,128 @@ const Team = () => {
             <Activity className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary font-mono">
-              {teamMembers.filter(m => m.status === 'online').length}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Активных пользователей
-            </p>
+            {loading ? (
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-primary font-mono">
+                  {teamMembers.filter(m => m.status === 'online').length}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Активных пользователей
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2 text-muted-foreground">Загрузка данных команды...</span>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <Card className="text-center py-12 border-destructive/50 bg-destructive/5">
+          <CardContent>
+            <p className="text-destructive mb-4">Ошибка загрузки данных: {error}</p>
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Попробовать снова
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Team Members Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredMembers.map((member) => (
-          <Card key={member.id} className="hover:border-primary/50 transition-all duration-300 group">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={member.avatar} alt={member.name} />
-                      <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                    </Avatar>
-                    <div className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-background ${getStatusColor(member.status)}`}></div>
+      {!loading && !error && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredMembers.map((member) => (
+            <Card key={member.id} className="hover:border-primary/50 transition-all duration-300 group">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={member.avatar_url || "/placeholder.svg"} alt={member.full_name} />
+                        <AvatarFallback>{member.full_name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      </Avatar>
+                      <div className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-background ${getStatusColor(member.status)}`}></div>
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg group-hover:cyber-text transition-colors">{member.full_name}</CardTitle>
+                      <CardDescription>{member.position || 'Сотрудник'}</CardDescription>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className="text-lg group-hover:cyber-text transition-colors">{member.name}</CardTitle>
-                    <CardDescription>{member.role}</CardDescription>
+                  <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  {member.phone && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Phone className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-muted-foreground">{member.phone}</span>
+                    </div>
+                  )}
+                  {member.telegram_username && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <MessageCircle className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-muted-foreground">@{member.telegram_username}</span>
+                    </div>
+                  )}
+                  {member.hire_date && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-muted-foreground">С {new Date(member.hire_date).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-2 border-t">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-muted-foreground">Прогресс задач</span>
+                    <span className="text-sm font-mono text-primary">
+                      {getProgressPercentage(member.tasksCompleted, member.totalTasks)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-secondary rounded-full h-2">
+                    <div 
+                      className="bg-primary h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${getProgressPercentage(member.tasksCompleted, member.totalTasks)}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>{member.tasksCompleted} выполнено</span>
+                    <span>{member.totalTasks} всего</span>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm">
-                  <Mail className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-muted-foreground">{member.email}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-muted-foreground">{member.phone}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <MapPin className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-muted-foreground">{member.location}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Calendar className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-muted-foreground">С {new Date(member.joinDate).toLocaleDateString()}</span>
-                </div>
-              </div>
 
-              <div className="pt-2 border-t">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-muted-foreground">Прогресс задач</span>
-                  <span className="text-sm font-mono text-primary">
-                    {getProgressPercentage(member.tasksCompleted, member.totalTasks)}%
-                  </span>
+                <div className="flex items-center justify-between pt-2 border-t">
+                  <div className="flex items-center gap-1">
+                    <Award className="h-4 w-4 text-accent" />
+                    <span className="text-sm font-mono text-accent">{member.achievements}</span>
+                    <span className="text-xs text-muted-foreground">наград</span>
+                  </div>
+                  {member.department && (
+                    <Badge 
+                      variant="secondary" 
+                      className="bg-primary/20 text-primary border-primary/30"
+                    >
+                      {member.department}
+                    </Badge>
+                  )}
                 </div>
-                <div className="w-full bg-secondary rounded-full h-2">
-                  <div 
-                    className="bg-primary h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${getProgressPercentage(member.tasksCompleted, member.totalTasks)}%` }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                  <span>{member.tasksCompleted} выполнено</span>
-                  <span>{member.totalTasks} всего</span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t">
-                <div className="flex items-center gap-1">
-                  <Award className="h-4 w-4 text-accent" />
-                  <span className="text-sm font-mono text-accent">{member.achievements}</span>
-                  <span className="text-xs text-muted-foreground">наград</span>
-                </div>
-                <Badge 
-                  variant="secondary" 
-                  className="bg-primary/20 text-primary border-primary/30"
-                >
-                  {member.department}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {filteredMembers.length === 0 && (
         <Card className="text-center py-12">

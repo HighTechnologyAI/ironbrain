@@ -21,7 +21,7 @@ interface TerminalInterfaceProps {
   onExecute?: (command: string) => Promise<any>;
 }
 
-export const TerminalInterface = ({ title, endpoint, onExecute }: TerminalInterfaceProps) => {
+const TerminalInterface = ({ title, endpoint, onExecute }: TerminalInterfaceProps) => {
   const [command, setCommand] = useState('');
   const [logs, setLogs] = useState<TerminalLog[]>([]);
   const [isConnected, setIsConnected] = useState(true);
@@ -274,3 +274,5 @@ ${new Date().toISOString()} - System health check: OK`;
     </Card>
   );
 };
+
+export default TerminalInterface;
