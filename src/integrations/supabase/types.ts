@@ -332,6 +332,60 @@ export type Database = {
         }
         Relationships: []
       }
+      task_comments: {
+        Row: {
+          content: string
+          created_at: string
+          file_name: string | null
+          file_size: number | null
+          file_url: string | null
+          id: string
+          mentioned_users: string[] | null
+          task_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          mentioned_users?: string[] | null
+          task_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          mentioned_users?: string[] | null
+          task_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_comments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_history: {
         Row: {
           change_reason: string | null
@@ -376,6 +430,45 @@ export type Database = {
             columns: ["task_id"]
             isOneToOne: false
             referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_participants: {
+        Row: {
+          id: string
+          joined_at: string
+          role: string | null
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          role?: string | null
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          role?: string | null
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_participants_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -455,6 +548,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      webhook_logs: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          ip_address: string | null
+          payload: Json | null
+          result: Json | null
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          payload?: Json | null
+          result?: Json | null
+          timestamp?: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          payload?: Json | null
+          result?: Json | null
+          timestamp?: string
+        }
+        Relationships: []
       }
     }
     Views: {
