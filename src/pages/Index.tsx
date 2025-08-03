@@ -26,9 +26,11 @@ import {
   LogOut,
   Loader2
 } from "lucide-react";
+import OnlineUsersWidget from "@/components/OnlineUsersWidget";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { usePerformanceData } from "@/hooks/use-performance-data";
+import { useUserPresence } from "@/hooks/use-user-presence";
 
 const Index = () => {
   const [language, setLanguage] = useState<'ru' | 'en'>('ru');
@@ -38,6 +40,7 @@ const Index = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { data: performanceData, loading: performanceLoading } = usePerformanceData();
+  const { userCount: onlineUserCount } = useUserPresence();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -305,7 +308,7 @@ const Index = () => {
               <div className="flex items-center gap-2">
                 <Activity className="h-4 w-4 text-primary" />
                 <span className="text-muted-foreground">Активных:</span>
-                <span className="text-primary font-mono">{performanceData.activeTeamMembers} пользователей</span>
+                <span className="text-primary font-mono">{onlineUserCount} пользователей</span>
               </div>
             </div>
             <div className="text-xs text-muted-foreground">
@@ -351,8 +354,11 @@ const Index = () => {
         </CardHeader>
       </Card>
 
+      {/* Online Users Widget */}
+      <OnlineUsersWidget />
+
       {/* Menu Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {menuItems.map((item, index) => (
           <Card 
             key={index}

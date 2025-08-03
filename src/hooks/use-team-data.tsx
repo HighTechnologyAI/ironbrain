@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserPresence } from '@/hooks/use-user-presence';
 
 export interface TeamMember {
   id: string;
@@ -21,6 +22,7 @@ export const useTeamData = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { isOnline } = useUserPresence();
 
   useEffect(() => {
     const fetchTeamData = async () => {
@@ -56,9 +58,18 @@ export const useTeamData = () => {
           const totalTasks = userTasks.length;
           const userAchievements = achievementsData?.filter(achievement => achievement.employee_id === profile.id).length || 0;
           
-          // Случайный статус для демонстрации (в реальной системе это должно приходить из системы присутствия)
-          const statuses: ('online' | 'away' | 'offline')[] = ['online', 'away', 'offline'];
-          const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+          // Определяем реальный статус присутствия
+          let userStatus: 'online' | 'away' | 'offline' = 'offline';
+          if (profile.user_id && isOnline(profile.user_id)) {
+            userStatus = 'online';
+          } else {
+            // Проверяем время последней активности (если есть)
+            const lastActive = new Date(profile.updated_at);
+            const timeDiff = Date.now() - lastActive.getTime();
+            if (timeDiff < 5 * 60 * 1000) { // 5 минут
+              userStatus = 'away';
+            }
+          }
 
           return {
             id: profile.id,
@@ -73,7 +84,7 @@ export const useTeamData = () => {
             tasksCompleted: completedTasks,
             totalTasks,
             achievements: userAchievements,
-            status: randomStatus
+            status: userStatus
           };
         }) || [];
 
@@ -93,7 +104,7 @@ export const useTeamData = () => {
     const interval = setInterval(fetchTeamData, 60000);
     
     return () => clearInterval(interval);
-  }, []);
+  }, [isOnline]);
 
   return { teamMembers, loading, error };
 };
