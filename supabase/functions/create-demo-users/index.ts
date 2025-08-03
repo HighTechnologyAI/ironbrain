@@ -23,17 +23,16 @@ serve(async (req) => {
       }
     )
 
-    // Демо сотрудники
+    // Демо сотрудники с реальными email и паролями
     const demoEmployees = [
-      { email: 'anna.petrova@company.com', password: 'Demo123!', fullName: 'Анна Петрова' },
-      { email: 'dmitry.sidorov@company.com', password: 'Demo123!', fullName: 'Дмитрий Сидоров' },
-      { email: 'elena.kozlova@company.com', password: 'Demo123!', fullName: 'Елена Козлова' },
-      { email: 'mikhail.volkov@company.com', password: 'Demo123!', fullName: 'Михаил Волков' },
-      { email: 'olga.morozova@company.com', password: 'Demo123!', fullName: 'Ольга Морозова' },
-      { email: 'sergey.petrov@company.com', password: 'Demo123!', fullName: 'Сергей Петров' },
-      { email: 'tatyana.ivanova@company.com', password: 'Demo123!', fullName: 'Татьяна Иванова' },
-      { email: 'vladimir.kuznetsov@company.com', password: 'Demo123!', fullName: 'Владимир Кузнецов' },
-      { email: 'yulia.novikova@company.com', password: 'Demo123!', fullName: 'Юлия Новикова' }
+      { email: 'alpay@hightechai.site', password: 'qwerty123', fullName: 'alpay' },
+      { email: 'arbnika@hightechai.site', password: 'qwerty123', fullName: 'arbnika' },
+      { email: 'ilo@hightechai.site', password: 'qwerty123', fullName: 'ilo' },
+      { email: 'shevket@hightechai.site', password: 'qwerty123', fullName: 'shevket' },
+      { email: 'dany@hightechai.site', password: 'qwerty123', fullName: 'dany' },
+      { email: 'zhan@hightechai.site', password: 'qwerty123', fullName: 'zhan' },
+      { email: 'o.k@hightechai.site', password: 'qwerty123', fullName: 'oleksandr' },
+      { email: 'peter@hightechai.site', password: 'qwerty123', fullName: 'peter' }
     ]
 
     const createdUsers = []

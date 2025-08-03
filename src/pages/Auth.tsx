@@ -151,8 +151,8 @@ const Auth = () => {
     
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: "demo@tiger.com",
-        password: "demo123456",
+        email: "alpay@hightechai.site",
+        password: "qwerty123",
       });
 
       if (error) {
@@ -222,7 +222,7 @@ const Auth = () => {
                       id="signin-email"
                       name="email"
                       type="email"
-                      placeholder="demo@tiger.com"
+                      placeholder="alpay@hightechai.site"
                       value={formData.email}
                       onChange={handleInputChange}
                       required
@@ -239,7 +239,7 @@ const Auth = () => {
                         id="signin-password"
                         name="password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="demo123456"
+                        placeholder="qwerty123"
                         value={formData.password}
                         onChange={handleInputChange}
                         required
@@ -384,7 +384,7 @@ const Auth = () => {
                 disabled={isLoading}
               >
                 <Zap className="h-4 w-4 mr-2" />
-                Демо вход (demo@tiger.com)
+                Демо вход (alpay@hightechai.site)
               </Button>
             </div>
           </CardContent>
