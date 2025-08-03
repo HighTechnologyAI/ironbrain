@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Zap, Shield, Lock, Mail, User, Eye, EyeOff } from "lucide-react";
+import { Zap, Shield, Lock, Mail, User, Eye, EyeOff, Building, Briefcase } from "lucide-react";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +17,9 @@ const Auth = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    fullName: ""
+    fullName: "",
+    position: "",
+    department: ""
   });
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -41,6 +44,13 @@ const Auth = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -100,7 +110,9 @@ const Auth = () => {
         options: {
           emailRedirectTo: redirectUrl,
           data: {
-            full_name: formData.fullName
+            full_name: formData.fullName,
+            position: formData.position,
+            department: formData.department
           }
         }
       });
@@ -271,6 +283,42 @@ const Auth = () => {
                       required
                       disabled={isLoading}
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-position" className="flex items-center gap-2">
+                      <Briefcase className="h-4 w-4" />
+                      Должность
+                    </Label>
+                    <Input
+                      id="signup-position"
+                      name="position"
+                      type="text"
+                      placeholder="Менеджер проектов"
+                      value={formData.position}
+                      onChange={handleInputChange}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-department" className="flex items-center gap-2">
+                      <Building className="h-4 w-4" />
+                      Подразделение
+                    </Label>
+                    <Select onValueChange={(value) => handleSelectChange('department', value)} disabled={isLoading}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Выберите подразделение" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Управление">Управление</SelectItem>
+                        <SelectItem value="Маркетинг">Маркетинг</SelectItem>
+                        <SelectItem value="Экспертиза">Экспертиза</SelectItem>
+                        <SelectItem value="Производство">Производство</SelectItem>
+                        <SelectItem value="Руководство">Руководство</SelectItem>
+                        <SelectItem value="IT">IT</SelectItem>
+                        <SelectItem value="Консультации">Консультации</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email" className="flex items-center gap-2">
