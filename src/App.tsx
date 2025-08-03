@@ -8,6 +8,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import AIAssistant from "./pages/AIAssistant";
 import Auth from "./pages/Auth";
+import AdminPanel from "./pages/AdminPanel";
 import Tasks from "./pages/Tasks";
 import CreateDemoUsers from "./pages/CreateDemoUsers";
 import NotFound from "./pages/NotFound";
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
             <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/admin" element={<AdminPanel />} />
             <Route path="/create-demo-users" element={<CreateDemoUsers />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

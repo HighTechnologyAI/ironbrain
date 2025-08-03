@@ -1,0 +1,511 @@
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import {
+  Shield,
+  Database,
+  Users,
+  BarChart3,
+  Terminal,
+  Download,
+  RefreshCw,
+  Activity,
+  Settings,
+  Code,
+  Eye,
+  Play
+} from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
+const AdminPanel = () => {
+  const [adminKey, setAdminKey] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [systemStatus, setSystemStatus] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [sqlQuery, setSqlQuery] = useState('');
+  const [queryResult, setQueryResult] = useState<any>(null);
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const { toast } = useToast();
+
+  const adminApiCall = async (action: string, method = 'GET', body?: any) => {
+    try {
+      const response = await fetch(`https://zqnjgwrvvrqaenzmlvfx.supabase.co/functions/v1/admin-api?action=${action}`, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-key': adminKey,
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpxbmpnd3J2dnJxYWVuem1sdmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyNDYwNDcsImV4cCI6MjA2OTgyMjA0N30.uv41CLbWP5ZMnQLymCIE9uB9m4wC9xyKNSOU3btqcR8`
+        },
+        body: body ? JSON.stringify(body) : undefined
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error: any) {
+      toast({
+        title: 'API Error',
+        description: error.message,
+        variant: 'destructive'
+      });
+      throw error;
+    }
+  };
+
+  const authenticate = async () => {
+    if (!adminKey.trim()) {
+      toast({
+        title: 'Ошибка',
+        description: 'Введите admin ключ',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await adminApiCall('system_status');
+      setIsAuthenticated(true);
+      loadDashboard();
+      toast({
+        title: 'Успешно',
+        description: 'Вход в админ панель выполнен',
+      });
+    } catch (error) {
+      toast({
+        title: 'Ошибка аутентификации',
+        description: 'Неверный admin ключ',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadDashboard = async () => {
+    setLoading(true);
+    try {
+      const [statusRes, tasksRes, analyticsRes] = await Promise.all([
+        adminApiCall('system_status'),
+        adminApiCall('tasks_management'),
+        adminApiCall('analytics')
+      ]);
+
+      setSystemStatus(statusRes);
+      setTasks(tasksRes.tasks || []);
+      setAnalytics(analyticsRes.analytics);
+    } catch (error) {
+      console.error('Failed to load dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const executeQuery = async () => {
+    if (!sqlQuery.trim()) return;
+
+    setLoading(true);
+    try {
+      const result = await adminApiCall('database_query', 'POST', {
+        query: sqlQuery
+      });
+      setQueryResult(result);
+      toast({
+        title: 'Запрос выполнен',
+        description: `Получено ${result.result?.length || 0} записей`,
+      });
+    } catch (error) {
+      console.error('Query failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const downloadBackup = async () => {
+    setLoading(true);
+    try {
+      const backup = await adminApiCall('backup_data');
+      
+      // Download backup file
+      const blob = new Blob([JSON.stringify(backup.backup, null, 2)], {
+        type: 'application/json'
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tiger-crm-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: 'Бэкап создан',
+        description: 'Файл загружен на ваш компьютер',
+      });
+    } catch (error) {
+      console.error('Backup failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Shield className="h-8 w-8 text-primary" />
+              <h1 className="text-2xl font-bold">Tiger CRM Admin</h1>
+            </div>
+            <p className="text-muted-foreground">
+              Панель администрирования системы
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="admin-key" className="text-sm font-medium">
+                Admin Key
+              </label>
+              <Input
+                id="admin-key"
+                type="password"
+                placeholder="Введите admin ключ"
+                value={adminKey}
+                onChange={(e) => setAdminKey(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && authenticate()}
+              />
+            </div>
+            <Button 
+              onClick={authenticate} 
+              disabled={loading}
+              className="w-full"
+            >
+              {loading ? 'Проверка...' : 'Войти в админ панель'}
+            </Button>
+            
+            <Alert>
+              <Settings className="h-4 w-4" />
+              <AlertDescription>
+                Ключ по умолчанию: <code>tiger-admin-2025</code>
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Shield className="h-8 w-8 text-primary" />
+              Tiger CRM Admin Panel
+            </h1>
+            <p className="text-muted-foreground">
+              Системное администрирование и мониторинг
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={loadDashboard} disabled={loading}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Обновить
+            </Button>
+            <Button variant="outline" onClick={downloadBackup} disabled={loading}>
+              <Download className="h-4 w-4 mr-2" />
+              Бэкап
+            </Button>
+          </div>
+        </div>
+
+        <Tabs defaultValue="dashboard" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="dashboard">
+              <Activity className="h-4 w-4 mr-2" />
+              Дашборд
+            </TabsTrigger>
+            <TabsTrigger value="database">
+              <Database className="h-4 w-4 mr-2" />
+              База данных
+            </TabsTrigger>
+            <TabsTrigger value="users">
+              <Users className="h-4 w-4 mr-2" />
+              Пользователи
+            </TabsTrigger>
+            <TabsTrigger value="analytics">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Аналитика
+            </TabsTrigger>
+            <TabsTrigger value="terminal">
+              <Terminal className="h-4 w-4 mr-2" />
+              API Терминал
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="dashboard" className="mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Статус системы</CardTitle>
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">
+                    {systemStatus?.system_status || 'Loading...'}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {systemStatus?.timestamp && new Date(systemStatus.timestamp).toLocaleString()}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Всего пользователей</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {systemStatus?.stats?.total_users || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Активных профилей: {systemStatus?.stats?.total_profiles || 0}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Всего задач</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {systemStatus?.stats?.total_tasks || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    За всё время
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">API статус</CardTitle>
+                  <Database className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">
+                    {systemStatus?.health?.api || 'Unknown'}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    БД: {systemStatus?.health?.database || 'Unknown'}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Последние задачи</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {tasks.slice(0, 5).map((task: any) => (
+                      <div key={task.id} className="flex justify-between items-center p-2 border rounded">
+                        <div>
+                          <p className="font-medium">{task.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {task.assigned_to?.full_name}
+                          </p>
+                        </div>
+                        <Badge variant={task.status === 'completed' ? 'default' : 'secondary'}>
+                          {task.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Быстрые действия</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button className="w-full justify-start" variant="outline">
+                    <Database className="h-4 w-4 mr-2" />
+                    Оптимизировать БД
+                  </Button>
+                  <Button className="w-full justify-start" variant="outline">
+                    <Users className="h-4 w-4 mr-2" />
+                    Управление пользователями
+                  </Button>
+                  <Button className="w-full justify-start" variant="outline">
+                    <Download className="h-4 w-4 mr-2" />
+                    Экспорт отчётов
+                  </Button>
+                  <Button className="w-full justify-start" variant="outline">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Системные настройки
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="database" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="h-5 w-5" />
+                  SQL Query Executor
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">SQL Query (только SELECT)</label>
+                  <Textarea
+                    placeholder="SELECT * FROM profiles LIMIT 10;"
+                    value={sqlQuery}
+                    onChange={(e) => setSqlQuery(e.target.value)}
+                    className="min-h-[100px] font-mono"
+                  />
+                </div>
+                <Button onClick={executeQuery} disabled={loading || !sqlQuery.trim()}>
+                  <Play className="h-4 w-4 mr-2" />
+                  Выполнить запрос
+                </Button>
+
+                {queryResult && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Результат:</h4>
+                    <pre className="bg-muted p-4 rounded-md overflow-auto max-h-96 text-sm">
+                      {JSON.stringify(queryResult, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="users" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Управление пользователями</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Интерфейс управления пользователями будет добавлен в следующей версии.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Производительность задач</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {analytics && (
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Процент завершения</p>
+                        <p className="text-2xl font-bold">
+                          {analytics.tasks?.completion_rate?.toFixed(1)}%
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Среднее время выполнения</p>
+                        <p className="text-2xl font-bold">
+                          {analytics.tasks?.average_time} дней
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Тренды за 30 дней</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {analytics && (
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Создано задач</p>
+                        <p className="text-2xl font-bold">
+                          {analytics.trends?.tasks_created_last_30_days}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Тренд завершения</p>
+                        <p className="text-2xl font-bold">
+                          {analytics.trends?.completion_trend}%
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="terminal" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Terminal className="h-5 w-5" />
+                  API Terminal
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Alert className="mb-4">
+                  <Eye className="h-4 w-4" />
+                  <AlertDescription>
+                    Для внешнего доступа используйте:<br />
+                    <code className="text-sm">
+                      POST https://zqnjgwrvvrqaenzmlvfx.supabase.co/functions/v1/admin-api?action=ACTION
+                    </code><br />
+                    Header: <code>x-admin-key: {adminKey}</code>
+                  </AlertDescription>
+                </Alert>
+                
+                <div className="space-y-2">
+                  <h4 className="font-medium">Доступные API endpoints:</h4>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>• <code>system_status</code> - Статус системы</li>
+                    <li>• <code>users_stats</code> - Статистика пользователей</li>
+                    <li>• <code>tasks_management</code> - Управление задачами</li>
+                    <li>• <code>database_query</code> - Выполнение запросов к БД</li>
+                    <li>• <code>backup_data</code> - Создание бэкапа</li>
+                    <li>• <code>analytics</code> - Аналитика</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+};
+
+export default AdminPanel;
