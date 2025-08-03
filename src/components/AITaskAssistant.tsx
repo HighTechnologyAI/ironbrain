@@ -116,7 +116,7 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
         estimated_hours: aiResponse.estimated_hours || null,
         tags: aiResponse.tags || [],
         created_by: selectedEmployee, // В демо - создатель = исполнитель. В реальной системе: auth.uid()
-        company_id: '00000000-0000-0000-0000-000000000000' // Заглушка для демо
+        company_id: null // Убираем обязательность компании для демо
       };
 
       const { error } = await supabase
