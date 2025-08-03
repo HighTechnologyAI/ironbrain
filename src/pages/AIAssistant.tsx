@@ -195,8 +195,8 @@ const AIAssistant = () => {
               <CardDescription>Активные сотрудники в системе</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {employees.slice(0, 4).map((employee) => (
+              <div className="space-y-2 max-h-80 overflow-y-auto">
+                {employees.map((employee) => (
                   <div 
                     key={employee.id}
                     className="flex items-center justify-between p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors"
