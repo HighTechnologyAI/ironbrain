@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import CreateTaskForm from '@/components/CreateTaskForm';
+import TaskAIAssistant from '@/components/TaskAIAssistant';
 import {
   ArrowLeft,
   Calendar,
@@ -242,28 +243,32 @@ const Tasks = () => {
               Создана: {format(new Date(task.created_at), 'dd.MM.yyyy HH:mm', { locale: ru })}
             </div>
             
-            {task.status !== 'completed' && task.status !== 'cancelled' && (
-              <div className="flex gap-2">
-                {task.status === 'pending' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => updateTaskStatus(task.id, 'in_progress')}
-                  >
-                    Начать работу
-                  </Button>
-                )}
-                {task.status === 'in_progress' && (
-                  <Button
-                    size="sm"
-                    onClick={() => updateTaskStatus(task.id, 'completed')}
-                  >
-                    <CheckCircle className="h-4 w-4 mr-1" />
-                    Завершить
-                  </Button>
-                )}
-              </div>
-            )}
+            <div className="flex gap-2">
+              <TaskAIAssistant task={task} employeeId={task.assigned_to?.id} />
+              
+              {task.status !== 'completed' && task.status !== 'cancelled' && (
+                <>
+                  {task.status === 'pending' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => updateTaskStatus(task.id, 'in_progress')}
+                    >
+                      Начать работу
+                    </Button>
+                  )}
+                  {task.status === 'in_progress' && (
+                    <Button
+                      size="sm"
+                      onClick={() => updateTaskStatus(task.id, 'completed')}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-1" />
+                      Завершить
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>
