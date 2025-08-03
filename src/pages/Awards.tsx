@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,17 +19,52 @@ import {
   TrendingUp,
   ArrowLeft,
   Plus,
-  Gift
+  Gift,
+  Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Awards = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [periodFilter, setPeriodFilter] = useState("all");
+  const [achievements, setAchievements] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const achievements = [
+  useEffect(() => {
+    fetchAchievements();
+  }, []);
+
+  const fetchAchievements = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('achievements')
+        .select(`
+          *,
+          employee:profiles!achievements_employee_id_fkey(full_name, position),
+          created_by:profiles!achievements_created_by_fkey(full_name)
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setAchievements(data || []);
+    } catch (error) {
+      console.error('Error fetching achievements:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить достижения",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const mockAchievements = [
     {
       id: 1,
       title: "Первый шаг",
@@ -210,7 +245,7 @@ const Awards = () => {
     }
   };
 
-  const filteredAchievements = achievements.filter(achievement => {
+  const filteredAchievements = (achievements.length > 0 ? achievements : mockAchievements).filter(achievement => {
     const matchesSearch = achievement.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          achievement.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || achievement.category === categoryFilter;
@@ -262,7 +297,7 @@ const Awards = () => {
             <Award className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-accent font-mono">{achievements.length}</div>
+            <div className="text-2xl font-bold text-accent font-mono">{achievements.length || mockAchievements.length}</div>
           </CardContent>
         </Card>
 

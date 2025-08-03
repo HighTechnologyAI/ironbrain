@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,18 +18,53 @@ import {
   User,
   Tag,
   MessageSquare,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Issues = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [issues, setIssues] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const issues = [
+  useEffect(() => {
+    fetchIssues();
+  }, []);
+
+  const fetchIssues = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('issues')
+        .select(`
+          *,
+          reported_by:profiles!issues_reported_by_fkey(full_name),
+          assigned_to:profiles!issues_assigned_to_fkey(full_name)
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setIssues(data || []);
+    } catch (error) {
+      console.error('Error fetching issues:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить проблемы",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const mockIssues = [
     {
       id: 1,
       title: "Низкая производительность серверов",
@@ -141,7 +176,7 @@ const Issues = () => {
     }
   };
 
-  const filteredIssues = issues.filter(issue => {
+  const filteredIssues = (issues.length > 0 ? issues : mockIssues).filter(issue => {
     const matchesSearch = issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          issue.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || issue.status === statusFilter;
@@ -209,7 +244,7 @@ const Issues = () => {
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold font-mono">{issues.length}</div>
+            <div className="text-2xl font-bold font-mono">{issues.length || mockIssues.length}</div>
           </CardContent>
         </Card>
 
@@ -220,7 +255,7 @@ const Issues = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold font-mono text-destructive">
-              {issues.filter(i => i.status === 'open').length}
+              {(issues.length > 0 ? issues : mockIssues).filter(i => i.status === 'open').length}
             </div>
           </CardContent>
         </Card>
@@ -232,7 +267,7 @@ const Issues = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold font-mono text-primary">
-              {issues.filter(i => i.status === 'in-progress').length}
+              {(issues.length > 0 ? issues : mockIssues).filter(i => i.status === 'in-progress').length}
             </div>
           </CardContent>
         </Card>
@@ -244,7 +279,7 @@ const Issues = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold font-mono text-green-600">
-              {issues.filter(i => i.status === 'resolved').length}
+              {(issues.length > 0 ? issues : mockIssues).filter(i => i.status === 'resolved').length}
             </div>
           </CardContent>
         </Card>

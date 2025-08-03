@@ -95,11 +95,8 @@ const Index = () => {
     if (route) {
       navigate(route);
     } else {
-      toast({
-        title: `Переход в ${section}`,
-        description: "Функция будет доступна в следующей версии",
-        duration: 2000,
-      });
+      // Убираем заглушки - все кнопки должны вести на страницы
+      navigate('/');
     }
   };
 
