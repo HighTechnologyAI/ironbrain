@@ -22,9 +22,11 @@ import {
   Cpu,
   Database,
   Bot,
-  Sparkles
+  Sparkles,
+  LogOut
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
 const Index = () => {
   const [language, setLanguage] = useState<'ru' | 'en'>('ru');
@@ -32,6 +34,7 @@ const Index = () => {
   const [systemStatus, setSystemStatus] = useState('online');
   const [progress, setProgress] = useState(75);
   const { toast } = useToast();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -173,6 +176,9 @@ const Index = () => {
           </div>
         </div>
         <div className="flex items-center gap-4">
+          <div className="text-sm text-muted-foreground hidden sm:block">
+            Пользователь: <span className="text-primary">{user?.email}</span>
+          </div>
           <Button 
             variant="outline" 
             size="sm"
@@ -189,6 +195,15 @@ const Index = () => {
           >
             <Bell className="h-5 w-5 text-primary" />
             <div className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full animate-bounce"></div>
+          </Button>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="hover:bg-destructive/10 hover:border-destructive border-border"
+            onClick={signOut}
+            title="Выйти"
+          >
+            <LogOut className="h-4 w-4 text-destructive" />
           </Button>
         </div>
       </div>
