@@ -64,8 +64,7 @@ const Issues = () => {
     }
   };
 
-  const mockIssues = [
-    {
+  // Демо данные удалены для бета версии
       id: 1,
       title: "Низкая производительность серверов",
       description: "Серверы приложения показывают высокую нагрузку CPU (>85%) в часы пик",
@@ -176,7 +175,7 @@ const Issues = () => {
     }
   };
 
-  const filteredIssues = (issues.length > 0 ? issues : mockIssues).filter(issue => {
+  const filteredIssues = issues.filter(issue => {
     const matchesSearch = issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          issue.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || issue.status === statusFilter;
@@ -244,7 +243,7 @@ const Issues = () => {
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold font-mono">{issues.length || mockIssues.length}</div>
+            <div className="text-2xl font-bold font-mono">{issues.length}</div>
           </CardContent>
         </Card>
 
@@ -255,7 +254,7 @@ const Issues = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold font-mono text-destructive">
-              {(issues.length > 0 ? issues : mockIssues).filter(i => i.status === 'open').length}
+              {issues.filter(i => i.status === 'open').length}
             </div>
           </CardContent>
         </Card>
@@ -267,7 +266,7 @@ const Issues = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold font-mono text-primary">
-              {(issues.length > 0 ? issues : mockIssues).filter(i => i.status === 'in-progress').length}
+              {issues.filter(i => i.status === 'in_progress').length}
             </div>
           </CardContent>
         </Card>
@@ -279,7 +278,7 @@ const Issues = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold font-mono text-green-600">
-              {(issues.length > 0 ? issues : mockIssues).filter(i => i.status === 'resolved').length}
+              {issues.filter(i => i.status === 'resolved').length}
             </div>
           </CardContent>
         </Card>

@@ -64,8 +64,7 @@ const Awards = () => {
     }
   };
 
-  const mockAchievements = [
-    {
+  // Демо данные удалены для бета версии
       id: 1,
       title: "Первый шаг",
       description: "Выполнить первую задачу в системе",
@@ -245,7 +244,7 @@ const Awards = () => {
     }
   };
 
-  const filteredAchievements = (achievements.length > 0 ? achievements : mockAchievements).filter(achievement => {
+  const filteredAchievements = achievements.filter(achievement => {
     const matchesSearch = achievement.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          achievement.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || achievement.category === categoryFilter;
@@ -297,7 +296,7 @@ const Awards = () => {
             <Award className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-accent font-mono">{achievements.length || mockAchievements.length}</div>
+            <div className="text-2xl font-bold text-accent font-mono">{achievements.length}</div>
           </CardContent>
         </Card>
 

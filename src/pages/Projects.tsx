@@ -57,8 +57,7 @@ const Projects = () => {
     }
   };
 
-  const mockProjects = [
-    {
+  // Демо данные удалены для бета версии
       id: 1,
       name: "Tiger CRM v2.0",
       description: "Обновление основной CRM системы с новыми возможностями",
@@ -164,7 +163,7 @@ const Projects = () => {
     }
   };
 
-  const filteredProjects = (projects.length > 0 ? projects : mockProjects).filter(project => {
+  const filteredProjects = projects.filter(project => {
     const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          project.manager.toLowerCase().includes(searchTerm.toLowerCase());
