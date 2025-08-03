@@ -202,7 +202,12 @@ const AIAssistant = () => {
                     className="flex items-center justify-between p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors"
                   >
                     <div>
-                      <div className="font-medium text-sm">{employee.full_name}</div>
+                      <div className="font-medium text-sm">
+                        {employee.full_name.includes('(') 
+                          ? employee.full_name.split('(')[1].replace(')', '') 
+                          : employee.full_name.split(' ')[0]
+                        }
+                      </div>
                       <div className="text-xs text-muted-foreground">
                         {employee.position}
                       </div>
