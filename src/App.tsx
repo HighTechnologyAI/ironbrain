@@ -10,6 +10,11 @@ import AIAssistant from "./pages/AIAssistant";
 import Auth from "./pages/Auth";
 import AdminPanel from "./pages/AdminPanel";
 import Tasks from "./pages/Tasks";
+import Team from "./pages/Team";
+import Projects from "./pages/Projects";
+import Analytics from "./pages/Analytics";
+import Issues from "./pages/Issues";
+import Awards from "./pages/Awards";
 import CreateDemoUsers from "./pages/CreateDemoUsers";
 import NotFound from "./pages/NotFound";
 
@@ -26,6 +31,11 @@ const App = () => (
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
             <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
+            <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
+            <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+            <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
+            <Route path="/awards" element={<ProtectedRoute><Awards /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/create-demo-users" element={<CreateDemoUsers />} />

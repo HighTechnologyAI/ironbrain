@@ -124,35 +124,40 @@ const Index = () => {
       icon: Users, 
       badge: "12", 
       color: "text-primary",
-      description: "Команда и сотрудники"
+      description: "Команда и сотрудники",
+      route: "/team"
     },
     { 
       title: t.projects, 
       icon: Target, 
       badge: "5", 
       color: "text-primary",
-      description: "Активные проекты"
+      description: "Активные проекты",
+      route: "/projects"
     },
     { 
       title: t.analytics, 
       icon: BarChart3, 
       badge: null, 
       color: "text-primary",
-      description: "Аналитика и отчеты"
+      description: "Аналитика и отчеты",
+      route: "/analytics"
     },
     { 
       title: t.problems, 
       icon: Shield, 
       badge: "3", 
       color: "text-destructive",
-      description: "Проблемы требующие внимания"
+      description: "Проблемы требующие внимания",
+      route: "/issues"
     },
     { 
       title: t.achievements_page, 
       icon: Award, 
       badge: "24", 
       color: "text-accent",
-      description: "Награды и достижения"
+      description: "Награды и достижения",
+      route: "/awards"
     },
     { 
       title: "Админ-панель", 
