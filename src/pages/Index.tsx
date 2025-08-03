@@ -92,12 +92,16 @@ const Index = () => {
 
   const t = translations[language];
 
-  const handleCardClick = (section: string) => {
-    toast({
-      title: `Переход в ${section}`,
-      description: "Функция будет доступна в следующей версии",
-      duration: 2000,
-    });
+  const handleCardClick = (section: string, route?: string) => {
+    if (route) {
+      navigate(route);
+    } else {
+      toast({
+        title: `Переход в ${section}`,
+        description: "Функция будет доступна в следующей версии",
+        duration: 2000,
+      });
+    }
   };
 
   const stats = [
@@ -112,7 +116,8 @@ const Index = () => {
       icon: CheckSquare, 
       badge: "8", 
       color: "text-primary",
-      description: "Управление личными задачами"
+      description: "Управление личными задачами",
+      route: "/tasks"
     },
     { 
       title: t.team, 
@@ -321,7 +326,7 @@ const Index = () => {
           <Card 
             key={index}
             className="bg-card border-border hover:border-primary/50 hover:cyber-glow transition-all duration-300 cursor-pointer group"
-            onClick={() => handleCardClick(item.title)}
+            onClick={() => handleCardClick(item.title, (item as any).route)}
           >
             <CardHeader>
               <CardTitle className="flex items-center gap-2 group-hover:cyber-text transition-colors">
