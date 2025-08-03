@@ -64,77 +64,7 @@ const Issues = () => {
     }
   };
 
-  // Демо данные удалены для бета версии
-      id: 1,
-      title: "Низкая производительность серверов",
-      description: "Серверы приложения показывают высокую нагрузку CPU (>85%) в часы пик",
-      status: "open",
-      priority: "high",
-      category: "infrastructure",
-      assignee: "Александр Петров",
-      reporter: "Система мониторинга",
-      createdAt: "2024-01-10T10:30:00Z",
-      updatedAt: "2024-01-11T15:45:00Z",
-      comments: 5,
-      impact: "Замедление работы приложения для всех пользователей"
-    },
-    {
-      id: 2,
-      title: "Ошибки интеграции с платежной системой",
-      description: "Периодические сбои при обработке платежей через API банка",
-      status: "in-progress",
-      priority: "critical",
-      category: "payments",
-      assignee: "Мария Иванова",
-      reporter: "Служба поддержки",
-      createdAt: "2024-01-09T14:20:00Z",
-      updatedAt: "2024-01-11T09:15:00Z",
-      comments: 8,
-      impact: "Потеря транзакций, недовольство клиентов"
-    },
-    {
-      id: 3,
-      title: "Уязвимость в системе аутентификации",
-      description: "Обнаружена потенциальная уязвимость в механизме сброса паролей",
-      status: "resolved",
-      priority: "high",
-      category: "security",
-      assignee: "Дмитрий Сидоров",
-      reporter: "Команда безопасности",
-      createdAt: "2024-01-05T08:45:00Z",
-      updatedAt: "2024-01-08T16:30:00Z",
-      comments: 12,
-      impact: "Риск несанкционированного доступа к аккаунтам"
-    },
-    {
-      id: 4,
-      title: "Медленная загрузка отчетов",
-      description: "Генерация больших отчетов занимает более 2 минут",
-      status: "open",
-      priority: "medium",
-      category: "performance",
-      assignee: "Елена Козлова",
-      reporter: "Отдел аналитики",
-      createdAt: "2024-01-08T12:00:00Z",
-      updatedAt: "2024-01-10T11:20:00Z",
-      comments: 3,
-      impact: "Задержки в получении аналитических данных"
-    },
-    {
-      id: 5,
-      title: "Проблемы с синхронизацией данных",
-      description: "Данные между основной и резервной базой синхронизируются с задержкой",
-      status: "open",
-      priority: "low",
-      category: "database",
-      assignee: "Не назначен",
-      reporter: "Администратор БД",
-      createdAt: "2024-01-07T16:30:00Z",
-      updatedAt: "2024-01-07T16:30:00Z",
-      comments: 1,
-      impact: "Потенциальная потеря данных при сбоях"
-    }
-  ];
+  // Демо данные удалены для бета версии - используем только реальные данные из БД
 
   const getStatusInfo = (status: string) => {
     switch (status) {

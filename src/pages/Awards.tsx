@@ -64,62 +64,7 @@ const Awards = () => {
     }
   };
 
-  // Демо данные удалены для бета версии
-      id: 1,
-      title: "Первый шаг",
-      description: "Выполнить первую задачу в системе",
-      icon: Star,
-      category: "starter",
-      points: 10,
-      rarity: "common",
-      earnedBy: 24,
-      color: "text-green-600"
-    },
-    {
-      id: 2,
-      title: "Спринтер",
-      description: "Выполнить 10 задач за неделю",
-      icon: Zap,
-      category: "productivity",
-      points: 50,
-      rarity: "uncommon",
-      earnedBy: 12,
-      color: "text-blue-600"
-    },
-    {
-      id: 3,
-      title: "Мастер качества",
-      description: "Выполнить 50 задач без замечаний",
-      icon: Crown,
-      category: "quality",
-      points: 200,
-      rarity: "rare",
-      earnedBy: 3,
-      color: "text-purple-600"
-    },
-    {
-      id: 4,
-      title: "Командный игрок",
-      description: "Помочь коллегам в 20 задачах",
-      icon: Users,
-      category: "teamwork",
-      points: 75,
-      rarity: "uncommon",
-      earnedBy: 8,
-      color: "text-orange-600"
-    },
-    {
-      id: 5,
-      title: "Легенда",
-      description: "Набрать 1000 очков достижений",
-      icon: Trophy,
-      category: "milestone",
-      points: 500,
-      rarity: "legendary",
-      earnedBy: 1,
-      color: "text-yellow-600"
-    }
-  ];
+  // Демо данные удалены для бета версии - используем только реальные данные из БД
 
   const recentAwards = [
     {
