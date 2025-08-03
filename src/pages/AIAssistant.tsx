@@ -26,7 +26,7 @@ const AIAssistant = () => {
   const demoEmployees = [
     {
       id: '1',
-      full_name: 'Александр Петров (Алпи)',
+      full_name: 'Алпи',
       position: 'COO / Operation Director',
       department: 'Управление',
       role: 'coo',
@@ -34,7 +34,7 @@ const AIAssistant = () => {
     },
     {
       id: '2', 
-      full_name: 'Мария Сидорова (Мики)',
+      full_name: 'Мики',
       position: 'Marketing Director',
       department: 'Маркетинг',
       role: 'marketing_director',
@@ -42,7 +42,7 @@ const AIAssistant = () => {
     },
     {
       id: '3',
-      full_name: 'Дмитрий Козлов (Жан)',
+      full_name: 'Жан',
       position: 'Top Specialist',
       department: 'Экспертиза',
       role: 'specialist',
@@ -50,7 +50,7 @@ const AIAssistant = () => {
     },
     {
       id: '4',
-      full_name: 'Елена Новикова (Алекс)', 
+      full_name: 'Алекс', 
       position: 'Factory Manager',
       department: 'Производство',
       role: 'factory_manager',
@@ -217,10 +217,7 @@ const AIAssistant = () => {
                   >
                     <div>
                       <div className="font-medium text-sm">
-                        {employee.full_name.includes('(') 
-                          ? employee.full_name.split('(')[1].replace(')', '') 
-                          : employee.full_name.split(' ')[0]
-                        }
+                        {employee.full_name}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {employee.position}
