@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/use-language';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input';
 import CreateTaskForm from '@/components/CreateTaskForm';
 import TaskAIAssistant from '@/components/TaskAIAssistant';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import {
   ArrowLeft,
   Calendar,
@@ -62,6 +64,7 @@ const Tasks = () => {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -93,8 +96,8 @@ const Tasks = () => {
     } catch (error) {
       console.error('Error loading tasks:', error);
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось загрузить задачи',
+        title: t.error,
+        description: t.tasksLoadError,
         variant: 'destructive',
       });
     } finally {
@@ -118,16 +121,16 @@ const Tasks = () => {
       if (error) throw error;
 
       toast({
-        title: 'Успешно',
-        description: 'Статус задачи обновлен',
+        title: t.success,
+        description: t.taskStatusUpdated,
       });
 
       loadTasks();
     } catch (error) {
       console.error('Error updating task:', error);
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось обновить статус задачи',
+        title: t.error,
+        description: t.taskStatusUpdateError,
         variant: 'destructive',
       });
     }
@@ -153,11 +156,11 @@ const Tasks = () => {
   };
 
   const statusLabels = {
-    pending: 'Ожидает',
-    in_progress: 'В работе',
-    completed: 'Завершена',
-    cancelled: 'Отменена',
-    on_hold: 'Приостановлена',
+    pending: t.pending,
+    in_progress: t.inProgress,
+    completed: t.completed,
+    cancelled: t.cancelled,
+    on_hold: t.onHold,
   };
 
   const statusColors = {
@@ -169,10 +172,10 @@ const Tasks = () => {
   };
 
   const priorityLabels = {
-    low: 'Низкий',
-    medium: 'Средний',
-    high: 'Высокий',
-    critical: 'Критический',
+    low: t.low,
+    medium: t.medium,
+    high: t.high,
+    critical: t.critical,
   };
 
   const priorityColors = {
@@ -207,12 +210,12 @@ const Tasks = () => {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <User className="h-4 w-4" />
-              <span>Исполнитель: {task.assigned_to?.full_name}</span>
+              <span>{t.assignee}: {task.assigned_to?.full_name}</span>
             </div>
             {task.due_date && (
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                <span>До: {format(new Date(task.due_date), 'dd MMMM yyyy', { locale: ru })}</span>
+                <span>{t.dueDate}: {format(new Date(task.due_date), 'dd MMMM yyyy', { locale: ru })}</span>
               </div>
             )}
           </div>
@@ -220,9 +223,9 @@ const Tasks = () => {
           {task.estimated_hours && (
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <Clock className="h-4 w-4" />
-              <span>Планируемо: {task.estimated_hours}ч</span>
+              <span>{t.estimated}: {task.estimated_hours}{t.hours}</span>
               {task.actual_hours && (
-                <span>• Фактически: {task.actual_hours}ч</span>
+                <span>• {t.actual}: {task.actual_hours}{t.hours}</span>
               )}
             </div>
           )}
@@ -238,35 +241,37 @@ const Tasks = () => {
             </div>
           )}
 
-          <div className="flex justify-between items-center pt-2">
+          <div className="flex flex-col gap-2 pt-2">
             <div className="text-xs text-muted-foreground">
-              Создана: {format(new Date(task.created_at), 'dd.MM.yyyy HH:mm', { locale: ru })}
+              {t.created}: {format(new Date(task.created_at), 'dd.MM.yyyy HH:mm', { locale: ru })}
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 justify-between items-center">
               <TaskAIAssistant task={task} employeeId={task.assigned_to?.id} />
               
               {task.status !== 'completed' && task.status !== 'cancelled' && (
-                <>
+                <div className="flex flex-wrap gap-2">
                   {task.status === 'pending' && (
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => updateTaskStatus(task.id, 'in_progress')}
+                      className="text-xs"
                     >
-                      Начать работу
+                      {t.startWork}
                     </Button>
                   )}
                   {task.status === 'in_progress' && (
                     <Button
                       size="sm"
                       onClick={() => updateTaskStatus(task.id, 'completed')}
+                      className="text-xs"
                     >
                       <CheckCircle className="h-4 w-4 mr-1" />
-                      Завершить
+                      {t.complete}
                     </Button>
                   )}
-                </>
+                </div>
               )}
             </div>
           </div>
@@ -280,7 +285,7 @@ const Tasks = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Загрузка задач...</p>
+          <p className="text-muted-foreground">{t.loading}</p>
         </div>
       </div>
     );
@@ -299,13 +304,16 @@ const Tasks = () => {
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">Управление задачами</h1>
+              <h1 className="text-3xl font-bold">{t.tasksTitle}</h1>
               <p className="text-muted-foreground">
-                Создавайте и отслеживайте задачи для команды
+                {t.tasksDescription}
               </p>
             </div>
           </div>
-          <CreateTaskForm onTaskCreated={loadTasks} />
+          <div className="flex gap-2">
+            <LanguageSwitcher />
+            <CreateTaskForm onTaskCreated={loadTasks} />
+          </div>
         </div>
 
         <div className="flex gap-4 mb-6">
@@ -313,7 +321,7 @@ const Tasks = () => {
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Поиск задач..."
+                placeholder={t.searchTasks}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -322,34 +330,34 @@ const Tasks = () => {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Статус" />
+              <SelectValue placeholder={t.taskStatus} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Все статусы</SelectItem>
-              <SelectItem value="pending">Ожидает</SelectItem>
-              <SelectItem value="in_progress">В работе</SelectItem>
-              <SelectItem value="completed">Завершена</SelectItem>
-              <SelectItem value="cancelled">Отменена</SelectItem>
+              <SelectItem value="all">{t.allStatuses}</SelectItem>
+              <SelectItem value="pending">{t.pending}</SelectItem>
+              <SelectItem value="in_progress">{t.inProgress}</SelectItem>
+              <SelectItem value="completed">{t.completed}</SelectItem>
+              <SelectItem value="cancelled">{t.cancelled}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={priorityFilter} onValueChange={setPriorityFilter}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Приоритет" />
+              <SelectValue placeholder={t.taskPriority} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Все приоритеты</SelectItem>
-              <SelectItem value="low">Низкий</SelectItem>
-              <SelectItem value="medium">Средний</SelectItem>
-              <SelectItem value="high">Высокий</SelectItem>
+              <SelectItem value="all">{t.allPriorities}</SelectItem>
+              <SelectItem value="low">{t.low}</SelectItem>
+              <SelectItem value="medium">{t.medium}</SelectItem>
+              <SelectItem value="high">{t.high}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="all">Все задачи ({filteredTasks.length})</TabsTrigger>
-            <TabsTrigger value="my">Мои задачи ({getMyTasks().length})</TabsTrigger>
-            <TabsTrigger value="created">Созданные мной ({getCreatedTasks().length})</TabsTrigger>
+            <TabsTrigger value="all">{t.allTasks} ({filteredTasks.length})</TabsTrigger>
+            <TabsTrigger value="my">{t.myTasks} ({getMyTasks().length})</TabsTrigger>
+            <TabsTrigger value="created">{t.createdByMe} ({getCreatedTasks().length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="mt-6">
@@ -361,9 +369,9 @@ const Tasks = () => {
             {filteredTasks.length === 0 && (
               <div className="text-center py-12">
                 <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Задач не найдено</h3>
+                <h3 className="text-lg font-semibold mb-2">{t.noTasksFound}</h3>
                 <p className="text-muted-foreground">
-                  Создайте первую задачу или измените фильтры поиска
+                  {t.noTasksFoundDesc}
                 </p>
               </div>
             )}
@@ -378,9 +386,9 @@ const Tasks = () => {
             {getMyTasks().length === 0 && (
               <div className="text-center py-12">
                 <Timer className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">У вас нет активных задач</h3>
+                <h3 className="text-lg font-semibold mb-2">{t.noActiveTasks}</h3>
                 <p className="text-muted-foreground">
-                  Задачи, назначенные на вас, будут отображаться здесь
+                  {t.noActiveTasksDesc}
                 </p>
               </div>
             )}
@@ -395,9 +403,9 @@ const Tasks = () => {
             {getCreatedTasks().length === 0 && (
               <div className="text-center py-12">
                 <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Вы еще не создали ни одной задачи</h3>
+                <h3 className="text-lg font-semibold mb-2">{t.noCreatedTasks}</h3>
                 <p className="text-muted-foreground">
-                  Нажмите "Создать задачу" чтобы начать
+                  {t.noCreatedTasksDesc}
                 </p>
               </div>
             )}
