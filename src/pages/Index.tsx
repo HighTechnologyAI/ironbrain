@@ -1,165 +1,193 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Smartphone, Users, MessageCircle, BarChart3, Settings, Bell } from "lucide-react";
+import { 
+  Users, 
+  CheckSquare, 
+  MessageSquare, 
+  TrendingUp, 
+  Settings, 
+  Bell,
+  Zap,
+  Target,
+  Award,
+  BarChart3,
+  Shield
+} from "lucide-react";
 
 const Index = () => {
-  const [language, setLanguage] = useState('ru');
+  const [language, setLanguage] = useState<'ru' | 'en'>('ru');
 
   const translations = {
     ru: {
-      title: "🛡️ IRON CRM",
-      welcome: "Добро пожаловать",
-      subtitle: "Интеллектуальная система управления командой",
+      title: "TIGER CRM",
+      subtitle: "Система достижения результатов компании",
+      welcome: "Добро пожаловать в Tiger Technology AI",
+      welcomeDescription: "Управляйте задачами, достижениями и масштабированием команды",
+      activeTasks: "Активные задачи",
+      teamMembers: "Участники команды", 
+      achievements: "Достижения",
       myTasks: "Мои задачи",
-      team: "Команда", 
-      aiChat: "AI Чат",
+      team: "Команда",
+      projects: "Проекты",
       analytics: "Аналитика",
-      settings: "Настройки",
-      notifications: "Уведомления",
-      activeTasks: "Активных задач",
-      teamMembers: "Участников команды",
-      aiRequests: "AI запросов сегодня"
+      problems: "Проблемы",
+      achievements_page: "Награды"
     },
     en: {
-      title: "🛡️ IRON CRM",
-      welcome: "Welcome", 
-      subtitle: "Intelligent team management system",
+      title: "TIGER CRM",
+      subtitle: "Company Results Achievement System",
+      welcome: "Welcome to Tiger Technology AI",
+      welcomeDescription: "Manage tasks, achievements and team scaling",
+      activeTasks: "Active Tasks",
+      teamMembers: "Team Members",
+      achievements: "Achievements", 
       myTasks: "My Tasks",
       team: "Team",
-      aiChat: "AI Chat", 
+      projects: "Projects",
       analytics: "Analytics",
-      settings: "Settings",
-      notifications: "Notifications",
-      activeTasks: "Active tasks",
-      teamMembers: "Team members",
-      aiRequests: "AI requests today"
+      problems: "Issues",
+      achievements_page: "Awards"
     }
   };
 
-  const t = translations[language as keyof typeof translations];
+  const t = translations[language];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-background p-6">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <Smartphone className="h-8 w-8 text-blue-600" />
-              <h1 className="text-xl font-bold text-slate-900 dark:text-white">{t.title}</h1>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-4xl font-bold cyber-text flex items-center gap-3">
+            <div className="relative">
+              <Zap className="text-primary h-8 w-8 cyber-glow" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-full blur-xl"></div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setLanguage(language === 'ru' ? 'en' : 'ru')}
-              >
-                {language === 'ru' ? '🇷🇺' : '🇬🇧'}
-              </Button>
-              <Button variant="ghost" size="sm">
-                <Bell className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+            {t.title}
+          </h1>
+          <p className="text-muted-foreground mt-2 font-mono text-sm tracking-wider">{t.subtitle}</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="cyber-glow border-primary/30 hover:border-primary"
+            onClick={() => setLanguage(language === 'ru' ? 'en' : 'ru')}
+          >
+            {language === 'ru' ? 'EN' : 'РУ'}
+          </Button>
+          <Button variant="ghost" size="icon" className="hover:bg-primary/10">
+            <Bell className="h-5 w-5 text-primary" />
+          </Button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Card */}
-        <Card className="mb-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0">
+      {/* Welcome Card */}
+      <Card className="mb-8 bg-card border-border cyber-glow">
+        <CardHeader className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent"></div>
+          <CardTitle className="text-2xl cyber-text relative z-10">{t.welcome}</CardTitle>
+          <CardDescription className="text-muted-foreground relative z-10">{t.welcomeDescription}</CardDescription>
+        </CardHeader>
+      </Card>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-foreground">{t.activeTasks}</CardTitle>
+            <CheckSquare className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold cyber-text">12</div>
+            <p className="text-xs text-muted-foreground">+2 с прошлой недели</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-foreground">{t.teamMembers}</CardTitle>
+            <Users className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold cyber-text">8</div>
+            <p className="text-xs text-muted-foreground">Активных сотрудников</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-foreground">{t.achievements}</CardTitle>
+            <Award className="h-4 w-4 text-accent" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-accent">156</div>
+            <p className="text-xs text-muted-foreground">За этот месяц</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Menu Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card className="bg-card border-border hover:border-primary/50 hover:cyber-glow transition-all duration-300 cursor-pointer group">
           <CardHeader>
-            <CardTitle className="text-2xl">{t.welcome}!</CardTitle>
-            <p className="text-blue-100">{t.subtitle}</p>
+            <CardTitle className="flex items-center gap-2 group-hover:cyber-text transition-colors">
+              <CheckSquare className="h-5 w-5 text-primary group-hover:text-primary" />
+              {t.myTasks}
+              <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">5</Badge>
+            </CardTitle>
           </CardHeader>
         </Card>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">5</div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">{t.activeTasks}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">12</div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">{t.teamMembers}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-2">23</div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">{t.aiRequests}</div>
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="bg-card border-border hover:border-primary/50 hover:cyber-glow transition-all duration-300 cursor-pointer group">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 group-hover:cyber-text transition-colors">
+              <Users className="h-5 w-5 text-primary" />
+              {t.team}
+              <Badge variant="outline" className="border-primary/30 text-primary">8</Badge>
+            </CardTitle>
+          </CardHeader>
+        </Card>
 
-        {/* Main Menu */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardContent className="p-6 text-center">
-              <div className="h-12 w-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <BarChart3 className="h-6 w-6 text-blue-600" />
-              </div>
-              <h3 className="font-semibold mb-2">{t.myTasks}</h3>
-              <Badge variant="secondary">5 новых</Badge>
-            </CardContent>
-          </Card>
+        <Card className="bg-card border-border hover:border-primary/50 hover:cyber-glow transition-all duration-300 cursor-pointer group">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 group-hover:cyber-text transition-colors">
+              <Target className="h-5 w-5 text-primary" />
+              {t.projects}
+              <Badge variant="outline" className="border-primary/30 text-primary">3</Badge>
+            </CardTitle>
+          </CardHeader>
+        </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardContent className="p-6 text-center">
-              <div className="h-12 w-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Users className="h-6 w-6 text-green-600" />
-              </div>
-              <h3 className="font-semibold mb-2">{t.team}</h3>
-              <Badge variant="secondary">Онлайн: 8</Badge>
-            </CardContent>
-          </Card>
+        <Card className="bg-card border-border hover:border-primary/50 hover:cyber-glow transition-all duration-300 cursor-pointer group">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 group-hover:cyber-text transition-colors">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              {t.analytics}
+            </CardTitle>
+          </CardHeader>
+        </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardContent className="p-6 text-center">
-              <div className="h-12 w-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <MessageCircle className="h-6 w-6 text-purple-600" />
-              </div>
-              <h3 className="font-semibold mb-2">{t.aiChat}</h3>
-              <Badge variant="secondary">🤖 AI</Badge>
-            </CardContent>
-          </Card>
+        <Card className="bg-card border-border hover:border-primary/50 hover:cyber-glow transition-all duration-300 cursor-pointer group">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 group-hover:cyber-text transition-colors">
+              <Shield className="h-5 w-5 text-destructive" />
+              {t.problems}
+              <Badge variant="destructive" className="bg-destructive/20 text-destructive border-destructive/30">2</Badge>
+            </CardTitle>
+          </CardHeader>
+        </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardContent className="p-6 text-center">
-              <div className="h-12 w-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <BarChart3 className="h-6 w-6 text-orange-600" />
-              </div>
-              <h3 className="font-semibold mb-2">{t.analytics}</h3>
-              <Badge variant="secondary">Отчеты</Badge>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardContent className="p-6 text-center">
-              <div className="h-12 w-12 bg-gray-100 dark:bg-gray-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Settings className="h-6 w-6 text-gray-600" />
-              </div>
-              <h3 className="font-semibold mb-2">{t.settings}</h3>
-              <Badge variant="secondary">Профиль</Badge>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardContent className="p-6 text-center">
-              <div className="h-12 w-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Bell className="h-6 w-6 text-red-600" />
-              </div>
-              <h3 className="font-semibold mb-2">{t.notifications}</h3>
-              <Badge variant="secondary">3 новых</Badge>
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="bg-card border-border hover:border-primary/50 hover:cyber-glow transition-all duration-300 cursor-pointer group">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 group-hover:cyber-text transition-colors">
+              <Award className="h-5 w-5 text-accent" />
+              {t.achievements_page}
+              <Badge variant="outline" className="border-accent/30 text-accent">12</Badge>
+            </CardTitle>
+          </CardHeader>
+        </Card>
       </div>
     </div>
   );
