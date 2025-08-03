@@ -20,12 +20,12 @@ import {
   MessageCircle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useTeamData } from "@/hooks/use-team-data";
+import { useTeamDataWithPresence } from "@/hooks/use-team-data-with-presence";
 
 const Team = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-  const { teamMembers, loading, error } = useTeamData();
+  const { teamMembers, loading, error } = useTeamDataWithPresence();
 
   const filteredMembers = teamMembers.filter(member =>
     member.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||

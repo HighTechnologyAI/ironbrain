@@ -18,7 +18,7 @@ export interface TeamMember {
   status: 'online' | 'away' | 'offline';
 }
 
-export const useTeamData = () => {
+export const useTeamDataWithPresence = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +71,7 @@ export const useTeamData = () => {
             tasksCompleted: completedTasks,
             totalTasks,
             achievements: userAchievements,
-            status: 'offline' as const // Будет обновлено позже через presence
+            status: 'offline' as const
           };
         }) || [];
 
@@ -92,6 +92,31 @@ export const useTeamData = () => {
     
     return () => clearInterval(interval);
   }, []);
+
+  // Обновляем статусы присутствия отдельно, без перезагрузки всех данных
+  useEffect(() => {
+    if (teamMembers.length > 0) {
+      setTeamMembers(prevMembers => 
+        prevMembers.map(member => {
+          // Определяем статус присутствия
+          let status: 'online' | 'away' | 'offline' = 'offline';
+          
+          if (member.id && isOnline(member.id)) {
+            status = 'online';
+          } else {
+            // Проверяем время последней активности
+            const lastActive = new Date(member.hire_date || Date.now());
+            const timeDiff = Date.now() - lastActive.getTime();
+            if (timeDiff < 5 * 60 * 1000) { // 5 минут
+              status = 'away';
+            }
+          }
+          
+          return { ...member, status };
+        })
+      );
+    }
+  }, [isOnline, teamMembers.length]);
 
   return { teamMembers, loading, error };
 };
