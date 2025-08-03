@@ -115,7 +115,7 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
         priority: (aiResponse.priority as 'low' | 'medium' | 'high' | 'critical') || 'medium',
         estimated_hours: aiResponse.estimated_hours || null,
         tags: aiResponse.tags || [],
-        created_by: selectedEmployee, // В реальной системе это будет текущий пользователь
+        created_by: selectedEmployee, // В демо - создатель = исполнитель. В реальной системе: auth.uid()
         company_id: '00000000-0000-0000-0000-000000000000' // Заглушка для демо
       };
 

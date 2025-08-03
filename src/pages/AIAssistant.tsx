@@ -104,13 +104,27 @@ const AIAssistant = () => {
 
   const loadData = async () => {
     try {
-      // В демо версии используем заранее подготовленные данные
-      setEmployees(demoEmployees);
+      // Загружаем реальные профили из БД
+      const { data: realEmployees } = await supabase
+        .from('profiles')
+        .select('id, full_name, position, department')
+        .eq('is_active', true);
+
+      // Если есть реальные сотрудники, используем их, иначе демо данные
+      if (realEmployees && realEmployees.length > 0) {
+        setEmployees(realEmployees);
+      } else {
+        setEmployees(demoEmployees);
+      }
       
-      // Загружаем недавние задачи (если есть)
+      // Загружаем персонализированные задачи
+      // В реальной системе здесь будет auth.uid(), а пока используем первого сотрудника
+      const currentUserId = realEmployees?.[0]?.id || '1';
+      
       const { data: tasks } = await supabase
         .from('tasks')
-        .select('id, title, status, created_at, assigned_to')
+        .select('id, title, status, created_at, assigned_to, priority')
+        .or(`assigned_to.eq.${currentUserId},created_by.eq.${currentUserId}`)
         .order('created_at', { ascending: false })
         .limit(5);
 
@@ -119,7 +133,7 @@ const AIAssistant = () => {
     } catch (error) {
       console.error('Error loading data:', error);
       toast({
-        title: "Ошибка загрузки",
+        title: "Ошибка загрузки", 
         description: "Не удалось загрузить данные",
         variant: "destructive"
       });
@@ -242,25 +256,40 @@ const AIAssistant = () => {
             <CardContent>
               {recentTasks.length > 0 ? (
                 <div className="space-y-3">
-                  {recentTasks.map((task) => (
-                    <div 
-                      key={task.id}
-                      className="p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors"
-                    >
-                      <div className="font-medium text-sm">{task.title}</div>
-                      <div className="flex items-center justify-between mt-1">
-                        <Badge 
-                          variant={task.status === 'completed' ? 'default' : 'outline'}
-                          className="text-xs"
-                        >
-                          {task.status}
-                        </Badge>
-                        <div className="text-xs text-muted-foreground">
-                          {new Date(task.created_at).toLocaleDateString()}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                   {recentTasks.map((task) => (
+                     <div 
+                       key={task.id}
+                       className="p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors border-l-2 border-l-primary/50"
+                     >
+                       <div className="font-medium text-sm">{task.title}</div>
+                       <div className="flex items-center justify-between mt-1">
+                         <div className="flex items-center gap-2">
+                           <Badge 
+                             variant={task.status === 'completed' ? 'default' : 'outline'}
+                             className="text-xs"
+                           >
+                             {task.status}
+                           </Badge>
+                           {task.priority && (
+                             <Badge 
+                               variant="outline" 
+                               className={`text-xs ${
+                                 task.priority === 'critical' ? 'border-red-500 text-red-500' :
+                                 task.priority === 'high' ? 'border-orange-500 text-orange-500' :
+                                 task.priority === 'medium' ? 'border-yellow-500 text-yellow-500' :
+                                 'border-green-500 text-green-500'
+                               }`}
+                             >
+                               {task.priority}
+                             </Badge>
+                           )}
+                         </div>
+                         <div className="text-xs text-muted-foreground">
+                           {new Date(task.created_at).toLocaleDateString()}
+                         </div>
+                       </div>
+                     </div>
+                   ))}
                 </div>
               ) : (
                 <div className="text-center py-4">
