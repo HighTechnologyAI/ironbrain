@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { supabase } from '@/integrations/supabase/client';
+import { useLanguage } from '@/hooks/use-language';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,48 +21,97 @@ import {
   Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { usePerformanceData } from "@/hooks/use-performance-data";
 
 const Analytics = () => {
   const [dateRange, setDateRange] = useState("30d");
   const [department, setDepartment] = useState("all");
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { data: performanceData, loading } = usePerformanceData();
+  const { t, language } = useLanguage();
 
-  const stats = [
-    {
-      title: "Выполненных задач",
-      value: "1,247",
-      change: "+12.5%",
-      trend: "up",
-      icon: Target,
-      color: "text-primary"
-    },
-    {
-      title: "Активных сотрудников",
-      value: "24",
-      change: "+8.3%", 
-      trend: "up",
-      icon: Users,
-      color: "text-primary"
-    },
-    {
-      title: "Среднее время выполнения",
-      value: "2.4 дня",
-      change: "-15.2%",
-      trend: "down",
-      icon: Clock,
-      color: "text-green-600"
-    },
-    {
-      title: "Достижений получено",
-      value: "186",
-      change: "+23.1%",
-      trend: "up", 
-      icon: Award,
-      color: "text-accent"
+  useEffect(() => {
+    loadAnalyticsData();
+  }, [dateRange, department]);
+
+  const loadAnalyticsData = async () => {
+    setLoading(true);
+    try {
+      // Загружаем данные задач
+      const { data: tasks } = await supabase
+        .from('tasks')
+        .select(`
+          *,
+          assigned_to:profiles!tasks_assigned_to_fkey(id, full_name, department),
+          created_by:profiles!tasks_created_by_fkey(id, full_name)
+        `);
+
+      // Загружаем данные профилей
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('is_active', true);
+
+      // Загружаем достижения
+      const { data: achievements } = await supabase
+        .from('achievements')
+        .select('*');
+
+      setAnalyticsData({
+        tasks: tasks || [],
+        profiles: profiles || [],
+        achievements: achievements || []
+      });
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const getStats = () => {
+    if (!analyticsData) return [];
+    
+    const { tasks, profiles, achievements } = analyticsData;
+    const completedTasks = tasks.filter((t: any) => t.status === 'completed').length;
+    const avgHours = tasks.reduce((acc: number, t: any) => acc + (t.actual_hours || 0), 0) / tasks.length || 0;
+    
+    return [
+      {
+        title: language === 'ru' ? 'Выполненных задач' : 'Завършени задачи',
+        value: completedTasks.toString(),
+        change: "+12.5%",
+        trend: "up",
+        icon: Target,
+        color: "text-primary"
+      },
+      {
+        title: language === 'ru' ? 'Активных сотрудников' : 'Активни служители',
+        value: profiles.length.toString(),
+        change: "+8.3%", 
+        trend: "up",
+        icon: Users,
+        color: "text-primary"
+      },
+      {
+        title: language === 'ru' ? 'Среднее время' : 'Средно време',
+        value: `${avgHours.toFixed(1)}${language === 'ru' ? ' ч' : ' ч'}`,
+        change: "-15.2%",
+        trend: "down",
+        icon: Clock,
+        color: "text-green-600"
+      },
+      {
+        title: language === 'ru' ? 'Достижений' : 'Постижения',
+        value: achievements.length.toString(),
+        change: "+23.1%",
+        trend: "up", 
+        icon: Award,
+        color: "text-accent"
+      }
+    ];
+  };
+
 
   const departmentStats = [
     { name: "Разработка", tasks: 347, members: 8, efficiency: 89 },
@@ -99,6 +150,16 @@ const Analytics = () => {
     return "bg-destructive";
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background p-6 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  const stats = getStats();
+
   return (
     <div className="min-h-screen bg-background p-6">
       {/* Header */}
@@ -115,9 +176,11 @@ const Analytics = () => {
           <div>
             <h1 className="text-3xl font-bold cyber-text flex items-center gap-3">
               <BarChart3 className="text-primary h-8 w-8" />
-              Аналитика
+              {t.analytics}
             </h1>
-            <p className="text-muted-foreground mt-1">Анализ производительности и метрики команды</p>
+            <p className="text-muted-foreground mt-1">
+              {language === 'ru' ? 'Анализ производительности и метрики команды' : 'Анализ на производителността и метрики на екипа'}
+            </p>
           </div>
         </div>
         <Button variant="outline" className="cyber-glow">
