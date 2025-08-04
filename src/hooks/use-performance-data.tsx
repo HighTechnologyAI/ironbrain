@@ -9,11 +9,15 @@ interface PerformanceData {
   totalTeamMembers: number;
   activeTeamMembers: number;
   totalAchievements: number;
+  totalProjects: number;
+  totalIssues: number;
   performance: number;
   weeklyGrowth: {
     tasks: number;
     team: number;
     achievements: number;
+    projects: number;
+    issues: number;
   };
 }
 
@@ -26,11 +30,15 @@ export const usePerformanceData = () => {
     totalTeamMembers: 0,
     activeTeamMembers: 0,
     totalAchievements: 0,
+    totalProjects: 0,
+    totalIssues: 0,
     performance: 0,
     weeklyGrowth: {
       tasks: 0,
       team: 0,
-      achievements: 0
+      achievements: 0,
+      projects: 0,
+      issues: 0
     }
   });
   
@@ -63,6 +71,20 @@ export const usePerformanceData = () => {
         
         if (achievementsError) throw achievementsError;
 
+        // Получаем данные о проектах
+        const { data: projectsData, error: projectsError } = await supabase
+          .from('projects')
+          .select('created_at');
+        
+        if (projectsError) throw projectsError;
+
+        // Получаем данные о проблемах
+        const { data: issuesData, error: issuesError } = await supabase
+          .from('issues')
+          .select('created_at');
+        
+        if (issuesError) throw issuesError;
+
         // Обрабатываем данные
         const now = new Date();
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -82,6 +104,8 @@ export const usePerformanceData = () => {
         const totalTeamMembers = teamData?.length || 0;
         const activeTeamMembers = teamData?.filter(member => member.is_active).length || 0;
         const totalAchievements = achievementsData?.length || 0;
+        const totalProjects = projectsData?.length || 0;
+        const totalIssues = issuesData?.length || 0;
 
         // Подсчет роста за неделю
         const weeklyTasks = tasksData?.filter(task => 
@@ -96,6 +120,14 @@ export const usePerformanceData = () => {
           new Date(achievement.created_at) > weekAgo
         ).length || 0;
 
+        const weeklyProjects = projectsData?.filter(project => 
+          new Date(project.created_at) > weekAgo
+        ).length || 0;
+
+        const weeklyIssues = issuesData?.filter(issue => 
+          new Date(issue.created_at) > weekAgo
+        ).length || 0;
+
         // Расчет производительности (выполненные задачи / общее количество задач * 100)
         const performance = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
@@ -107,11 +139,15 @@ export const usePerformanceData = () => {
           totalTeamMembers,
           activeTeamMembers,
           totalAchievements,
+          totalProjects,
+          totalIssues,
           performance,
           weeklyGrowth: {
             tasks: weeklyTasks,
             team: weeklyTeam,
-            achievements: weeklyAchievements
+            achievements: weeklyAchievements,
+            projects: weeklyProjects,
+            issues: weeklyIssues
           }
         });
 
