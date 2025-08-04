@@ -95,8 +95,32 @@ const Index = () => {
     if (route) {
       navigate(route);
     } else {
-      // Убираем заглушки - все кнопки должны вести на страницы
-      navigate('/');
+      // Определяем маршруты для карточек статистики
+      switch (section) {
+        case t.activeTasks:
+          toast({
+            title: "Переход к задачам",
+            description: "Открываем список активных задач...",
+          });
+          navigate('/tasks');
+          break;
+        case t.teamMembers:
+          toast({
+            title: "Переход к команде",
+            description: "Открываем управление командой...",
+          });
+          navigate('/team');
+          break;
+        case t.achievements:
+          toast({
+            title: "Переход к достижениям", 
+            description: "Открываем награды и достижения...",
+          });
+          navigate('/awards');
+          break;
+        default:
+          console.log(`Clicked on ${section}`);
+      }
     }
   };
 
@@ -268,18 +292,18 @@ const Index = () => {
         {stats.map((stat, index) => (
           <Card 
             key={index}
-            className="bg-card border-border hover:border-primary/50 transition-all duration-300 group cursor-pointer"
+            className="bg-card border-border hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 group cursor-pointer transform hover:scale-105 active:scale-95"
             onClick={() => handleCardClick(stat.label)}
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-foreground">{stat.label}</CardTitle>
-              <stat.icon className={`h-4 w-4 ${stat.color} group-hover:scale-110 transition-transform`} />
+              <CardTitle className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{stat.label}</CardTitle>
+              <stat.icon className={`h-4 w-4 ${stat.color} group-hover:scale-110 group-hover:rotate-12 transition-all duration-300`} />
             </CardHeader>
             <CardContent>
-              <div className={`text-2xl font-bold ${stat.color} font-mono`}>{stat.value}</div>
+              <div className={`text-2xl font-bold ${stat.color} font-mono group-hover:text-primary transition-colors`}>{stat.value}</div>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <TrendingUp className="h-3 w-3 text-primary" />
-                <span className="text-primary">{stat.trend}</span>
+                <TrendingUp className="h-3 w-3 text-primary group-hover:animate-bounce" />
+                <span className="text-primary font-semibold">{stat.trend}</span>
                 <span>за неделю</span>
               </div>
             </CardContent>
