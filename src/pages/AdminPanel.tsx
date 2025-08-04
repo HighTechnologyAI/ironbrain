@@ -6,7 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/use-language';
 import { supabase } from '@/integrations/supabase/client';
+import AppNavigation from '@/components/AppNavigation';
 import {
   Shield,
   Database,
@@ -18,8 +20,10 @@ import {
   Activity,
   Settings,
   Code,
-  Eye,
-  Play
+  Play,
+  Lock,
+  Server,
+  MonitorSpeaker
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import TerminalInterface from '@/components/TerminalInterface';
@@ -35,6 +39,7 @@ const AdminPanel = () => {
   const [tasks, setTasks] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const adminApiCall = async (action: string, method = 'GET', body?: any) => {
     try {
@@ -164,15 +169,17 @@ const AdminPanel = () => {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Shield className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold">Tiger CRM Admin</h1>
+        <Card className="w-full max-w-md border-primary/30 shadow-2xl">
+          <CardHeader className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+              <Lock className="h-8 w-8 text-primary" />
             </div>
-            <p className="text-muted-foreground">
-              Панель администрирования системы
-            </p>
+            <div>
+              <h1 className="text-2xl font-bold">Tiger CRM Admin</h1>
+              <p className="text-muted-foreground text-sm">
+                Панель администрирования системы
+              </p>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -186,20 +193,31 @@ const AdminPanel = () => {
                 value={adminKey}
                 onChange={(e) => setAdminKey(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && authenticate()}
+                className="border-primary/30 focus:border-primary"
               />
             </div>
             <Button 
               onClick={authenticate} 
               disabled={loading}
-              className="w-full"
+              className="w-full bg-primary hover:bg-primary/90"
             >
-              {loading ? 'Проверка...' : 'Войти в админ панель'}
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <Activity className="h-4 w-4 animate-spin" />
+                  Проверка...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Войти в админ панель
+                </div>
+              )}
             </Button>
             
             <Alert>
-              <Settings className="h-4 w-4" />
+              <MonitorSpeaker className="h-4 w-4" />
               <AlertDescription>
-                Ключ по умолчанию: <code>tiger-admin-2025</code>
+                Ключ по умолчанию: <code className="bg-primary/20 px-1 rounded">tiger-admin-2025</code>
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -209,29 +227,37 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Shield className="h-8 w-8 text-primary" />
-              Tiger CRM Admin Panel
-            </h1>
-            <p className="text-muted-foreground">
-              Системное администрирование и мониторинг
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={loadDashboard} disabled={loading}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Обновить
-            </Button>
-            <Button variant="outline" onClick={downloadBackup} disabled={loading}>
-              <Download className="h-4 w-4 mr-2" />
-              Бэкап
-            </Button>
-          </div>
-        </div>
+    <div className="min-h-screen bg-background">
+      <AppNavigation 
+        title="Tiger CRM Admin Panel"
+        subtitle="Системное администрирование и мониторинг"
+      />
+      
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Admin Status Banner */}
+        <Card className="mb-6 bg-gradient-to-r from-primary/10 to-destructive/10 border-primary/30">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <Shield className="h-6 w-6 text-primary" />
+              <div>
+                <h3 className="font-semibold text-primary">Режим администратора активен</h3>
+                <p className="text-sm text-muted-foreground">
+                  Полный доступ к системным функциям и управлению
+                </p>
+              </div>
+              <div className="ml-auto flex items-center gap-2">
+                <Button variant="outline" onClick={loadDashboard} disabled={loading} size="sm">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Обновить
+                </Button>
+                <Button variant="outline" onClick={downloadBackup} disabled={loading} size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Бэкап
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Tabs defaultValue="dashboard" className="w-full">
           <TabsList className="grid w-full grid-cols-6">

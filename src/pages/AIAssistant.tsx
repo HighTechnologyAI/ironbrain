@@ -4,16 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/use-language';
+import AppNavigation from '@/components/AppNavigation';
 import AITaskAssistant from '@/components/AITaskAssistant';
 import { 
   Users, 
   CheckSquare, 
   Bot, 
   Sparkles,
-  ArrowLeft,
   Zap,
   Target,
-  BarChart3
+  BarChart3,
+  Activity,
+  Brain
 } from 'lucide-react';
 
 const AIAssistant = () => {
@@ -21,6 +24,7 @@ const AIAssistant = () => {
   const [recentTasks, setRecentTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   // Демо данные для сотрудников
   const demoEmployees = [
@@ -152,15 +156,11 @@ const AIAssistant = () => {
     });
   };
 
-  const goBack = () => {
-    window.history.back();
-  };
-
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-6 flex items-center justify-center">
-        <div className="flex items-center gap-2 cyber-text">
-          <Zap className="h-6 w-6 animate-spin" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex items-center gap-2 text-primary">
+          <Brain className="h-6 w-6 animate-pulse" />
           <span>Загрузка Tiger AI...</span>
         </div>
       </div>
@@ -168,27 +168,35 @@ const AIAssistant = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={goBack} className="hover:bg-primary/10">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold cyber-text flex items-center gap-3">
-              <Bot className="h-8 w-8 animate-pulse cyber-glow" />
-              Tiger AI Assistant
-              <Sparkles className="h-6 w-6 text-accent" />
-            </h1>
-            <p className="text-muted-foreground font-mono text-sm">
-              Персональный помощник для управления задачами команды
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background">
+      <AppNavigation 
+        title="Tiger AI Assistant"
+        subtitle="Персональный помощник для управления задачами команды"
+      />
+      
+      <div className="max-w-7xl mx-auto p-6">
+        {/* AI Status Banner */}
+        <Card className="mb-6 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5 border-primary/30">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <Bot className="h-6 w-6 text-primary animate-pulse" />
+              <div>
+                <h3 className="font-semibold text-primary">Tiger AI Assistant активен</h3>
+                <p className="text-sm text-muted-foreground">
+                  Готов к созданию персонализированных задач для вашей команды
+                </p>
+              </div>
+              <div className="ml-auto flex items-center gap-2">
+                <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30">
+                  <Activity className="h-3 w-3 mr-1" />
+                  Онлайн
+                </Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* AI Assistant Panel */}
         <div className="lg:col-span-2">
           <AITaskAssistant 
@@ -339,6 +347,7 @@ const AIAssistant = () => {
               </div>
             </CardContent>
           </Card>
+          </div>
         </div>
       </div>
     </div>
