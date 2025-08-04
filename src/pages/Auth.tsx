@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Zap, Shield, Lock, Mail, User, Eye, EyeOff, Building, Briefcase } from "lucide-react";
+import { Zap, Shield, Lock, Mail, User, Eye, EyeOff, Building, Briefcase, Phone, MessageCircle } from "lucide-react";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +19,9 @@ const Auth = () => {
     password: "",
     fullName: "",
     position: "",
-    department: ""
+    department: "",
+    phone: "",
+    telegramUsername: ""
   });
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -112,7 +114,9 @@ const Auth = () => {
           data: {
             full_name: formData.fullName,
             position: formData.position,
-            department: formData.department
+            department: formData.department,
+            phone: formData.phone,
+            telegram_username: formData.telegramUsername
           }
         }
       });
@@ -289,6 +293,38 @@ const Auth = () => {
                         <SelectItem value="Консультации">Консультации</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-phone" className="flex items-center gap-2">
+                      <Phone className="h-4 w-4" />
+                      Телефон
+                    </Label>
+                    <Input
+                      id="signup-phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="+7 (999) 123-45-67"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-telegram" className="flex items-center gap-2">
+                      <MessageCircle className="h-4 w-4" />
+                      Telegram
+                    </Label>
+                    <Input
+                      id="signup-telegram"
+                      name="telegramUsername"
+                      type="text"
+                      placeholder="@username"
+                      value={formData.telegramUsername}
+                      onChange={handleInputChange}
+                      required
+                      disabled={isLoading}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email" className="flex items-center gap-2">
