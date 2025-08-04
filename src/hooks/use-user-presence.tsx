@@ -64,7 +64,7 @@ export const useUserPresence = () => {
       }
     });
 
-    // Обновляем статус каждые 30 секунд
+    // Периодически обновляем время присутствия
     const statusInterval = setInterval(async () => {
       const userStatus: UserPresence = {
         user_id: user.id,
@@ -73,9 +73,9 @@ export const useUserPresence = () => {
         online_at: new Date().toISOString(),
         status: 'online'
       };
-
+      
       await channel.track(userStatus);
-    }, 30000);
+    }, 120000); // Обновляем каждые 2 минуты вместо 30 секунд
 
     // Cleanup при размонтировании
     return () => {
