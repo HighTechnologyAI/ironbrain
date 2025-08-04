@@ -19,6 +19,7 @@ import {
   MessageCircle,
   File
 } from 'lucide-react';
+import TaskParticipantManager from '@/components/TaskParticipantManager';
 import { format } from 'date-fns';
 import { ru, bg } from 'date-fns/locale';
 import { APP_CONFIG } from '@/config/app-config';
@@ -45,6 +46,7 @@ interface TaskParticipant {
   user: {
     id: string;
     full_name: string;
+    position: string;
   };
 }
 
@@ -107,7 +109,7 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
         .from('task_participants')
         .select(`
           *,
-          user:profiles(id, full_name)
+          user:profiles(id, full_name, position)
         `)
         .eq('task_id', taskId);
 
@@ -219,7 +221,7 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
         .insert({
           task_id: taskId,
           user_id: user.id,
-          content: newComment.trim() || 'Прикреплен файл',
+          content: newComment.trim() || t.fileAttached,
           file_url: fileData?.url,
           file_name: fileData?.name,
           file_size: fileData?.size,
@@ -288,38 +290,29 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
   return (
     <div className="space-y-4">
       {/* Участники задачи */}
-      {participants.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Участники ({participants.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {participants.map((participant) => (
-                <Badge key={participant.id} variant="outline" className="flex items-center gap-1">
-                  <Avatar className="h-4 w-4">
-                    <AvatarFallback className="text-xs">
-                      {participant.user.full_name.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  {participant.user.full_name}
-                  {participant.role === 'watcher' && <span className="text-xs opacity-60">(наблюдатель)</span>}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            {t.participants} ({participants.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TaskParticipantManager
+            taskId={taskId}
+            participants={participants}
+            onParticipantsChange={loadParticipants}
+            canManage={isTaskCreator}
+          />
+        </CardContent>
+      </Card>
 
       {/* Чат */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-2">
             <MessageCircle className="h-4 w-4" />
-            Комментарии ({comments.length})
+            {t.comments} ({comments.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -398,7 +391,7 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
 
             <div className="flex gap-2">
               <Textarea
-                placeholder="Добавить комментарий..."
+                placeholder={t.writeComment}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 className="flex-1 min-h-[80px]"
@@ -422,7 +415,7 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
                   disabled={uploading}
                 >
                   <Paperclip className="h-4 w-4 mr-1" />
-                  Файл
+                  {t.addFile}
                 </Button>
               </div>
 
@@ -432,18 +425,18 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
                 size="sm"
               >
                 {uploading ? (
-                  'Загрузка...'
+                  t.uploading
                 ) : (
                   <>
                     <Send className="h-4 w-4 mr-1" />
-                    Отправить
+                    {t.send}
                   </>
                 )}
               </Button>
             </div>
 
             <div className="text-xs text-muted-foreground">
-              Осталось символов: {APP_CONFIG.comments.maxLength - newComment.length}
+              {language === 'ru' ? 'Осталось символов' : 'Останали символи'}: {APP_CONFIG.comments.maxLength - newComment.length}
             </div>
           </div>
         </CardContent>

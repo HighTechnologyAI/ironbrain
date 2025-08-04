@@ -19,6 +19,7 @@ import CreateTaskForm from '@/components/CreateTaskForm';
 import TaskAIAssistant from '@/components/TaskAIAssistant';
 import TaskDetails from '@/components/TaskDetails';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import NotificationCenter from '@/components/NotificationCenter';
 import {
   ArrowLeft,
   Calendar,
@@ -322,7 +323,8 @@ const Tasks = () => {
               </p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-4">
+            <NotificationCenter />
             <LanguageSwitcher />
             <CreateTaskForm onTaskCreated={loadTasks} />
           </div>

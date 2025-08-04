@@ -129,9 +129,9 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
           {/* Основная информация о задаче */}
           <div className="lg:col-span-2 space-y-4">
             <div>
-              <h3 className="text-sm font-medium mb-2">Описание</h3>
+              <h3 className="text-sm font-medium mb-2">{language === 'ru' ? 'Описание' : 'Описание'}</h3>
               <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {task.description || 'Описание не указано'}
+                {task.description || (language === 'ru' ? 'Описание не указано' : 'Няма описание')}
               </p>
             </div>
 
@@ -156,20 +156,20 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Исполнитель:</span>
+                  <span className="text-muted-foreground">{t.assignee}:</span>
                   <span>{task.assigned_to?.full_name}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Создал:</span>
+                  <span className="text-muted-foreground">{language === 'ru' ? 'Создал' : 'Създадено от'}:</span>
                   <span>{task.created_by?.full_name}</span>
                 </div>
 
                 {task.due_date && (
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">Срок:</span>
+                    <span className="text-muted-foreground">{t.dueDate}:</span>
                     <span>
                       {format(new Date(task.due_date), 'dd MMMM yyyy', { locale: dateLocale })}
                     </span>
@@ -179,12 +179,12 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
                 {task.estimated_hours && (
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">Планируемо:</span>
-                    <span>{task.estimated_hours}ч</span>
+                    <span className="text-muted-foreground">{t.estimated}:</span>
+                    <span>{task.estimated_hours}{t.hours}</span>
                     {task.actual_hours && (
                       <>
-                        <span className="text-muted-foreground">• Фактически:</span>
-                        <span>{task.actual_hours}ч</span>
+                        <span className="text-muted-foreground">• {t.actual}:</span>
+                        <span>{task.actual_hours}{t.hours}</span>
                       </>
                     )}
                   </div>
@@ -192,7 +192,7 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
 
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Создана:</span>
+                  <span className="text-muted-foreground">{t.created}:</span>
                   <span>
                     {format(new Date(task.created_at), 'dd.MM.yyyy HH:mm', { locale: dateLocale })}
                   </span>
@@ -203,7 +203,7 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Tag className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">Теги:</span>
+                    <span className="text-sm text-muted-foreground">{language === 'ru' ? 'Теги' : 'Тагове'}:</span>
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {task.tags.map((tag, index) => (
@@ -220,12 +220,12 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
 
             {/* Действия */}
             <div className="space-y-2">
-              <h3 className="text-sm font-medium">Действия</h3>
+              <h3 className="text-sm font-medium">{language === 'ru' ? 'Действия' : 'Действия'}</h3>
               
               {isTaskCreator && (
                 <Button variant="outline" size="sm" className="w-full justify-start">
                   <Settings className="h-4 w-4 mr-2" />
-                  Настройки задачи
+                  {language === 'ru' ? 'Настройки задачи' : 'Настройки на задачата'}
                 </Button>
               )}
             </div>

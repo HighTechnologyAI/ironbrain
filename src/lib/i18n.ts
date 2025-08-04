@@ -27,6 +27,24 @@ export interface Translations {
   edited: string;
   joined: string;
   
+  // Notifications
+  notifications: string;
+  noNotifications: string;
+  markAsRead: string;
+  markAllAsRead: string;
+  invitedToTask: string;
+  acceptInvitation: string;
+  declineInvitation: string;
+  invitationAccepted: string;
+  invitationDeclined: string;
+  
+  // Chat and invitations
+  inviteToChat: string;
+  chatInvitation: string;
+  inviteParticipant: string;
+  removeFromChat: string;
+  fileAttached: string;
+  
   // Users
   unknownUser: string;
   userNotFound: string;
@@ -136,6 +154,24 @@ export const translations: Record<string, Translations> = {
     edited: 'изменено',
     joined: 'присоединился',
     
+    // Notifications
+    notifications: 'Уведомления',
+    noNotifications: 'Нет уведомлений',
+    markAsRead: 'Отметить как прочитанное',
+    markAllAsRead: 'Отметить все как прочитанные',
+    invitedToTask: 'Приглашение в задачу',
+    acceptInvitation: 'Принять',
+    declineInvitation: 'Отклонить',
+    invitationAccepted: 'Приглашение принято',
+    invitationDeclined: 'Приглашение отклонено',
+    
+    // Chat and invitations
+    inviteToChat: 'Пригласить в чат',
+    chatInvitation: 'Приглашение в чат задачи',
+    inviteParticipant: 'Пригласить участника',
+    removeFromChat: 'Удалить из чата',
+    fileAttached: 'Прикреплен файл',
+    
     // Users
     unknownUser: 'Неизвестный пользователь',
     userNotFound: 'Пользователь не найден',
@@ -243,6 +279,24 @@ export const translations: Record<string, Translations> = {
     uploading: 'Качване...',
     edited: 'редактирано',
     joined: 'се присъедини',
+    
+    // Notifications
+    notifications: 'Известия',
+    noNotifications: 'Няма известия',
+    markAsRead: 'Маркирай като прочетено',
+    markAllAsRead: 'Маркирай всички като прочетени',
+    invitedToTask: 'Покана за задача',
+    acceptInvitation: 'Приеми',
+    declineInvitation: 'Откажи',
+    invitationAccepted: 'Поканата е приета',
+    invitationDeclined: 'Поканата е отказана',
+    
+    // Chat and invitations
+    inviteToChat: 'Покани в чат',
+    chatInvitation: 'Покана за чат на задача',
+    inviteParticipant: 'Покани участник',
+    removeFromChat: 'Премахни от чата',
+    fileAttached: 'Прикачен файл',
     
     // Users
     unknownUser: 'Неизвестен потребител',
