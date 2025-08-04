@@ -49,11 +49,11 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({
         .single();
 
       if (!profile) {
-        toast({
-          title: t('error'),
-          description: t('userNotFound'),
-          variant: 'destructive',
-        });
+      toast({
+        title: t.error,
+        description: t.userNotFound,
+        variant: 'destructive',
+      });
         return;
       }
 
@@ -62,7 +62,7 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({
         .insert({
           task_id: taskId,
           content: newComment.trim(),
-          author_id: profile.id,
+          user_id: profile.id,
         });
 
       if (error) throw error;
@@ -70,14 +70,14 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({
       setNewComment('');
       onCommentsChange();
       toast({
-        title: t('success'),
-        description: t('commentAdded'),
+        title: t.success,
+        description: t.commentAdded,
       });
     } catch (error) {
       console.error('Comment submission error:', error);
       toast({
-        title: t('error'),
-        description: t('commentFailed'),
+        title: t.error,
+        description: t.commentFailed,
         variant: 'destructive',
       });
     } finally {
@@ -96,14 +96,14 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({
     <div className="space-y-4">
       <h4 className="text-sm font-medium flex items-center gap-2">
         <MessageCircle className="h-4 w-4" />
-        {t('comments')} ({comments.length})
+        {t.comments} ({comments.length})
       </h4>
 
       {/* Comments List */}
       <div className="space-y-4 max-h-96 overflow-y-auto">
         {comments.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
-            {t('noComments')}
+            {t.noComments}
           </p>
         ) : (
           comments.map((comment) => (
@@ -117,14 +117,14 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({
               <div className="flex-1 space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">
-                    {comment.author?.full_name || t('unknownUser')}
+                    {comment.author?.full_name || t.unknownUser}
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {new Date(comment.created_at).toLocaleString()}
                   </span>
                   {comment.updated_at !== comment.created_at && (
                     <span className="text-xs text-muted-foreground">
-                      ({t('edited')})
+                      ({t.edited})
                     </span>
                   )}
                 </div>
@@ -139,7 +139,7 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({
       {canComment && (
         <div className="space-y-3 border-t pt-4">
           <Textarea
-            placeholder={t('writeComment')}
+            placeholder={t.writeComment}
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             onKeyDown={handleKeyPress}
@@ -148,7 +148,7 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({
           />
           <div className="flex justify-between items-center">
             <p className="text-xs text-muted-foreground">
-              {t('pressCtrlEnter')}
+              {t.pressCtrlEnter}
             </p>
             <Button
               size="sm"
@@ -156,7 +156,7 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({
               disabled={!newComment.trim() || isSubmitting}
             >
               <Send className="h-4 w-4 mr-2" />
-              {isSubmitting ? t('sending') : t('send')}
+              {isSubmitting ? t.sending : t.send}
             </Button>
           </div>
         </div>

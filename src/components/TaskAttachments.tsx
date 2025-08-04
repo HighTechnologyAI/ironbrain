@@ -50,10 +50,10 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
     try {
       for (const file of Array.from(files)) {
         // Validate file type
-        if (!PROJECT_CONFIG.FILE_UPLOAD.ALLOWED_TYPES.includes(file.type)) {
+        if (!PROJECT_CONFIG.FILE_UPLOAD.ALLOWED_TYPES.includes(file.type as any)) {
           toast({
-            title: t('error'),
-            description: `${t('unsupportedFileType')}: ${file.type}`,
+            title: t.error,
+            description: `${t.unsupportedFileType}: ${file.type}`,
             variant: 'destructive',
           });
           continue;
@@ -62,8 +62,8 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
         // Validate file size
         if (file.size > PROJECT_CONFIG.FILE_UPLOAD.MAX_FILE_SIZE) {
           toast({
-            title: t('error'),
-            description: `${t('fileTooLarge')}: ${formatFileSize(file.size)}`,
+            title: t.error,
+            description: `${t.fileTooLarge}: ${formatFileSize(file.size)}`,
             variant: 'destructive',
           });
           continue;
@@ -80,8 +80,8 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
 
         if (storageError) {
           toast({
-            title: t('error'),
-            description: t('uploadFailed'),
+            title: t.error,
+            description: t.uploadFailed,
             variant: 'destructive',
           });
           continue;
@@ -96,23 +96,23 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
 
         if (!profile) {
           toast({
-            title: t('error'),
-            description: t('userNotFound'),
+            title: t.error,
+            description: t.userNotFound,
             variant: 'destructive',
           });
           continue;
         }
 
-        // Save attachment record
+        // Save attachment record using task_comments table for file attachments
         const { error: dbError } = await supabase
-          .from('task_attachments')
+          .from('task_comments')
           .insert({
             task_id: taskId,
+            content: `File uploaded: ${file.name}`,
+            user_id: profile.id,
             file_name: file.name,
-            file_path: fileName,
+            file_url: fileName,
             file_size: file.size,
-            file_type: file.type,
-            uploaded_by: profile.id,
           });
 
         if (dbError) {
@@ -122,8 +122,8 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
             .remove([fileName]);
           
           toast({
-            title: t('error'),
-            description: t('uploadFailed'),
+            title: t.error,
+            description: t.uploadFailed,
             variant: 'destructive',
           });
           continue;
@@ -132,14 +132,14 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
 
       onAttachmentsChange();
       toast({
-        title: t('success'),
-        description: t('filesUploaded'),
+        title: t.success,
+        description: t.filesUploaded,
       });
     } catch (error) {
       console.error('Upload error:', error);
       toast({
-        title: t('error'),
-        description: t('uploadFailed'),
+        title: t.error,
+        description: t.uploadFailed,
         variant: 'destructive',
       });
     } finally {
@@ -170,8 +170,8 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
     } catch (error) {
       console.error('Download error:', error);
       toast({
-        title: t('error'),
-        description: t('downloadFailed'),
+        title: t.error,
+        description: t.downloadFailed,
         variant: 'destructive',
       });
     }
@@ -181,7 +181,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
     try {
       // Delete from database
       const { error: dbError } = await supabase
-        .from('task_attachments')
+        .from('task_comments')
         .delete()
         .eq('id', attachmentId);
 
@@ -198,14 +198,14 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
 
       onAttachmentsChange();
       toast({
-        title: t('success'),
-        description: t('fileDeleted'),
+        title: t.success,
+        description: t.fileDeleted,
       });
     } catch (error) {
       console.error('Delete error:', error);
       toast({
-        title: t('error'),
-        description: t('deleteFailed'),
+        title: t.error,
+        description: t.deleteFailed,
         variant: 'destructive',
       });
     }
@@ -216,7 +216,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-medium flex items-center gap-2">
           <Paperclip className="h-4 w-4" />
-          {t('attachments')} ({attachments.length})
+          {t.attachments} ({attachments.length})
         </h4>
         {canUpload && (
           <div>
@@ -235,7 +235,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
               disabled={isUploading}
             >
               <Upload className="h-4 w-4 mr-2" />
-              {isUploading ? t('uploading') : t('addFile')}
+              {isUploading ? t.uploading : t.addFile}
             </Button>
           </div>
         )}

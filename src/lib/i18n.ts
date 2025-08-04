@@ -21,6 +21,43 @@ export interface Translations {
   create: string;
   search: string;
   filter: string;
+  send: string;
+  sending: string;
+  uploading: string;
+  edited: string;
+  joined: string;
+  
+  // Users
+  unknownUser: string;
+  userNotFound: string;
+  
+  // Files and attachments
+  attachments: string;
+  addFile: string;
+  filesUploaded: string;
+  fileDeleted: string;
+  uploadFailed: string;
+  downloadFailed: string;
+  deleteFailed: string;
+  unsupportedFileType: string;
+  fileTooLarge: string;
+  
+  // Comments
+  comments: string;
+  noComments: string;
+  writeComment: string;
+  commentAdded: string;
+  commentFailed: string;
+  pressCtrlEnter: string;
+  
+  // Participants
+  participants: string;
+  noParticipants: string;
+  addParticipant: string;
+  participantAdded: string;
+  participantRemoved: string;
+  addParticipantFailed: string;
+  removeParticipantFailed: string;
   
   // Navigation
   dashboard: string;
@@ -93,6 +130,43 @@ export const translations: Record<string, Translations> = {
     create: 'Создать',
     search: 'Поиск',
     filter: 'Фильтр',
+    send: 'Отправить',
+    sending: 'Отправка...',
+    uploading: 'Загрузка...',
+    edited: 'изменено',
+    joined: 'присоединился',
+    
+    // Users
+    unknownUser: 'Неизвестный пользователь',
+    userNotFound: 'Пользователь не найден',
+    
+    // Files and attachments
+    attachments: 'Вложения',
+    addFile: 'Добавить файл',
+    filesUploaded: 'Файлы загружены',
+    fileDeleted: 'Файл удален',
+    uploadFailed: 'Ошибка загрузки',
+    downloadFailed: 'Ошибка скачивания',
+    deleteFailed: 'Ошибка удаления',
+    unsupportedFileType: 'Неподдерживаемый тип файла',
+    fileTooLarge: 'Файл слишком большой',
+    
+    // Comments
+    comments: 'Комментарии',
+    noComments: 'Нет комментариев',
+    writeComment: 'Написать комментарий...',
+    commentAdded: 'Комментарий добавлен',
+    commentFailed: 'Ошибка добавления комментария',
+    pressCtrlEnter: 'Ctrl+Enter для отправки',
+    
+    // Participants
+    participants: 'Участники',
+    noParticipants: 'Нет участников',
+    addParticipant: 'Добавить участника',
+    participantAdded: 'Участник добавлен',
+    participantRemoved: 'Участник удален',
+    addParticipantFailed: 'Ошибка добавления участника',
+    removeParticipantFailed: 'Ошибка удаления участника',
     
     // Navigation
     dashboard: 'Главная',
@@ -164,6 +238,43 @@ export const translations: Record<string, Translations> = {
     create: 'Създай',
     search: 'Търсене',
     filter: 'Филтър',
+    send: 'Изпрати',
+    sending: 'Изпращане...',
+    uploading: 'Качване...',
+    edited: 'редактирано',
+    joined: 'се присъедини',
+    
+    // Users
+    unknownUser: 'Неизвестен потребител',
+    userNotFound: 'Потребителят не е намерен',
+    
+    // Files and attachments
+    attachments: 'Прикачени файлове',
+    addFile: 'Добави файл',
+    filesUploaded: 'Файловете са качени',
+    fileDeleted: 'Файлът е изтрит',
+    uploadFailed: 'Грешка при качване',
+    downloadFailed: 'Грешка при изтегляне',
+    deleteFailed: 'Грешка при изтриване',
+    unsupportedFileType: 'Неподдържан тип файл',
+    fileTooLarge: 'Файлът е твърде голям',
+    
+    // Comments
+    comments: 'Коментари',
+    noComments: 'Няма коментари',
+    writeComment: 'Напиши коментар...',
+    commentAdded: 'Коментарът е добавен',
+    commentFailed: 'Грешка при добавяне на коментар',
+    pressCtrlEnter: 'Ctrl+Enter за изпращане',
+    
+    // Participants
+    participants: 'Участници',
+    noParticipants: 'Няма участници',
+    addParticipant: 'Добави участник',
+    participantAdded: 'Участникът е добавен',
+    participantRemoved: 'Участникът е премахнат',
+    addParticipantFailed: 'Грешка при добавяне на участник',
+    removeParticipantFailed: 'Грешка при премахване на участник',
     
     // Navigation
     dashboard: 'Начало',

@@ -63,14 +63,14 @@ export const TaskParticipants: React.FC<TaskParticipantsProps> = ({
 
       onParticipantsChange();
       toast({
-        title: t('success'),
-        description: t('participantAdded'),
+        title: t.success,
+        description: t.participantAdded,
       });
     } catch (error) {
       console.error('Add participant error:', error);
       toast({
-        title: t('error'),
-        description: t('addParticipantFailed'),
+        title: t.error,
+        description: t.addParticipantFailed,
         variant: 'destructive',
       });
     } finally {
@@ -89,14 +89,14 @@ export const TaskParticipants: React.FC<TaskParticipantsProps> = ({
 
       onParticipantsChange();
       toast({
-        title: t('success'),
-        description: t('participantRemoved'),
+        title: t.success,
+        description: t.participantRemoved,
       });
     } catch (error) {
       console.error('Remove participant error:', error);
       toast({
-        title: t('error'),
-        description: t('removeParticipantFailed'),
+        title: t.error,
+        description: t.removeParticipantFailed,
         variant: 'destructive',
       });
     }
@@ -107,14 +107,14 @@ export const TaskParticipants: React.FC<TaskParticipantsProps> = ({
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-medium flex items-center gap-2">
           <Users className="h-4 w-4" />
-          {t('participants')} ({participants.length})
+          {t.participants} ({participants.length})
         </h4>
         {canManage && availableMembers.length > 0 && (
           <Select onValueChange={handleAddParticipant} disabled={isAdding}>
             <SelectTrigger className="w-[200px]">
               <div className="flex items-center gap-2">
                 <UserPlus className="h-4 w-4" />
-                <SelectValue placeholder={t('addParticipant')} />
+                <SelectValue placeholder={t.addParticipant} />
               </div>
             </SelectTrigger>
             <SelectContent>
@@ -145,7 +145,7 @@ export const TaskParticipants: React.FC<TaskParticipantsProps> = ({
 
       {participants.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-4">
-          {t('noParticipants')}
+          {t.noParticipants}
         </p>
       ) : (
         <div className="space-y-2">
@@ -163,7 +163,7 @@ export const TaskParticipants: React.FC<TaskParticipantsProps> = ({
                 </Avatar>
                 <div>
                   <p className="text-sm font-medium">
-                    {participant.user?.full_name || t('unknownUser')}
+                    {participant.user?.full_name || t.unknownUser}
                   </p>
                   <div className="flex items-center gap-2">
                     {participant.user?.position && (
@@ -172,7 +172,7 @@ export const TaskParticipants: React.FC<TaskParticipantsProps> = ({
                       </Badge>
                     )}
                     <span className="text-xs text-muted-foreground">
-                      {t('joined')} {new Date(participant.joined_at).toLocaleDateString()}
+                      {t.joined} {new Date(participant.joined_at).toLocaleDateString()}
                     </span>
                   </div>
                 </div>
