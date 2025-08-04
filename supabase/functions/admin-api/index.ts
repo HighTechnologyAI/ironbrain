@@ -207,6 +207,86 @@ async function createTaskViaAPI(supabase: any, req: Request) {
   });
 }
 
+async function updateTaskViaAPI(supabase: any, req: Request) {
+  const body = await req.json();
+  const { task_id, ...updateData } = body;
+  
+  const { data, error } = await supabase
+    .from('tasks')
+    .update(updateData)
+    .eq('id', task_id)
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  return new Response(JSON.stringify({
+    success: true,
+    task: data,
+    message: 'Task updated successfully via API'
+  }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  });
+}
+
+async function deleteTaskViaAPI(supabase: any, req: Request) {
+  const body = await req.json();
+  const { task_id } = body;
+  
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .eq('id', task_id);
+
+  if (error) throw error;
+
+  return new Response(JSON.stringify({
+    success: true,
+    message: 'Task deleted successfully via API'
+  }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  });
+}
+
+async function executeBulkOperation(supabase: any, req: Request) {
+  const body = await req.json();
+  const { operation, task_ids, data } = body;
+  
+  let result;
+  switch (operation) {
+    case 'assign_tasks':
+      result = await supabase
+        .from('tasks')
+        .update({ assigned_to: data.assigned_to })
+        .in('id', task_ids);
+      break;
+    case 'update_status':
+      result = await supabase
+        .from('tasks')
+        .update({ status: data.status })
+        .in('id', task_ids);
+      break;
+    case 'update_priority':
+      result = await supabase
+        .from('tasks')
+        .update({ priority: data.priority })
+        .in('id', task_ids);
+      break;
+    default:
+      throw new Error('Unknown bulk operation');
+  }
+
+  if (result.error) throw result.error;
+
+  return new Response(JSON.stringify({
+    success: true,
+    affected_count: result.data?.length || 0,
+    message: `Bulk ${operation} completed successfully`
+  }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  });
+}
+
 async function executeDatabaseQuery(supabase: any, req: Request) {
   const { query, table, operation, data, filters } = await req.json();
 
