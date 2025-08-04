@@ -24,7 +24,9 @@ import {
   Lock,
   Server,
   MonitorSpeaker,
-  Eye
+  Eye,
+  ArrowLeft,
+  Home
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import TerminalInterface from '@/components/TerminalInterface';
@@ -215,12 +217,6 @@ const AdminPanel = () => {
               )}
             </Button>
             
-            <Alert>
-              <MonitorSpeaker className="h-4 w-4" />
-              <AlertDescription>
-                Ключ по умолчанию: <code className="bg-primary/20 px-1 rounded">tiger-admin-2025</code>
-              </AlertDescription>
-            </Alert>
           </CardContent>
         </Card>
       </div>
@@ -247,6 +243,15 @@ const AdminPanel = () => {
                 </p>
               </div>
               <div className="ml-auto flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => window.location.href = '/'} 
+                  size="sm"
+                  className="bg-background hover:bg-muted"
+                >
+                  <Home className="h-4 w-4 mr-2" />
+                  Главное меню
+                </Button>
                 <Button variant="outline" onClick={loadDashboard} disabled={loading} size="sm">
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Обновить
