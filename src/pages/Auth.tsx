@@ -146,36 +146,6 @@ const Auth = () => {
     }
   };
 
-  const handleDemoLogin = async () => {
-    setIsLoading(true);
-    
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: "alpay@hightechai.site",
-        password: "qwerty123",
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.user) {
-        toast({
-          title: "Демо вход выполнен",
-          description: "Добро пожаловать в демо версию Tiger CRM!",
-        });
-        navigate('/');
-      }
-    } catch (error: any) {
-      toast({
-        title: "Ошибка демо входа",
-        description: "Не удалось войти под демо аккаунтом",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
@@ -222,7 +192,7 @@ const Auth = () => {
                       id="signin-email"
                       name="email"
                       type="email"
-                      placeholder="alpay@hightechai.site"
+                      placeholder="example@company.com"
                       value={formData.email}
                       onChange={handleInputChange}
                       required
@@ -239,7 +209,7 @@ const Auth = () => {
                         id="signin-password"
                         name="password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="qwerty123"
+                        placeholder="••••••••"
                         value={formData.password}
                         onChange={handleInputChange}
                         required
@@ -375,26 +345,9 @@ const Auth = () => {
               </TabsContent>
             </Tabs>
 
-            <div className="mt-6">
-              <Separator className="my-4" />
-              <Button
-                variant="outline"
-                className="w-full border-primary/30 hover:border-primary transition-all"
-                onClick={handleDemoLogin}
-                disabled={isLoading}
-              >
-                <Zap className="h-4 w-4 mr-2" />
-                Демо вход (alpay@hightechai.site)
-              </Button>
-            </div>
           </CardContent>
         </Card>
 
-        <div className="text-center mt-6 text-xs text-muted-foreground">
-          <p>
-            💡 Подсказка: Отключите "Confirm email" в настройках Supabase для быстрого тестирования
-          </p>
-        </div>
       </div>
     </div>
   );
