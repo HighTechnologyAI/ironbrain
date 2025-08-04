@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import NotificationCenter from '@/components/NotificationCenter';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/hooks/use-language';
 import { usePerformanceData } from '@/hooks/use-performance-data';
@@ -102,7 +103,7 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
       key: 'admin', 
       path: '/admin', 
       icon: Settings, 
-      label: 'Админ',
+      label: t.admin || 'Админ',
       badge: 'SYS',
       variant: 'secondary' as const
     }
@@ -197,14 +198,7 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
               {user?.email}
             </div>
             
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setLanguage(language === 'ru' ? 'en' : 'ru')}
-              className="hover:bg-primary/10"
-            >
-              {language === 'ru' ? 'EN' : 'РУ'}
-            </Button>
+            <LanguageSwitcher />
 
             <NotificationCenter />
 
@@ -213,7 +207,7 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
               size="sm"
               onClick={signOut}
               className="hover:bg-destructive/10 hover:border-destructive"
-              title="Выйти"
+              title={t.logout || 'Выйти'}
             >
               <LogOut className="h-4 w-4" />
             </Button>

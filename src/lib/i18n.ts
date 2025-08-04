@@ -103,6 +103,47 @@ export interface Translations {
   awards: string;
   analytics: string;
   admin: string;
+  logout: string;
+
+  // Team page
+  teamManagement: string;
+  addEmployee: string;
+  loadingTeam: string;
+  dataLoadError: string;
+  tryAgain: string;
+  employee: string;
+  department: string;
+  since: string;
+  status: string;
+  noTeamMembers: string;
+  administrator: string;
+  manager: string;
+  intern: string;
+  unknown: string;
+  away: string;
+  offline: string;
+
+  // Index page
+  goingToTasks: string;
+  openingTasksList: string;
+  goingToTeam: string;
+  openingTeamManagement: string;
+  goingToAchievements: string;
+  openingAchievements: string;
+  personalTasksDesc: string;
+  teamDesc: string;
+  projectsDesc: string;
+  analyticsDesc: string;
+  problemsDesc: string;
+  achievementsDesc: string;
+  adminDesc: string;
+  perWeek: string;
+  active: string;
+  users: string;
+  aiAssistantDesc: string;
+  personalization: string;
+  smartTasks: string;
+  loadAnalysis: string;
   
   // Tasks
   tasksTitle: string;
@@ -246,6 +287,47 @@ export const translations: Record<string, Translations> = {
     awards: 'Awards',
     analytics: 'Analytics',
     admin: 'Admin',
+    logout: 'Logout',
+
+    // Team page
+    teamManagement: 'Team management',
+    addEmployee: 'Add employee',
+    loadingTeam: 'Loading team...',
+    dataLoadError: 'Data loading error',
+    tryAgain: 'Try again',
+    employee: 'Employee',
+    department: 'Department',
+    since: 'Since',
+    status: 'Status',
+    noTeamMembers: 'No team members. Add first employee.',
+    administrator: 'Administrator',
+    manager: 'Manager',
+    intern: 'Intern',
+    unknown: 'Unknown',
+    away: 'Away',
+    offline: 'Offline',
+
+    // Index page
+    goingToTasks: 'Going to tasks',
+    openingTasksList: 'Opening tasks list...',
+    goingToTeam: 'Going to team',
+    openingTeamManagement: 'Opening team management...',
+    goingToAchievements: 'Going to achievements',
+    openingAchievements: 'Opening awards and achievements...',
+    personalTasksDesc: 'Personal task management',
+    teamDesc: 'Team and employees',
+    projectsDesc: 'Active projects',
+    analyticsDesc: 'Analytics and reports',
+    problemsDesc: 'Issues requiring attention',
+    achievementsDesc: 'Awards and achievements',
+    adminDesc: 'System management and external control',
+    perWeek: 'per week',
+    active: 'Active',
+    users: 'users',
+    aiAssistantDesc: 'Personal assistant for creating tasks taking into account the skills of each employee',
+    personalization: 'Personalization',
+    smartTasks: 'Smart tasks',
+    loadAnalysis: 'Load analysis',
     
     // Tasks
     tasksTitle: 'Task Management',
@@ -387,6 +469,47 @@ export const translations: Record<string, Translations> = {
     awards: 'Награды',
     analytics: 'Аналитика',
     admin: 'Админ',
+    logout: 'Выйти',
+
+    // Team page
+    teamManagement: 'Управление командой',
+    addEmployee: 'Добавить сотрудника',
+    loadingTeam: 'Загрузка команды...',
+    dataLoadError: 'Ошибка загрузки данных',
+    tryAgain: 'Попробовать снова',
+    employee: 'Сотрудник',
+    department: 'Отдел',
+    since: 'С',
+    status: 'Статус',
+    noTeamMembers: 'Нет участников команды. Добавьте первого сотрудника.',
+    administrator: 'Администратор',
+    manager: 'Менеджер',
+    intern: 'Стажер',
+    unknown: 'Неизвестно',
+    away: 'Отошел',
+    offline: 'Не в сети',
+
+    // Index page
+    goingToTasks: 'Переход к задачам',
+    openingTasksList: 'Открываем список активных задач...',
+    goingToTeam: 'Переход к команде',
+    openingTeamManagement: 'Открываем управление командой...',
+    goingToAchievements: 'Переход к достижениям',
+    openingAchievements: 'Открываем награды и достижения...',
+    personalTasksDesc: 'Управление личными задачами',
+    teamDesc: 'Команда и сотрудники',
+    projectsDesc: 'Активные проекты',
+    analyticsDesc: 'Аналитика и отчеты',
+    problemsDesc: 'Проблемы требующие внимания',
+    achievementsDesc: 'Награды и достижения',
+    adminDesc: 'Управление системой и внешний контроль',
+    perWeek: 'за неделю',
+    active: 'Активных',
+    users: 'пользователей',
+    aiAssistantDesc: 'Персональный помощник для создания задач с учетом навыков каждого сотрудника',
+    personalization: 'Персонализация',
+    smartTasks: 'Умные задачи',
+    loadAnalysis: 'Анализ нагрузки',
     
     // Tasks
     tasksTitle: 'Управление задачами',
@@ -529,6 +652,47 @@ export const translations: Record<string, Translations> = {
     awards: 'Награди',
     analytics: 'Анализи',
     admin: 'Админ',
+    logout: 'Изход',
+
+    // Team page
+    teamManagement: 'Управление на екипа',
+    addEmployee: 'Добави служител',
+    loadingTeam: 'Зареждане на екипа...',
+    dataLoadError: 'Грешка при зареждане на данни',
+    tryAgain: 'Опитай пак',
+    employee: 'Служител',
+    department: 'Отдел',
+    since: 'От',
+    status: 'Статус',
+    noTeamMembers: 'Няма членове на екипа. Добавете първия служител.',
+    administrator: 'Администратор',
+    manager: 'Мениджър',
+    intern: 'Стажант',
+    unknown: 'Неизвестно',
+    away: 'Отсъства',
+    offline: 'Офлайн',
+
+    // Index page
+    goingToTasks: 'Отиваме към задачите',
+    openingTasksList: 'Отваряме списъка със задачи...',
+    goingToTeam: 'Отиваме към екипа',
+    openingTeamManagement: 'Отваряме управлението на екипа...',
+    goingToAchievements: 'Отиваме към постиженията',
+    openingAchievements: 'Отваряме наградите и постиженията...',
+    personalTasksDesc: 'Управление на лични задачи',
+    teamDesc: 'Екип и служители',
+    projectsDesc: 'Активни проекти',
+    analyticsDesc: 'Аналитика и отчети',
+    problemsDesc: 'Проблеми изискващи внимание',
+    achievementsDesc: 'Награди и постижения',
+    adminDesc: 'Системно управление и външен контрол',
+    perWeek: 'за седмица',
+    active: 'Активни',
+    users: 'потребители',
+    aiAssistantDesc: 'Личен асистент за създаване на задачи с отчитане на уменията на всеки служител',
+    personalization: 'Персонализация',
+    smartTasks: 'Умни задачи',
+    loadAnalysis: 'Анализ на натоварването',
     
     // Tasks
     tasksTitle: 'Управление на задачи',

@@ -6,11 +6,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, ArrowLeft, Plus, Mail, Phone, Calendar, UserCheck, UserX, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTeamDataWithPresence } from "@/hooks/use-team-data-with-presence";
+import { useLanguage } from "@/hooks/use-language";
 import CreateTeamMemberForm from "@/components/CreateTeamMemberForm";
 import AppNavigation from "@/components/AppNavigation";
 
 const Team = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const { teamMembers, loading, error } = useTeamDataWithPresence();
 
@@ -46,10 +48,10 @@ const Team = () => {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'online': return 'В сети';
-      case 'away': return 'Отошел';
-      case 'offline': return 'Не в сети';
-      default: return 'Неизвестно';
+      case 'online': return t.online || 'В сети';
+      case 'away': return t.away || 'Отошел';
+      case 'offline': return t.offline || 'Не в сети';
+      default: return t.unknown || 'Неизвестно';
     }
   };
 
@@ -65,17 +67,17 @@ const Team = () => {
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'admin': return 'Администратор';
-      case 'manager': return 'Менеджер';
-      case 'employee': return 'Сотрудник';
-      case 'intern': return 'Стажер';
-      default: return 'Неизвестно';
+      case 'admin': return t.administrator || 'Администратор';
+      case 'manager': return t.manager || 'Менеджер';
+      case 'employee': return t.employee || 'Сотрудник';
+      case 'intern': return t.intern || 'Стажер';
+      default: return t.unknown || 'Неизвестно';
     }
   };
 
   return (
     <>
-      <AppNavigation title="Команда" subtitle="Управление участниками команды" />
+      <AppNavigation title={t.team || "Команда"} subtitle={t.teamManagement || "Управление участниками команды"} />
       <div className="min-h-screen bg-background p-6">
         {/* Action Button */}
         <div className="flex justify-end mb-6">
@@ -84,7 +86,7 @@ const Team = () => {
             onClick={() => setShowCreateForm(true)}
           >
             <Plus className="h-4 w-4 mr-2" />
-            Добавить сотрудника
+            {t.addEmployee || 'Добавить сотрудника'}
           </Button>
         </div>
 
@@ -92,7 +94,7 @@ const Team = () => {
         {loading && (
           <div className="flex justify-center items-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2 text-muted-foreground">Загрузка команды...</span>
+            <span className="ml-2 text-muted-foreground">{t.loadingTeam || 'Загрузка команды...'}</span>
           </div>
         )}
 
@@ -100,9 +102,9 @@ const Team = () => {
         {error && (
           <Card className="border-destructive bg-destructive/5">
             <CardContent className="pt-6">
-              <p className="text-destructive mb-4">Ошибка загрузки данных: {error}</p>
+              <p className="text-destructive mb-4">{t.dataLoadError || 'Ошибка загрузки данных'}: {error}</p>
               <Button onClick={() => window.location.reload()} variant="outline">
-                Попробовать снова
+                {t.tryAgain || 'Попробовать снова'}
               </Button>
             </CardContent>
           </Card>
@@ -127,7 +129,7 @@ const Team = () => {
                       </div>
                       <div>
                         <CardTitle className="text-lg">{member.full_name}</CardTitle>
-                        <CardDescription>{member.position || 'Сотрудник'}</CardDescription>
+                        <CardDescription>{member.position || t.employee || 'Сотрудник'}</CardDescription>
                       </div>
                     </div>
                   </div>
@@ -136,7 +138,7 @@ const Team = () => {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <Badge className="bg-secondary text-secondary-foreground">
-                      Сотрудник
+                      {t.employee || 'Сотрудник'}
                     </Badge>
                     <Badge variant="outline" className="text-xs">
                       {getStatusLabel(member.status || 'offline')}
@@ -145,7 +147,7 @@ const Team = () => {
 
                   {member.department && (
                     <div className="text-sm text-muted-foreground">
-                      Отдел: {member.department}
+                      {t.department || 'Отдел'}: {member.department}
                     </div>
                   )}
 
@@ -159,13 +161,13 @@ const Team = () => {
                   {member.hire_date && (
                     <div className="flex items-center gap-2 text-sm">
                       <Calendar className="h-3 w-3 text-muted-foreground" />
-                      <span>С {new Date(member.hire_date).toLocaleDateString()}</span>
+                      <span>{t.since || 'С'} {new Date(member.hire_date).toLocaleDateString()}</span>
                     </div>
                   )}
 
                   <div className="pt-2 border-t">
                     <div className="text-xs text-muted-foreground">
-                      Статус: {getStatusLabel(member.status || 'offline')}
+                      {t.status || 'Статус'}: {getStatusLabel(member.status || 'offline')}
                     </div>
                   </div>
                 </CardContent>
@@ -180,7 +182,7 @@ const Team = () => {
             <CardContent>
               <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">
-                Нет участников команды. Добавьте первого сотрудника.
+                {t.noTeamMembers || 'Нет участников команды. Добавьте первого сотрудника.'}
               </p>
             </CardContent>
           </Card>

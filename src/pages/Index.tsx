@@ -55,22 +55,22 @@ const Index = () => {
       switch (section) {
         case t.activeTasks:
           toast({
-            title: "Переход к задачам",
-            description: "Открываем список активных задач...",
+            title: t.goingToTasks || "Переход к задачам",
+            description: t.openingTasksList || "Открываем список активных задач...",
           });
           navigate('/tasks');
           break;
         case t.teamMembers:
           toast({
-            title: "Переход к команде",
-            description: "Открываем управление командой...",
+            title: t.goingToTeam || "Переход к команде",
+            description: t.openingTeamManagement || "Открываем управление командой...",
           });
           navigate('/team');
           break;
         case t.achievements:
           toast({
-            title: "Переход к достижениям", 
-            description: "Открываем награды и достижения...",
+            title: t.goingToAchievements || "Переход к достижениям", 
+            description: t.openingAchievements || "Открываем награды и достижения...",
           });
           navigate('/awards');
           break;
@@ -110,7 +110,7 @@ const Index = () => {
       icon: CheckSquare, 
       badge: performanceData.pendingTasks > 0 ? performanceData.pendingTasks.toString() : null, 
       color: "text-primary",
-      description: "Управление личными задачами",
+      description: t.personalTasksDesc || "Управление личными задачами",
       route: "/tasks"
     },
     { 
@@ -118,7 +118,7 @@ const Index = () => {
       icon: Users, 
       badge: performanceData.activeTeamMembers > 0 ? performanceData.activeTeamMembers.toString() : null, 
       color: "text-primary",
-      description: "Команда и сотрудники",
+      description: t.teamDesc || "Команда и сотрудники",
       route: "/team"
     },
     { 
@@ -126,7 +126,7 @@ const Index = () => {
       icon: Target, 
       badge: "5", 
       color: "text-primary",
-      description: "Активные проекты",
+      description: t.projectsDesc || "Активные проекты",
       route: "/projects"
     },
     { 
@@ -134,7 +134,7 @@ const Index = () => {
       icon: BarChart3, 
       badge: null, 
       color: "text-primary",
-      description: "Аналитика и отчеты",
+      description: t.analyticsDesc || "Аналитика и отчеты",
       route: "/analytics"
     },
     { 
@@ -142,7 +142,7 @@ const Index = () => {
       icon: Shield, 
       badge: performanceData.overdueTasks > 0 ? performanceData.overdueTasks.toString() : null, 
       color: "text-destructive",
-      description: "Проблемы требующие внимания",
+      description: t.problemsDesc || "Проблемы требующие внимания",
       route: "/issues"
     },
     { 
@@ -150,15 +150,15 @@ const Index = () => {
       icon: Award, 
       badge: performanceData.totalAchievements > 0 ? performanceData.totalAchievements.toString() : null, 
       color: "text-accent",
-      description: "Награды и достижения",
+      description: t.achievementsDesc || "Награды и достижения",
       route: "/awards"
     },
     { 
-      title: "Админ-панель", 
+      title: t.admin || "Админ-панель", 
       icon: Settings, 
       badge: "SYS", 
       color: "text-accent",
-      description: "Управление системой и внешний контроль",
+      description: t.adminDesc || "Управление системой и внешний контроль",
       route: "/admin"
     }
   ];
@@ -234,7 +234,7 @@ const Index = () => {
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <TrendingUp className="h-3 w-3 text-primary group-hover:animate-bounce" />
                 <span className="text-primary font-semibold">{stat.trend}</span>
-                <span>за неделю</span>
+                <span>{t.perWeek || 'за неделю'}</span>
               </div>
             </CardContent>
           </Card>
@@ -258,8 +258,8 @@ const Index = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Activity className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground">Активных:</span>
-                  <span className="text-primary font-mono">{onlineUserCount} пользователей</span>
+                  <span className="text-muted-foreground">{t.active || 'Активных'}:</span>
+                  <span className="text-primary font-mono">{onlineUserCount} {t.users || 'пользователей'}</span>
                 </div>
               </div>
               <div className="text-xs text-muted-foreground">
@@ -286,20 +286,20 @@ const Index = () => {
               </Badge>
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              🤖 Персональный помощник для создания задач с учетом навыков каждого сотрудника
+              🤖 {t.aiAssistantDesc || 'Персональный помощник для создания задач с учетом навыков каждого сотрудника'}
             </CardDescription>
             <div className="flex items-center gap-4 mt-2 text-xs">
               <div className="flex items-center gap-1 text-primary">
                 <Sparkles className="h-3 w-3" />
-                <span>Персонализация</span>
+                <span>{t.personalization || 'Персонализация'}</span>
               </div>
               <div className="flex items-center gap-1 text-primary">
                 <Target className="h-3 w-3" />
-                <span>Умные задачи</span>
+                <span>{t.smartTasks || 'Умные задачи'}</span>
               </div>
               <div className="flex items-center gap-1 text-primary">
                 <BarChart3 className="h-3 w-3" />
-                <span>Анализ нагрузки</span>
+                <span>{t.loadAnalysis || 'Анализ нагрузки'}</span>
               </div>
             </div>
           </CardHeader>
