@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/use-language';
@@ -41,8 +42,26 @@ const AdminPanel = () => {
   const [queryResult, setQueryResult] = useState<any>(null);
   const [tasks, setTasks] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    priority: 'medium',
+    status: 'pending',
+    assigned_to: '',
+    estimated_hours: ''
+  });
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const { toast } = useToast();
   const { t } = useLanguage();
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setCurrentUser(data.user);
+    };
+    getCurrentUser();
+  }, []);
 
   const adminApiCall = async (action: string, method = 'GET', body?: any) => {
     try {
@@ -104,15 +123,17 @@ const AdminPanel = () => {
   const loadDashboard = async () => {
     setLoading(true);
     try {
-      const [statusRes, tasksRes, analyticsRes] = await Promise.all([
+      const [statusRes, tasksRes, analyticsRes, profilesRes] = await Promise.all([
         adminApiCall('system_status'),
         adminApiCall('tasks_management'),
-        adminApiCall('analytics')
+        adminApiCall('analytics'),
+        supabase.from('profiles').select('*').eq('is_active', true)
       ]);
 
       setSystemStatus(statusRes);
       setTasks(tasksRes.tasks || []);
       setAnalytics(analyticsRes.analytics);
+      setProfiles(profilesRes.data || []);
     } catch (error) {
       console.error('Failed to load dashboard:', error);
     } finally {
@@ -164,6 +185,51 @@ const AdminPanel = () => {
       });
     } catch (error) {
       console.error('Backup failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createTask = async () => {
+    if (!newTask.title.trim()) {
+      toast({
+        title: 'Ошибка',
+        description: 'Введите название задачи',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const taskData = {
+        ...newTask,
+        estimated_hours: newTask.estimated_hours ? parseInt(newTask.estimated_hours) : null,
+        assigned_to: newTask.assigned_to || null,
+        created_by: profiles.find(p => p.user_id === currentUser?.id)?.id
+      };
+
+      await adminApiCall('tasks_management', 'POST', { task_data: taskData });
+      
+      // Reset form
+      setNewTask({
+        title: '',
+        description: '',
+        priority: 'medium',
+        status: 'pending',
+        assigned_to: '',
+        estimated_hours: ''
+      });
+
+      // Reload tasks
+      loadDashboard();
+
+      toast({
+        title: 'Успешно',
+        description: 'Задача создана через API',
+      });
+    } catch (error) {
+      console.error('Create task failed:', error);
     } finally {
       setLoading(false);
     }
@@ -277,10 +343,14 @@ const AdminPanel = () => {
         </Card>
 
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="dashboard">
               <Activity className="h-4 w-4 mr-2" />
               Дашборд
+            </TabsTrigger>
+            <TabsTrigger value="tasks">
+              <Settings className="h-4 w-4 mr-2" />
+              Задачи
             </TabsTrigger>
             <TabsTrigger value="database">
               <Database className="h-4 w-4 mr-2" />
@@ -450,6 +520,130 @@ const AdminPanel = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="tasks" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Создать новую задачу</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Название задачи *</label>
+                    <Input
+                      placeholder="Введите название задачи"
+                      value={newTask.title}
+                      onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Описание</label>
+                    <Textarea
+                      placeholder="Опишите задачу"
+                      value={newTask.description}
+                      onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+                      className="min-h-[100px]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Приоритет</label>
+                      <Select value={newTask.priority} onValueChange={(value) => setNewTask({...newTask, priority: value})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Низкий</SelectItem>
+                          <SelectItem value="medium">Средний</SelectItem>
+                          <SelectItem value="high">Высокий</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Статус</label>
+                      <Select value={newTask.status} onValueChange={(value) => setNewTask({...newTask, status: value})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">В ожидании</SelectItem>
+                          <SelectItem value="in_progress">В работе</SelectItem>
+                          <SelectItem value="completed">Завершена</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Назначить</label>
+                      <Select value={newTask.assigned_to} onValueChange={(value) => setNewTask({...newTask, assigned_to: value})}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Выберите исполнителя" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {profiles.map((profile) => (
+                            <SelectItem key={profile.id} value={profile.id}>
+                              {profile.full_name} ({profile.position})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Часы (оценка)</label>
+                      <Input
+                        type="number"
+                        placeholder="Часов"
+                        value={newTask.estimated_hours}
+                        onChange={(e) => setNewTask({...newTask, estimated_hours: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  <Button onClick={createTask} disabled={loading || !newTask.title.trim()} className="w-full">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Создать задачу через API
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Последние созданные задачи</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {tasks.slice(0, 10).map((task: any) => (
+                      <div key={task.id} className="flex justify-between items-start p-3 border rounded-lg">
+                        <div className="flex-1">
+                          <p className="font-medium">{task.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {task.assigned_to?.full_name || 'Не назначено'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(task.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <Badge variant={task.status === 'completed' ? 'default' : 'secondary'}>
+                            {task.status}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {task.priority}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="users" className="mt-6">
