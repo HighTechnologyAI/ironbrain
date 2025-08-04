@@ -23,12 +23,15 @@ import {
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import CreateProjectForm from "@/components/CreateProjectForm";
+import AppNavigation from "@/components/AppNavigation";
 
 const Projects = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -90,27 +93,16 @@ const Projects = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => navigate('/')}
-            className="hover:bg-primary/10"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold cyber-text flex items-center gap-3">
-              <Target className="text-primary h-8 w-8" />
-              Проекты
-            </h1>
-            <p className="text-muted-foreground mt-1">Управление проектами и их выполнением</p>
-          </div>
-        </div>
-        <Button className="cyber-glow">
+    <>
+      <AppNavigation title="Проекты" subtitle="Управление проектами и их выполнением" />
+      <div className="min-h-screen bg-background p-6">
+      {/* Header - Removed since using AppNavigation */}
+      {/* Action Button */}
+      <div className="flex justify-end mb-6">
+        <Button 
+          className="cyber-glow"
+          onClick={() => setShowCreateForm(true)}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Новый проект
         </Button>
@@ -276,7 +268,14 @@ const Projects = () => {
           </CardContent>
         </Card>
       )}
-    </div>
+      </div>
+
+      <CreateProjectForm 
+        open={showCreateForm}
+        onOpenChange={setShowCreateForm}
+        onProjectCreated={fetchProjects}
+      />
+    </>
   );
 };
 
