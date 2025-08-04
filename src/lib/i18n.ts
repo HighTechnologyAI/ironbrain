@@ -5,6 +5,7 @@ export interface Language {
 }
 
 export const languages: Language[] = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'ru', name: 'Русский', flag: '🇷🇺' },
   { code: 'bg', name: 'Български', flag: '🇧🇬' },
 ];
@@ -136,6 +137,131 @@ export interface Translations {
 }
 
 export const translations: Record<string, Translations> = {
+  en: {
+    // Common
+    loading: 'Loading...',
+    error: 'Error',
+    success: 'Success',
+    save: 'Save',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    edit: 'Edit',
+    create: 'Create',
+    search: 'Search',
+    filter: 'Filter',
+    send: 'Send',
+    sending: 'Sending...',
+    uploading: 'Uploading...',
+    edited: 'edited',
+    joined: 'joined',
+    
+    // Notifications
+    notifications: 'Notifications',
+    noNotifications: 'No notifications',
+    markAsRead: 'Mark as read',
+    markAllAsRead: 'Mark all as read',
+    invitedToTask: 'Task invitation',
+    acceptInvitation: 'Accept',
+    declineInvitation: 'Decline',
+    invitationAccepted: 'Invitation accepted',
+    invitationDeclined: 'Invitation declined',
+    
+    // Chat and invitations
+    inviteToChat: 'Invite to chat',
+    chatInvitation: 'Task chat invitation',
+    inviteParticipant: 'Invite participant',
+    removeFromChat: 'Remove from chat',
+    fileAttached: 'File attached',
+    
+    // Users
+    unknownUser: 'Unknown user',
+    userNotFound: 'User not found',
+    
+    // Files and attachments
+    attachments: 'Attachments',
+    addFile: 'Add file',
+    filesUploaded: 'Files uploaded',
+    fileDeleted: 'File deleted',
+    uploadFailed: 'Upload failed',
+    downloadFailed: 'Download failed',
+    deleteFailed: 'Delete failed',
+    unsupportedFileType: 'Unsupported file type',
+    fileTooLarge: 'File too large',
+    
+    // Comments
+    comments: 'Comments',
+    noComments: 'No comments',
+    writeComment: 'Write a comment...',
+    commentAdded: 'Comment added',
+    commentFailed: 'Failed to add comment',
+    pressCtrlEnter: 'Ctrl+Enter to send',
+    
+    // Participants
+    participants: 'Participants',
+    noParticipants: 'No participants',
+    addParticipant: 'Add participant',
+    participantAdded: 'Participant added',
+    participantRemoved: 'Participant removed',
+    addParticipantFailed: 'Failed to add participant',
+    removeParticipantFailed: 'Failed to remove participant',
+    
+    // Navigation
+    dashboard: 'Dashboard',
+    tasks: 'Tasks',
+    team: 'Team',
+    projects: 'Projects',
+    issues: 'Issues',
+    awards: 'Awards',
+    analytics: 'Analytics',
+    admin: 'Admin',
+    
+    // Tasks
+    tasksTitle: 'Task Management',
+    tasksDescription: 'Create and track tasks for your team',
+    allTasks: 'All tasks',
+    myTasks: 'My tasks',
+    createdByMe: 'Created by me',
+    taskStatus: 'Status',
+    taskPriority: 'Priority',
+    searchTasks: 'Search tasks...',
+    createTask: 'Create task',
+    startWork: 'Start work',
+    complete: 'Complete',
+    assignee: 'Assignee',
+    dueDate: 'Due',
+    estimated: 'Estimated',
+    actual: 'Actual',
+    hours: 'h',
+    created: 'Created',
+    noTasksFound: 'No tasks found',
+    noTasksFoundDesc: 'Create your first task or change search filters',
+    noActiveTasks: 'You have no active tasks',
+    noActiveTasksDesc: 'Tasks assigned to you will appear here',
+    noCreatedTasks: 'You haven\'t created any tasks yet',
+    noCreatedTasksDesc: 'Click "Create task" to get started',
+    
+    // Task Status
+    pending: 'Pending',
+    inProgress: 'In Progress',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
+    onHold: 'On Hold',
+    
+    // Task Priority
+    low: 'Low',
+    medium: 'Medium',
+    high: 'High',
+    critical: 'Critical',
+    
+    // Statuses
+    allStatuses: 'All statuses',
+    allPriorities: 'All priorities',
+    
+    // Messages
+    taskStatusUpdated: 'Task status updated',
+    taskStatusUpdateError: 'Failed to update task status',
+    tasksLoadError: 'Failed to load tasks',
+  },
   ru: {
     // Common
     loading: 'Загрузка...',

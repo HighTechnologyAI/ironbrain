@@ -20,8 +20,9 @@ import {
   File
 } from 'lucide-react';
 import TaskParticipantManager from '@/components/TaskParticipantManager';
+import ChatInviteButton from '@/components/ChatInviteButton';
 import { format } from 'date-fns';
-import { ru, bg } from 'date-fns/locale';
+import { ru, bg, enUS } from 'date-fns/locale';
 import { APP_CONFIG } from '@/config/app-config';
 
 interface TaskComment {
@@ -69,7 +70,7 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
   const { t, language } = useLanguage();
   const { toast } = useToast();
 
-  const dateLocale = language === 'bg' ? bg : ru;
+  const dateLocale = language === 'bg' ? bg : language === 'en' ? enUS : ru;
 
   useEffect(() => {
     loadComments();
@@ -310,10 +311,13 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
       {/* Чат */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <MessageCircle className="h-4 w-4" />
-            {t.comments} ({comments.length})
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <MessageCircle className="h-4 w-4" />
+              {t.comments} ({comments.length})
+            </CardTitle>
+            {isTaskCreator && <ChatInviteButton taskId={taskId} />}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Список комментариев */}

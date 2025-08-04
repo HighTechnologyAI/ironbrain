@@ -13,20 +13,22 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Bell, Check, X, UserPlus } from 'lucide-react';
 import { format } from 'date-fns';
-import { ru, bg } from 'date-fns/locale';
+import { ru, bg, enUS } from 'date-fns/locale';
 
 interface Notification {
   id: string;
-  type: 'task_invitation' | 'chat_invitation' | 'general';
+  type: 'task_invitation' | 'chat_invitation' | 'general' | 'admin_announcement';
   title: string;
   message: string;
   data?: {
     task_id?: string;
     task_title?: string;
     inviter_name?: string;
+    chat_invitation_id?: string;
   };
   read: boolean;
   created_at: string;
+  expires_at?: string;
 }
 
 const NotificationCenter = () => {
@@ -37,7 +39,7 @@ const NotificationCenter = () => {
   const { t, language } = useLanguage();
   const { toast } = useToast();
 
-  const dateLocale = language === 'bg' ? bg : ru;
+  const dateLocale = language === 'bg' ? bg : language === 'en' ? enUS : ru;
 
   useEffect(() => {
     if (user) {
@@ -48,39 +50,63 @@ const NotificationCenter = () => {
 
   const loadNotifications = async () => {
     try {
-      // В реальном проекте здесь была бы таблица notifications
-      // Пока что используем mock данные
-      const mockNotifications: Notification[] = [
-        {
-          id: '1',
-          type: 'task_invitation',
-          title: t.invitedToTask,
-          message: `${t.invitedToTask}: "Тестирование системы задач"`,
-          data: {
-            task_id: 'task-1',
-            task_title: 'Тестирование системы задач',
-            inviter_name: 'OLEKSANDR KOVALCHUK'
-          },
-          read: false,
-          created_at: new Date().toISOString()
-        }
-      ];
-      
-      setNotifications(mockNotifications);
-      setUnreadCount(mockNotifications.filter(n => !n.read).length);
+      if (!user) return;
+
+      // Получаем профиль пользователя для поиска уведомлений
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!profile) return;
+
+      // Загружаем уведомления из базы данных
+      const { data: notificationsData, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      // Преобразуем данные в нужный формат
+      const formattedNotifications: Notification[] = (notificationsData || []).map(notification => ({
+        id: notification.id,
+        type: notification.type as 'task_invitation' | 'chat_invitation' | 'general' | 'admin_announcement',
+        title: notification.title,
+        message: notification.message,
+        data: (notification.data as any) || {},
+        read: notification.read,
+        created_at: notification.created_at,
+        expires_at: notification.expires_at || undefined
+      }));
+
+      setNotifications(formattedNotifications);
+      setUnreadCount(formattedNotifications.filter(n => !n.read).length);
     } catch (error) {
       console.error('Error loading notifications:', error);
     }
   };
 
   const subscribeToNotifications = () => {
-    // В реальном проекте здесь была бы подписка на изменения таблицы notifications
+    if (!user) return;
+
+    // Подписываемся на изменения в таблице уведомлений
     const channel = supabase
-      .channel('notifications')
+      .channel('notifications-changes')
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
-        table: 'task_participants'
+        table: 'notifications'
+      }, () => {
+        loadNotifications();
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'chat_invitations'
       }, () => {
         loadNotifications();
       })
@@ -133,7 +159,72 @@ const NotificationCenter = () => {
     }
   };
 
+  const handleAcceptChatInvitation = async (notification: Notification) => {
+    if (!notification.data?.chat_invitation_id || !user) return;
+
+    try {
+      // Получаем профиль пользователя
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!profile) return;
+
+      // Обновляем статус приглашения в чат на "принято"
+      const { error } = await supabase
+        .from('chat_invitations')
+        .update({ 
+          status: 'accepted', 
+          responded_at: new Date().toISOString() 
+        })
+        .eq('id', notification.data.chat_invitation_id)
+        .eq('invited_user_id', profile.id);
+
+      if (error) throw error;
+
+      toast({
+        title: t.success,
+        description: t.invitationAccepted,
+      });
+
+      markAsRead(notification.id);
+    } catch (error) {
+      console.error('Error accepting chat invitation:', error);
+      toast({
+        title: t.error,
+        description: t.error,
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleDeclineInvitation = async (notification: Notification) => {
+    // Если это приглашение в чат, обновляем статус
+    if (notification.type === 'chat_invitation' && notification.data?.chat_invitation_id && user) {
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+
+        if (profile) {
+          await supabase
+            .from('chat_invitations')
+            .update({ 
+              status: 'declined', 
+              responded_at: new Date().toISOString() 
+            })
+            .eq('id', notification.data.chat_invitation_id)
+            .eq('invited_user_id', profile.id);
+        }
+      } catch (error) {
+        console.error('Error declining chat invitation:', error);
+      }
+    }
+
     toast({
       title: t.success,
       description: t.invitationDeclined,
@@ -203,15 +294,19 @@ const NotificationCenter = () => {
                         )}
                       </div>
                       
-                      {notification.type === 'task_invitation' && !notification.read && (
+                      {(notification.type === 'task_invitation' || notification.type === 'chat_invitation') && !notification.read && (
                         <div className="flex gap-2">
                           <Button 
                             size="sm" 
-                            onClick={() => handleAcceptInvitation(notification)}
+                            onClick={() => 
+                              notification.type === 'chat_invitation' 
+                                ? handleAcceptChatInvitation(notification)
+                                : handleAcceptInvitation(notification)
+                            }
                             className="h-7 px-2 text-xs"
                           >
                             <Check className="h-3 w-3 mr-1" />
-                            {t.acceptInvitation}
+                            {language === 'en' ? 'Join' : language === 'ru' ? 'Войти' : 'Влез'}
                           </Button>
                           <Button 
                             size="sm" 
@@ -220,7 +315,7 @@ const NotificationCenter = () => {
                             className="h-7 px-2 text-xs"
                           >
                             <X className="h-3 w-3 mr-1" />
-                            {t.declineInvitation}
+                            {language === 'en' ? 'Cancel' : language === 'ru' ? 'Отменить' : 'Отказ'}
                           </Button>
                         </div>
                       )}
