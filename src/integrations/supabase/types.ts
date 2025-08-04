@@ -659,7 +659,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_profile: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avatar_url: string | null
+          created_at: string | null
+          department: string | null
+          full_name: string
+          hire_date: string | null
+          id: string
+          is_active: boolean | null
+          phone: string | null
+          position: string | null
+          role: Database["public"]["Enums"]["employee_role"] | null
+          salary: number | null
+          telegram_username: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+      }
     }
     Enums: {
       achievement_type: "individual" | "team" | "company"
