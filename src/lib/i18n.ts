@@ -28,6 +28,22 @@ export interface Translations {
   edited: string;
   joined: string;
   
+  // Main page
+  title: string;
+  subtitle: string;
+  welcome: string;
+  welcomeDescription: string;
+  systemStatus: string;
+  online: string;
+  performance: string;
+  activeTasks: string;
+  teamMembers: string;
+  achievements: string;
+  problems: string;
+  achievements_page: string;
+  lastUpdate: string;
+  aiAssistant: string;
+  
   // Notifications
   notifications: string;
   noNotifications: string;
@@ -155,6 +171,22 @@ export const translations: Record<string, Translations> = {
     edited: 'edited',
     joined: 'joined',
     
+    // Main page
+    title: 'TIGER CRM',
+    subtitle: 'Task & Project Management System',
+    welcome: 'Welcome',
+    welcomeDescription: 'Your comprehensive task and project management system',
+    systemStatus: 'System Status',
+    online: 'Online',
+    performance: 'Performance',
+    activeTasks: 'Active Tasks',
+    teamMembers: 'Team Members',
+    achievements: 'Achievements',
+    problems: 'Problems',
+    achievements_page: 'Awards',
+    lastUpdate: 'Last Update',
+    aiAssistant: 'AI Assistant',
+    
     // Notifications
     notifications: 'Notifications',
     noNotifications: 'No notifications',
@@ -279,6 +311,22 @@ export const translations: Record<string, Translations> = {
     uploading: 'Загрузка...',
     edited: 'изменено',
     joined: 'присоединился',
+    
+    // Main page
+    title: 'ТИГР CRM',
+    subtitle: 'Система управления задачами и проектами',
+    welcome: 'Добро пожаловать',
+    welcomeDescription: 'Ваша комплексная система управления задачами и проектами',
+    systemStatus: 'Статус системы',
+    online: 'Онлайн',
+    performance: 'Производительность',
+    activeTasks: 'Активные задачи',
+    teamMembers: 'Участники команды',
+    achievements: 'Достижения',
+    problems: 'Проблемы',
+    achievements_page: 'Награды',
+    lastUpdate: 'Последнее обновление',
+    aiAssistant: 'AI Помощник',
     
     // Notifications
     notifications: 'Уведомления',
@@ -405,6 +453,22 @@ export const translations: Record<string, Translations> = {
     uploading: 'Качване...',
     edited: 'редактирано',
     joined: 'се присъедини',
+    
+    // Main page
+    title: 'TIGER CRM',
+    subtitle: 'Система за управление на задачи и проекти',
+    welcome: 'Добре дошли',
+    welcomeDescription: 'Вашата цялостна система за управление на задачи и проекти',
+    systemStatus: 'Състояние на системата',
+    online: 'Онлайн',
+    performance: 'Производителност',
+    activeTasks: 'Активни задачи',
+    teamMembers: 'Членове на екипа',
+    achievements: 'Постижения',
+    problems: 'Проблеми',
+    achievements_page: 'Награди',
+    lastUpdate: 'Последна актуализация',
+    aiAssistant: 'AI Асистент',
     
     // Notifications
     notifications: 'Известия',

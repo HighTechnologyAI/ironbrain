@@ -23,7 +23,8 @@ import {
   Play,
   Lock,
   Server,
-  MonitorSpeaker
+  MonitorSpeaker,
+  Eye
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import TerminalInterface from '@/components/TerminalInterface';

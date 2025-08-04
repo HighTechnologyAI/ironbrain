@@ -18,6 +18,7 @@ import {
   Wifi,
   Cpu,
   Database,
+  Settings,
   Bot,
   Sparkles,
   Loader2,
