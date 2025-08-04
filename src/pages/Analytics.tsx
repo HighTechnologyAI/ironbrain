@@ -32,6 +32,43 @@ const Analytics = () => {
 
   useEffect(() => {
     loadAnalyticsData();
+    
+    // Подписываемся на real-time обновления данных
+    const tasksChannel = supabase.channel('analytics-tasks-updates')
+      .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'tasks' }, 
+          () => {
+            console.log('Tasks updated, refreshing analytics...');
+            loadAnalyticsData();
+          }
+      )
+      .subscribe();
+
+    const profilesChannel = supabase.channel('analytics-profiles-updates')
+      .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'profiles' }, 
+          () => {
+            console.log('Profiles updated, refreshing analytics...');
+            loadAnalyticsData();
+          }
+      )
+      .subscribe();
+
+    const achievementsChannel = supabase.channel('analytics-achievements-updates')
+      .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'achievements' }, 
+          () => {
+            console.log('Achievements updated, refreshing analytics...');
+            loadAnalyticsData();
+          }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(tasksChannel);
+      supabase.removeChannel(profilesChannel);
+      supabase.removeChannel(achievementsChannel);
+    };
   }, [dateRange, department]);
 
   const loadAnalyticsData = async () => {

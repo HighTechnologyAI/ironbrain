@@ -125,10 +125,33 @@ export const usePerformanceData = () => {
 
     fetchPerformanceData();
     
-    // Обновляем данные каждые 30 секунд
-    const interval = setInterval(fetchPerformanceData, 30000);
+    // Подписываемся на real-time обновления
+    const tasksChannel = supabase.channel('performance-tasks-changes')
+      .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'tasks' }, 
+          () => fetchPerformanceData()
+      )
+      .subscribe();
+
+    const profilesChannel = supabase.channel('performance-profiles-changes')
+      .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'profiles' }, 
+          () => fetchPerformanceData()
+      )
+      .subscribe();
+
+    const achievementsChannel = supabase.channel('performance-achievements-changes')
+      .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'achievements' }, 
+          () => fetchPerformanceData()
+      )
+      .subscribe();
     
-    return () => clearInterval(interval);
+    return () => {
+      supabase.removeChannel(tasksChannel);
+      supabase.removeChannel(profilesChannel);
+      supabase.removeChannel(achievementsChannel);
+    };
   }, []);
 
   return { data, loading, error };
