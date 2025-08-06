@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -73,6 +74,12 @@
     --transition-fast: 0.15s ease-out;
     --transition-normal: 0.3s ease-out;
     --transition-slow: 0.5s ease-out;
+
+    /* Safe Area Support for iOS */
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-right: env(safe-area-inset-right);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    --safe-area-inset-left: env(safe-area-inset-left);
   }
 
   .light {
@@ -80,11 +87,32 @@
     --background: 222 84% 4.5%;
     --foreground: 120 100% 95%;
   }
+
+  /* iOS Safe Area support */
+  @supports (padding: max(0px)) {
+    .safe-area-top {
+      padding-top: max(1rem, env(safe-area-inset-top));
+    }
+    
+    .safe-area-bottom {
+      padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+    
+    .safe-area-left {
+      padding-left: max(1rem, env(safe-area-inset-left));
+    }
+    
+    .safe-area-right {
+      padding-right: max(1rem, env(safe-area-inset-right));
+    }
+  }
 }
 
 @layer base {
   * {
     @apply border-border;
+    /* Улучшенный тач-скроллинг для iOS */
+    -webkit-overflow-scrolling: touch;
   }
 
   body {
@@ -92,37 +120,48 @@
     background-image: var(--gradient-surface);
     min-height: 100vh;
     position: relative;
+    /* iOS specific optimizations */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none; /* Предотвращает bounce эффект в iOS */
   }
 
-  /* Drone silhouette background */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Cg fill='none' stroke='%2300ff00' stroke-width='0.5' opacity='0.05'%3E%3C!-- Main body --%3E%3Cellipse cx='400' cy='300' rx='60' ry='15'/%3E%3C!-- Front arms --%3E%3Cline x1='340' y1='300' x2='280' y2='260'/%3E%3Cline x1='460' y1='300' x2='520' y2='260'/%3E%3C!-- Rear arms --%3E%3Cline x1='340' y1='300' x2='280' y2='340'/%3E%3Cline x1='460' y1='300' x2='520' y2='340'/%3E%3C!-- Propellers --%3E%3Ccircle cx='280' cy='260' r='25' fill='none'/%3E%3Ccircle cx='520' cy='260' r='25' fill='none'/%3E%3Ccircle cx='280' cy='340' r='25' fill='none'/%3E%3Ccircle cx='520' cy='340' r='25' fill='none'/%3E%3C!-- Propeller blades --%3E%3Cline x1='255' y1='260' x2='305' y2='260'/%3E%3Cline x1='280' y1='235' x2='280' y2='285'/%3E%3Cline x1='495' y1='260' x2='545' y2='260'/%3E%3Cline x1='520' y1='235' x2='520' y2='285'/%3E%3Cline x1='255' y1='340' x2='305' y2='340'/%3E%3Cline x1='280' y1='315' x2='280' y2='365'/%3E%3Cline x1='495' y1='340' x2='545' y2='340'/%3E%3Cline x1='520' y1='315' x2='520' y2='365'/%3E%3C!-- Camera gimbal --%3E%3Crect x='390' y='315' width='20' height='10' rx='2'/%3E%3Ccircle cx='400' cy='330' r='8' fill='none'/%3E%3C!-- Landing gear --%3E%3Cline x1='370' y1='315' x2='370' y2='330'/%3E%3Cline x1='430' y1='315' x2='430' y2='330'/%3E%3Cline x1='365' y1='330' x2='375' y2='330'/%3E%3Cline x1='425' y1='330' x2='435' y2='330'/%3E%3C/g%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: 75% 25%;
-    background-size: 600px;
-    pointer-events: none;
-    z-index: -1;
+  /* Улучшение тач-интерфейса для iOS */
+  button, [role="button"], input, select, textarea {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
-  /* Additional drone elements for depth */
-  body::after {
-    content: '';
-    position: fixed;
-    bottom: 10%;
-    left: 10%;
-    width: 300px;
-    height: 200px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 200'%3E%3Cg fill='none' stroke='%2300ff00' stroke-width='0.3' opacity='0.03'%3E%3Cellipse cx='150' cy='100' rx='40' ry='10'/%3E%3Cline x1='110' y1='100' x2='70' y2='75'/%3E%3Cline x1='190' y1='100' x2='230' y2='75'/%3E%3Cline x1='110' y1='100' x2='70' y2='125'/%3E%3Cline x1='190' y1='100' x2='230' y2='125'/%3E%3Ccircle cx='70' cy='75' r='15'/%3E%3Ccircle cx='230' cy='75' r='15'/%3E%3Ccircle cx='70' cy='125' r='15'/%3E%3Ccircle cx='230' cy='125' r='15'/%3E%3C/g%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    pointer-events: none;
-    z-index: -1;
-    animation: float 20s ease-in-out infinite;
+  /* Drone silhouette background - скрыт на мобильных для производительности */
+  @media (min-width: 768px) {
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Cg fill='none' stroke='%2300ff00' stroke-width='0.5' opacity='0.05'%3E%3Cellipse cx='400' cy='300' rx='60' ry='15'/%3E%3Cline x1='340' y1='300' x2='280' y2='260'/%3E%3Cline x1='460' y1='300' x2='520' y2='260'/%3E%3Cline x1='340' y1='300' x2='280' y2='340'/%3E%3Cline x1='460' y1='300' x2='520' y2='340'/%3E%3Ccircle cx='280' cy='260' r='25' fill='none'/%3E%3Ccircle cx='520' cy='260' r='25' fill='none'/%3E%3Ccircle cx='280' cy='340' r='25' fill='none'/%3E%3Ccircle cx='520' cy='340' r='25' fill='none'/%3E%3Cline x1='255' y1='260' x2='305' y2='260'/%3E%3Cline x1='280' y1='235' x2='280' y2='285'/%3E%3Cline x1='495' y1='260' x2='545' y2='260'/%3E%3Cline x1='520' y1='235' x2='520' y2='285'/%3E%3Cline x1='255' y1='340' x2='305' y2='340'/%3E%3Cline x1='280' y1='315' x2='280' y2='365'/%3E%3Cline x1='495' y1='340' x2='545' y2='340'/%3E%3Cline x1='520' y1='315' x2='520' y2='365'/%3E%3Crect x='390' y='315' width='20' height='10' rx='2'/%3E%3Ccircle cx='400' cy='330' r='8' fill='none'/%3E%3Cline x1='370' y1='315' x2='370' y2='330'/%3E%3Cline x1='430' y1='315' x2='430' y2='330'/%3E%3Cline x1='365' y1='330' x2='375' y2='330'/%3E%3Cline x1='425' y1='330' x2='435' y2='330'/%3E%3C/g%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 75% 25%;
+      background-size: 600px;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: 10%;
+      left: 10%;
+      width: 300px;
+      height: 200px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 200'%3E%3Cg fill='none' stroke='%2300ff00' stroke-width='0.3' opacity='0.03'%3E%3Cellipse cx='150' cy='100' rx='40' ry='10'/%3E%3Cline x1='110' y1='100' x2='70' y2='75'/%3E%3Cline x1='190' y1='100' x2='230' y2='75'/%3E%3Cline x1='110' y1='100' x2='70' y2='125'/%3E%3Cline x1='190' y1='100' x2='230' y2='125'/%3E%3Ccircle cx='70' cy='75' r='15'/%3E%3Ccircle cx='230' cy='75' r='15'/%3E%3Ccircle cx='70' cy='125' r='15'/%3E%3Ccircle cx='230' cy='125' r='15'/%3E%3C/g%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      pointer-events: none;
+      z-index: -1;
+      animation: float 20s ease-in-out infinite;
+    }
   }
 
   /* Cyber glow effects */
@@ -163,5 +202,19 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--cyber-green));
+  }
+
+  /* iOS specific improvements */
+  @media (max-width: 768px) {
+    /* Больше отступы для касания на мобильных */
+    button, [role="button"] {
+      min-height: 44px; /* iOS recommendation */
+      min-width: 44px;
+    }
+    
+    /* Улучшенный фокус для accessibility */
+    input, textarea, select {
+      font-size: 16px; /* Предотвращает зум в iOS */
+    }
   }
 }
