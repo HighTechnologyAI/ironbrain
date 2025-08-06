@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 export interface SafeAreaInsets {
   top: number;
@@ -56,7 +56,7 @@ export const useMobileFeatures = () => {
 
   // Haptic Feedback функции
   const triggerHapticFeedback = async (style: 'light' | 'medium' | 'heavy' = 'medium') => {
-    if (Capacitor.isNativePlatform()) {
+    if (Capacitor.isNativeMobile()) {
       try {
         const impactStyle = style === 'light' ? ImpactStyle.Light : 
                           style === 'heavy' ? ImpactStyle.Heavy : ImpactStyle.Medium;
@@ -70,7 +70,7 @@ export const useMobileFeatures = () => {
   const triggerNotificationHaptic = async () => {
     if (Capacitor.isNativePlatform()) {
       try {
-        await Haptics.notification({ type: 'success' });
+        await Haptics.notification({ type: NotificationType.Success });
       } catch (error) {
         console.log('Haptics not available:', error);
       }
