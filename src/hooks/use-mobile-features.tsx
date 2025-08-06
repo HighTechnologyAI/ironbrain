@@ -56,7 +56,7 @@ export const useMobileFeatures = () => {
 
   // Haptic Feedback функции
   const triggerHapticFeedback = async (style: 'light' | 'medium' | 'heavy' = 'medium') => {
-    if (Capacitor.isNativeMobile()) {
+    if (Capacitor.isNativePlatform()) {
       try {
         const impactStyle = style === 'light' ? ImpactStyle.Light : 
                           style === 'heavy' ? ImpactStyle.Heavy : ImpactStyle.Medium;
