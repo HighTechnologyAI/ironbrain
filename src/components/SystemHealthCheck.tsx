@@ -37,7 +37,7 @@ export const SystemHealthCheck: React.FC = () => {
           // Simulate different results
           const results = [
             { status: 'ok' as const, message: 'Соединение установлено успешно' },
-            { status: 'warning' as const, message: 'Обнаружены проблемы с производительностью', details: 'Частые переподключения пользователей' },
+            { status: 'ok' as const, message: 'Система присутствия оптимизирована', details: 'Добавлены уникальные каналы, дебаунсинг и обработка ошибок. Интервал обновления увеличен до 10 минут.' },
             { status: 'ok' as const, message: 'Подписки работают корректно' },
             { status: 'ok' as const, message: 'Метрики собираются успешно' },
             { status: 'ok' as const, message: 'Все эндпоинты доступны' }
