@@ -42,10 +42,16 @@ export const useUserPresence = () => {
         setUserCount(users.length);
       })
       .on('presence', { event: 'join' }, ({ newPresences }) => {
-        console.log('User joined:', newPresences);
+        // Убираем избыточное логирование для production
+        if (process.env.NODE_ENV === 'development') {
+          console.log('User joined:', newPresences);
+        }
       })
       .on('presence', { event: 'leave' }, ({ leftPresences }) => {
-        console.log('User left:', leftPresences);
+        // Убираем избыточное логирование для production
+        if (process.env.NODE_ENV === 'development') {
+          console.log('User left:', leftPresences);
+        }
       });
 
     // Подписываемся на канал
@@ -64,18 +70,20 @@ export const useUserPresence = () => {
       }
     });
 
-    // Периодически обновляем время присутствия
+    // Периодически обновляем время присутствия (увеличено до 5 минут для снижения нагрузки)
     const statusInterval = setInterval(async () => {
-      const userStatus: UserPresence = {
-        user_id: user.id,
-        email: user.email || '',
-        full_name: user.user_metadata?.full_name || user.email || '',
-        online_at: new Date().toISOString(),
-        status: 'online'
-      };
-      
-      await channel.track(userStatus);
-    }, 120000); // Обновляем каждые 2 минуты вместо 30 секунд
+      if (document.visibilityState === 'visible') {
+        const userStatus: UserPresence = {
+          user_id: user.id,
+          email: user.email || '',
+          full_name: user.user_metadata?.full_name || user.email || '',
+          online_at: new Date().toISOString(),
+          status: 'online'
+        };
+        
+        await channel.track(userStatus);
+      }
+    }, 300000); // Обновляем каждые 5 минут и только если страница активна
 
     // Cleanup при размонтировании
     return () => {

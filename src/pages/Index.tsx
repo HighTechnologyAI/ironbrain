@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import OnlineUsersWidget from "@/components/OnlineUsersWidget";
 import AppNavigation from "@/components/AppNavigation";
+import { SystemHealthCheck } from "@/components/SystemHealthCheck";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
@@ -304,6 +305,11 @@ const Index = () => {
             </div>
           </CardHeader>
         </Card>
+
+        {/* System Health Check */}
+        <div className="mb-6">
+          <SystemHealthCheck />
+        </div>
 
         {/* Online Users Widget */}
         <OnlineUsersWidget />
