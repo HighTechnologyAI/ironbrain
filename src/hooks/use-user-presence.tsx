@@ -13,66 +13,99 @@ interface UserPresence {
 export const useUserPresence = () => {
   const [onlineUsers, setOnlineUsers] = useState<UserPresence[]>([]);
   const [userCount, setUserCount] = useState(0);
+  const [isConnected, setIsConnected] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
     if (!user) return;
 
-    // Создаем канал для отслеживания присутствия
-    const channel = supabase.channel('user_presence');
+    let channel: any = null;
+    let statusInterval: NodeJS.Timeout | null = null;
+    let reconnectTimeout: NodeJS.Timeout | null = null;
 
-    // Слушаем изменения присутствия
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const presenceState = channel.presenceState();
-        const users: UserPresence[] = [];
-        
-        Object.keys(presenceState).forEach(key => {
-          const presences = presenceState[key];
-          if (presences && presences.length > 0) {
-            // Извлекаем данные пользователя из первого элемента присутствия
-            const presence = presences[0] as any;
-            if (presence.user_id) {
-              users.push(presence as UserPresence);
-            }
+    const createConnection = () => {
+      // Очищаем предыдущий канал если есть
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+
+      // Создаем уникальный канал для каждого пользователя
+      const channelName = `user_presence_${user.id}`;
+      channel = supabase.channel(channelName, {
+        config: {
+          presence: {
+            key: user.id
           }
-        });
-        
-        setOnlineUsers(users);
-        setUserCount(users.length);
-      })
-      .on('presence', { event: 'join' }, ({ newPresences }) => {
-        // Убираем избыточное логирование для production
-        if (process.env.NODE_ENV === 'development') {
-          console.log('User joined:', newPresences);
-        }
-      })
-      .on('presence', { event: 'leave' }, ({ leftPresences }) => {
-        // Убираем избыточное логирование для production
-        if (process.env.NODE_ENV === 'development') {
-          console.log('User left:', leftPresences);
         }
       });
 
-    // Подписываемся на канал
-    channel.subscribe(async (status) => {
-      if (status === 'SUBSCRIBED') {
-        // Отправляем информацию о своем присутствии
-        const userStatus: UserPresence = {
-          user_id: user.id,
-          email: user.email || '',
-          full_name: user.user_metadata?.full_name || user.email || '',
-          online_at: new Date().toISOString(),
-          status: 'online'
-        };
+      // Слушаем изменения присутствия с дебаунсингом
+      let syncTimeout: NodeJS.Timeout | null = null;
+      
+      channel
+        .on('presence', { event: 'sync' }, () => {
+          if (syncTimeout) clearTimeout(syncTimeout);
+          syncTimeout = setTimeout(() => {
+            const presenceState = channel.presenceState();
+            const users: UserPresence[] = [];
+            
+            Object.keys(presenceState).forEach(key => {
+              const presences = presenceState[key];
+              if (presences && presences.length > 0) {
+                const presence = presences[0] as any;
+                if (presence.user_id) {
+                  users.push(presence as UserPresence);
+                }
+              }
+            });
+            
+            setOnlineUsers(users);
+            setUserCount(users.length);
+          }, 500); // Дебаунс на 500мс
+        })
+        .on('presence', { event: 'join' }, () => {
+          // Минимальное логирование
+        })
+        .on('presence', { event: 'leave' }, () => {
+          // Минимальное логирование
+        });
 
-        await channel.track(userStatus);
-      }
-    });
+      // Подписываемся на канал с обработкой ошибок
+      channel.subscribe(async (status: string) => {
+        if (status === 'SUBSCRIBED') {
+          setIsConnected(true);
+          
+          const userStatus: UserPresence = {
+            user_id: user.id,
+            email: user.email || '',
+            full_name: user.user_metadata?.full_name || user.email || '',
+            online_at: new Date().toISOString(),
+            status: 'online'
+          };
 
-    // Периодически обновляем время присутствия (увеличено до 5 минут для снижения нагрузки)
-    const statusInterval = setInterval(async () => {
-      if (document.visibilityState === 'visible') {
+          try {
+            await channel.track(userStatus);
+          } catch (error) {
+            console.error('Failed to track presence:', error);
+          }
+        } else if (status === 'CHANNEL_ERROR') {
+          setIsConnected(false);
+          // Переподключение через 10 секунд при ошибке
+          reconnectTimeout = setTimeout(createConnection, 10000);
+        } else if (status === 'TIMED_OUT') {
+          setIsConnected(false);
+          // Переподключение через 5 секунд при таймауте
+          reconnectTimeout = setTimeout(createConnection, 5000);
+        }
+      });
+    };
+
+    // Создаем первое подключение
+    createConnection();
+
+    // Обновляем статус реже и только при активной вкладке
+    statusInterval = setInterval(async () => {
+      if (document.visibilityState === 'visible' && isConnected && channel) {
         const userStatus: UserPresence = {
           user_id: user.id,
           email: user.email || '',
@@ -81,16 +114,70 @@ export const useUserPresence = () => {
           status: 'online'
         };
         
-        await channel.track(userStatus);
+        try {
+          await channel.track(userStatus);
+        } catch (error) {
+          // При ошибке обновления пробуем переподключиться
+          setIsConnected(false);
+          createConnection();
+        }
       }
-    }, 300000); // Обновляем каждые 5 минут и только если страница активна
+    }, 600000); // Увеличено до 10 минут
+
+    // Обработка видимости страницы
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && channel) {
+        // При скрытии страницы отмечаем как away
+        const userStatus: UserPresence = {
+          user_id: user.id,
+          email: user.email || '',
+          full_name: user.user_metadata?.full_name || user.email || '',
+          online_at: new Date().toISOString(),
+          status: 'away'
+        };
+        channel.track(userStatus).catch(() => {});
+      } else if (document.visibilityState === 'visible' && channel && isConnected) {
+        // При возвращении на страницу отмечаем как online
+        const userStatus: UserPresence = {
+          user_id: user.id,
+          email: user.email || '',
+          full_name: user.user_metadata?.full_name || user.email || '',
+          online_at: new Date().toISOString(),
+          status: 'online'
+        };
+        channel.track(userStatus).catch(() => {});
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     // Cleanup при размонтировании
     return () => {
-      clearInterval(statusInterval);
-      supabase.removeChannel(channel);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      
+      if (statusInterval) clearInterval(statusInterval);
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      
+      if (channel) {
+        // Отмечаем как offline перед отключением
+        const userStatus: UserPresence = {
+          user_id: user.id,
+          email: user.email || '',
+          full_name: user.user_metadata?.full_name || user.email || '',
+          online_at: new Date().toISOString(),
+          status: 'offline'
+        };
+        channel.track(userStatus).catch(() => {});
+        
+        // Небольшая задержка перед удалением канала
+        setTimeout(() => {
+          supabase.removeChannel(channel);
+        }, 1000);
+      }
+      
+      setIsConnected(false);
     };
-  }, [user]);
+  }, [user, isConnected]);
 
   return {
     onlineUsers,
