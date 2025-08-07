@@ -326,7 +326,7 @@ const Tasks = () => {
           <div className="flex items-center gap-4">
             <NotificationCenter />
             <LanguageSwitcher />
-            <CreateTaskForm onTaskCreated={loadTasks} />
+            {/* Создание задач только через админ панель */}
           </div>
         </div>
 

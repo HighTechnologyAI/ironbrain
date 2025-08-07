@@ -306,10 +306,12 @@ const Index = () => {
           </CardHeader>
         </Card>
 
-        {/* System Health Check */}
-        <div className="mb-6">
-          <SystemHealthCheck />
-        </div>
+        {/* System Health Check - только для основателя */}
+        {user?.email === 'founder@hightechai.site' && (
+          <div className="mb-6">
+            <SystemHealthCheck />
+          </div>
+        )}
 
         {/* Online Users Widget */}
         <OnlineUsersWidget />
