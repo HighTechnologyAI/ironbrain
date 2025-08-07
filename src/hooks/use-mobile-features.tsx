@@ -22,6 +22,7 @@ export const useMobileFeatures = () => {
 
   useEffect(() => {
     const setupMobileFeatures = async () => {
+      // Используем правильный API Capacitor
       if (Capacitor.isNativePlatform()) {
         setIsNativeMobile(true);
         
@@ -54,7 +55,7 @@ export const useMobileFeatures = () => {
     setupMobileFeatures();
   }, []);
 
-  // Haptic Feedback функции
+  // Haptic Feedback функции с правильным API
   const triggerHapticFeedback = async (style: 'light' | 'medium' | 'heavy' = 'medium') => {
     if (Capacitor.isNativePlatform()) {
       try {
