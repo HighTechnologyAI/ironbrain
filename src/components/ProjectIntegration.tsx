@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ExternalLink, Plus, Settings, RefreshCw, Maximize, Minimize } from 'lucide-react';
+import { ExternalLink, Plus, Settings, RefreshCw, Maximize, Download, Upload } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { IntegrationWidget } from "./IntegrationWidget";
 
 interface IntegratedProject {
   id: string;
@@ -99,26 +100,94 @@ export const ProjectIntegration = () => {
     });
   };
 
-  const removeProject = (id: string) => {
-    setProjects(prev => prev.filter(p => p.id !== id));
+  const updateProjectStatus = (id: string, status: 'active' | 'inactive' | 'error') => {
+    setProjects(prev => prev.map(p => 
+      p.id === id ? { ...p, status, lastSync: new Date().toISOString() } : p
+    ));
+  };
+
+  const exportConfig = () => {
+    const config = {
+      projects,
+      exportDate: new Date().toISOString(),
+      version: '1.0'
+    };
+    
+    const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'integrations-config.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    
     toast({
-      title: "Проект удален",
-      description: "Интеграция отключена"
+      title: "Конфигурация экспортирована",
+      description: "Файл конфигурации сохранен"
     });
+  };
+
+  const importConfig = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const config = JSON.parse(e.target?.result as string);
+        if (config.projects && Array.isArray(config.projects)) {
+          setProjects(config.projects);
+          toast({
+            title: "Конфигурация импортирована",
+            description: `Загружено ${config.projects.length} проектов`
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Ошибка импорта",
+          description: "Неверный формат файла",
+          variant: "destructive"
+        });
+      }
+    };
+    reader.readAsText(file);
   };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Интеграция внешних проектов</h2>
-        <p className="text-muted-foreground">
-          Управление интегрированными внешними системами и проектами
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold">Интеграция внешних проектов</h2>
+          <p className="text-muted-foreground">
+            Управление интегрированными внешними системами и проектами
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportConfig}>
+            <Download className="h-4 w-4 mr-2" />
+            Экспорт
+          </Button>
+          <label className="cursor-pointer">
+            <Button variant="outline" asChild>
+              <span>
+                <Upload className="h-4 w-4 mr-2" />
+                Импорт
+              </span>
+            </Button>
+            <input 
+              type="file" 
+              accept=".json" 
+              className="hidden" 
+              onChange={importConfig}
+            />
+          </label>
+        </div>
       </div>
 
       <Tabs defaultValue="active" className="w-full">
         <TabsList>
           <TabsTrigger value="active">Активные интеграции</TabsTrigger>
+          <TabsTrigger value="widgets">Виджеты</TabsTrigger>
           <TabsTrigger value="add">Добавить проект</TabsTrigger>
           <TabsTrigger value="settings">Настройки</TabsTrigger>
         </TabsList>
@@ -162,7 +231,13 @@ export const ProjectIntegration = () => {
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => removeProject(project.id)}
+                        onClick={() => {
+                          setProjects(prev => prev.filter(p => p.id !== project.id));
+                          toast({
+                            title: "Проект удален",
+                            description: "Интеграция отключена"
+                          });
+                        }}
                       >
                         Удалить
                       </Button>
@@ -218,6 +293,18 @@ export const ProjectIntegration = () => {
               </Card>
             ))
           )}
+        </TabsContent>
+        
+        <TabsContent value="widgets" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {projects.map(project => (
+              <IntegrationWidget 
+                key={project.id} 
+                project={project} 
+                onStatusChange={updateProjectStatus}
+              />
+            ))}
+          </div>
         </TabsContent>
 
         <TabsContent value="add" className="space-y-4">
