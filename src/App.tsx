@@ -21,6 +21,7 @@ import Analytics from "./pages/Analytics";
 import Issues from "./pages/Issues";
 import Awards from "./pages/Awards";
 import CreateDemoUsers from "./pages/CreateDemoUsers";
+import Integrations from "./pages/Integrations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -56,6 +57,7 @@ const App = () => (
                 <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
                 <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
                 <Route path="/awards" element={<ProtectedRoute><Awards /></ProtectedRoute>} />
+                <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/create-demo-users" element={<CreateDemoUsers />} />

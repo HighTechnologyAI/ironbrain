@@ -19,7 +19,8 @@ import {
   Award,
   Settings,
   Bot,
-  Bell
+  Bell,
+  ExternalLink
 } from 'lucide-react';
 
 interface AppNavigationProps {
@@ -98,6 +99,13 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
       label: t.achievements_page || 'Награды',
       badge: performanceData.totalAchievements > 0 ? performanceData.totalAchievements.toString() : null,
       variant: 'accent' as const
+    },
+    { 
+      key: 'integrations', 
+      path: '/integrations', 
+      icon: ExternalLink, 
+      label: 'Интеграции',
+      badge: null
     },
     { 
       key: 'admin', 
