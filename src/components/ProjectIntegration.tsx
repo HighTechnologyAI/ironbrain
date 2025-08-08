@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Plus, Settings, RefreshCw } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ExternalLink, Plus, Settings, RefreshCw, Maximize, Minimize } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface IntegratedProject {
   id: string;
@@ -38,7 +40,25 @@ export const ProjectIntegration = () => {
     type: 'iframe' as const
   });
   
+  const [fullscreenProject, setFullscreenProject] = useState<string | null>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+
+  // Сохранение в localStorage
+  useEffect(() => {
+    const savedProjects = localStorage.getItem('integrated-projects');
+    if (savedProjects) {
+      try {
+        setProjects(JSON.parse(savedProjects));
+      } catch (error) {
+        console.error('Error loading projects:', error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('integrated-projects', JSON.stringify(projects));
+  }, [projects]);
 
   const addProject = () => {
     if (!newProject.name || !newProject.url) {
@@ -163,10 +183,32 @@ export const ProjectIntegration = () => {
                   </div>
                   
                   {project.type === 'iframe' && (
-                    <div className="mt-4">
+                    <div className="mt-4 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">Предварительный просмотр</span>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Maximize className="h-4 w-4 mr-2" />
+                              Полный экран
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-full">
+                            <DialogHeader>
+                              <DialogTitle>{project.name}</DialogTitle>
+                            </DialogHeader>
+                            <iframe
+                              src={project.url}
+                              className="w-full h-full border-0 rounded-lg"
+                              title={project.name}
+                              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      </div>
                       <iframe
                         src={project.url}
-                        className="w-full h-96 border rounded-lg"
+                        className={`w-full border rounded-lg ${isMobile ? 'h-64' : 'h-96'}`}
                         title={project.name}
                         sandbox="allow-scripts allow-same-origin allow-forms"
                       />
