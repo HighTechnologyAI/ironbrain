@@ -27,6 +27,7 @@ export interface Translations {
   uploading: string;
   edited: string;
   joined: string;
+  close: string;
   
   // Main page
   title: string;
@@ -187,6 +188,50 @@ export interface Translations {
   allStatuses: string;
   allPriorities: string;
   
+  // Task Details Modal
+  details: string;
+  description: string;
+  tags: string;
+  actions: string;
+  
+  // AI Assistant
+  aiTaskAssistant: string;
+  aiAnalyzeContext: string;
+  exampleQuestions: string;
+  howToBest: string;
+  breakIntoSubtasks: string;
+  giveRecommendations: string;
+  askAiAboutTask: string;
+  enterToSend: string;
+  shiftEnterNewLine: string;
+  
+  // Task Comments
+  taskComments: string;
+  taskCommentsDescription: string;
+  taskCommentsWelcome: string;
+  taskCommentsInviteTeam: string;
+  taskCommentsSelectTeamMember: string;
+  taskCommentsInvite: string;
+  taskCommentsInvited: string;
+  taskCommentsWriteComment: string;
+  taskCommentsAttachFiles: string;
+  taskCommentsAttachedFiles: string;
+  taskCommentsSend: string;
+  taskCommentsUploading: string;
+  taskCommentsUploadedBy: string;
+  taskCommentsLoading: string;
+  taskCommentsSending: string;
+  
+  // Task Invitations
+  taskInvitationsPending: string;
+  taskInvitationsDescription: string;
+  taskChatInvitation: string;
+  task: string;
+  accept: string;
+  decline: string;
+  accepting: string;
+  declining: string;
+  
   // Messages
   taskStatusUpdated: string;
   taskStatusUpdateError: string;
@@ -211,6 +256,7 @@ export const translations: Record<string, Translations> = {
     uploading: 'Uploading...',
     edited: 'edited',
     joined: 'joined',
+    close: 'Close',
     
     // Main page
     title: 'TIGER CRM',
@@ -371,6 +417,65 @@ export const translations: Record<string, Translations> = {
     allStatuses: 'All statuses',
     allPriorities: 'All priorities',
     
+    // Task Details Modal
+    details: 'Details',
+    description: 'Description',
+    tags: 'Tags',
+    actions: 'Actions',
+    
+    // AI Assistant
+    aiTaskAssistant: 'AI Task Assistant',
+    aiAnalyzeContext: 'I analyze the context of this task and can help with planning, recommendations and optimization.',
+    exampleQuestions: 'Example questions:',
+    howToBest: 'How to best complete this task?',
+    breakIntoSubtasks: 'Break into subtasks',
+    giveRecommendations: 'Give recommendations',
+    askAiAboutTask: 'Ask AI assistant about the task...',
+    enterToSend: 'Enter - send',
+    shiftEnterNewLine: 'Shift+Enter - new line',
+    tigerAI: 'Tiger AI',
+    aiGreeting: 'Hello! I am Tiger AI - your personal assistant for task',
+    aiKnowDetails: 'I know all the details of this task:',
+    aiPriority: 'Priority',
+    aiStatus: 'Status',
+    aiAssignee: 'Assignee',
+    aiEstimated: 'Estimated time',
+    aiTags: 'Tags',
+    aiNoTags: 'No tags',
+    aiCanHelp: 'How can I help? I can:',
+    aiBreakTask: '✓ Break the task into subtasks',
+    aiGiveRecommendations: '✓ Give recommendations for execution',
+    aiHelpPlanning: '✓ Help with time planning',
+    aiAnswerQuestions: '✓ Answer questions about the context',
+    aiSuggestApproach: '✓ Suggest optimal approach',
+    
+    // Task Comments
+    taskComments: 'Comments',
+    taskCommentsDescription: 'Team chat for this task',
+    taskCommentsWelcome: 'Task chat "{taskTitle}" has been created. You can discuss details, attach files and invite team members.',
+    taskCommentsInviteTeam: 'Invite team member',
+    taskCommentsSelectTeamMember: 'Select team member...',
+    taskCommentsInvite: 'Invite',
+    taskCommentsInvited: '{email} has been invited to the task chat',
+    taskCommentsWriteComment: 'Write a comment...',
+    taskCommentsAttachFiles: 'Attach files',
+    taskCommentsAttachedFiles: 'Attached files',
+    taskCommentsSend: 'Send',
+    taskCommentsUploading: 'Uploading...',
+    taskCommentsUploadedBy: 'uploaded by',
+    taskCommentsLoading: 'Loading team members...',
+    taskCommentsSending: 'Sending...',
+    
+    // Task Invitations
+    taskInvitationsPending: 'Pending Task Invitations',
+    taskInvitationsDescription: 'You have been invited to join task chats',
+    taskChatInvitation: 'Task Chat Invitation',
+    task: 'Task',
+    accept: 'Accept',
+    decline: 'Decline',
+    accepting: 'Accepting...',
+    declining: 'Declining...',
+    
     // Messages
     taskStatusUpdated: 'Task status updated',
     taskStatusUpdateError: 'Failed to update task status',
@@ -393,6 +498,7 @@ export const translations: Record<string, Translations> = {
     uploading: 'Загрузка...',
     edited: 'изменено',
     joined: 'присоединился',
+    close: 'Закрыть',
     
     // Main page
     title: 'ТИГР CRM',
@@ -553,6 +659,65 @@ export const translations: Record<string, Translations> = {
     allStatuses: 'Все статусы',
     allPriorities: 'Все приоритеты',
     
+    // Task Details Modal
+    details: 'Детали',
+    description: 'Описание',
+    tags: 'Теги',
+    actions: 'Действия',
+    
+    // AI Assistant
+    aiTaskAssistant: 'AI Помощник по задаче',
+    aiAnalyzeContext: 'Анализирую контекст этой задачи и могу помочь с планированием, рекомендациями и оптимизацией выполнения.',
+    exampleQuestions: 'Примеры вопросов:',
+    howToBest: 'Как лучше выполнить эту задачу?',
+    breakIntoSubtasks: 'Разбей на подзадачи',
+    giveRecommendations: 'Дай рекомендации',
+    askAiAboutTask: 'Спросите AI помощника о задаче...',
+    enterToSend: 'Enter - отправить',
+    shiftEnterNewLine: 'Shift+Enter - новая строка',
+    tigerAI: 'Tiger AI',
+    aiGreeting: 'Здравствуйте! Я Tiger AI - ваш персональный помощник для задачи',
+    aiKnowDetails: 'Я знаю все детали этой задачи:',
+    aiPriority: 'Приоритет',
+    aiStatus: 'Статус',
+    aiAssignee: 'Исполнитель',
+    aiEstimated: 'Планируемое время',
+    aiTags: 'Теги',
+    aiNoTags: 'Нет тегов',
+    aiCanHelp: 'Чем могу помочь? Я могу:',
+    aiBreakTask: '✓ Разбить задачу на подзадачи',
+    aiGiveRecommendations: '✓ Дать рекомендации по выполнению',
+    aiHelpPlanning: '✓ Помочь с планированием времени',
+    aiAnswerQuestions: '✓ Ответить на вопросы по контексту',
+    aiSuggestApproach: '✓ Предложить оптимальный подход',
+    
+    // Task Comments
+    taskComments: 'Комментарии',
+    taskCommentsDescription: 'Командный чат для этой задачи',
+    taskCommentsWelcome: 'Чат задачи "{taskTitle}" создан. Вы можете обсуждать детали, прикреплять файлы и приглашать участников команды.',
+    taskCommentsInviteTeam: 'Пригласить участника команды',
+    taskCommentsSelectTeamMember: 'Выберите участника команды...',
+    taskCommentsInvite: 'Пригласить',
+    taskCommentsInvited: '{email} приглашен в чат задачи',
+    taskCommentsWriteComment: 'Написать комментарий...',
+    taskCommentsAttachFiles: 'Прикрепить файлы',
+    taskCommentsAttachedFiles: 'Прикрепленные файлы',
+    taskCommentsSend: 'Отправить',
+    taskCommentsUploading: 'Загрузка...',
+    taskCommentsUploadedBy: 'загружено',
+    taskCommentsLoading: 'Загрузка участников команды...',
+    taskCommentsSending: 'Отправка...',
+    
+    // Task Invitations
+    taskInvitationsPending: 'Ожидающие приглашения в задачи',
+    taskInvitationsDescription: 'Вас пригласили присоединиться к чатам задач',
+    taskChatInvitation: 'Приглашение в чат задачи',
+    task: 'Задача',
+    accept: 'Принять',
+    decline: 'Отклонить',
+    accepting: 'Принятие...',
+    declining: 'Отклонение...',
+    
     // Messages
     taskStatusUpdated: 'Статус задачи обновлен',
     taskStatusUpdateError: 'Не удалось обновить статус задачи',
@@ -576,6 +741,7 @@ export const translations: Record<string, Translations> = {
     uploading: 'Качване...',
     edited: 'редактирано',
     joined: 'се присъедини',
+    close: 'Затвори',
     
     // Main page
     title: 'TIGER CRM',
@@ -644,7 +810,7 @@ export const translations: Record<string, Translations> = {
     removeParticipantFailed: 'Грешка при премахване на участник',
     
     // Navigation
-    dashboard: 'Начало',
+    dashboard: 'Табло',
     tasks: 'Задачи',
     team: 'Екип',
     projects: 'Проекти',
@@ -658,8 +824,8 @@ export const translations: Record<string, Translations> = {
     teamManagement: 'Управление на екипа',
     addEmployee: 'Добави служител',
     loadingTeam: 'Зареждане на екипа...',
-    dataLoadError: 'Грешка при зареждане на данни',
-    tryAgain: 'Опитай пак',
+    dataLoadError: 'Грешка при зареждане на данните',
+    tryAgain: 'Опитай отново',
     employee: 'Служител',
     department: 'Отдел',
     since: 'От',
@@ -670,23 +836,23 @@ export const translations: Record<string, Translations> = {
     intern: 'Стажант',
     unknown: 'Неизвестно',
     away: 'Отсъства',
-    offline: 'Офлайн',
+    offline: 'Извън линия',
 
     // Index page
-    goingToTasks: 'Отиваме към задачите',
-    openingTasksList: 'Отваряме списъка със задачи...',
-    goingToTeam: 'Отиваме към екипа',
-    openingTeamManagement: 'Отваряме управлението на екипа...',
-    goingToAchievements: 'Отиваме към постиженията',
-    openingAchievements: 'Отваряме наградите и постиженията...',
+    goingToTasks: 'Отиване към задачите',
+    openingTasksList: 'Отваряне на списъка със задачи...',
+    goingToTeam: 'Отиване към екипа',
+    openingTeamManagement: 'Отваряне на управлението на екипа...',
+    goingToAchievements: 'Отиване към постиженията',
+    openingAchievements: 'Отваряне на наградите и постиженията...',
     personalTasksDesc: 'Управление на лични задачи',
     teamDesc: 'Екип и служители',
     projectsDesc: 'Активни проекти',
-    analyticsDesc: 'Аналитика и отчети',
+    analyticsDesc: 'Анализи и отчети',
     problemsDesc: 'Проблеми изискващи внимание',
     achievementsDesc: 'Награди и постижения',
-    adminDesc: 'Системно управление и външен контрол',
-    perWeek: 'за седмица',
+    adminDesc: 'Управление на системата и външен контрол',
+    perWeek: 'на седмица',
     active: 'Активни',
     users: 'потребители',
     aiAssistantDesc: 'Личен асистент за създаване на задачи с отчитане на уменията на всеки служител',
@@ -696,13 +862,13 @@ export const translations: Record<string, Translations> = {
     
     // Tasks
     tasksTitle: 'Управление на задачи',
-    tasksDescription: 'Създавайте и следете задачи за екипа',
+    tasksDescription: 'Създавайте и проследявайте задачи за вашия екип',
     allTasks: 'Всички задачи',
     myTasks: 'Моите задачи',
     createdByMe: 'Създадени от мен',
     taskStatus: 'Статус',
     taskPriority: 'Приоритет',
-    searchTasks: 'Търсене на задачи...',
+    searchTasks: 'Търси задачи...',
     createTask: 'Създай задача',
     startWork: 'Започни работа',
     complete: 'Завърши',
@@ -712,19 +878,19 @@ export const translations: Record<string, Translations> = {
     actual: 'Действително',
     hours: 'ч',
     created: 'Създадена',
-    noTasksFound: 'Няма намерени задачи',
+    noTasksFound: 'Не са намерени задачи',
     noTasksFoundDesc: 'Създайте първата задача или променете филтрите за търсене',
     noActiveTasks: 'Нямате активни задачи',
-    noActiveTasksDesc: 'Задачите, възложени на вас, ще се показват тук',
-    noCreatedTasks: 'Още не сте създали нито една задача',
-    noCreatedTasksDesc: 'Натиснете "Създай задача" за да започнете',
+    noActiveTasksDesc: 'Задачите, възложени на вас, ще се появят тук',
+    noCreatedTasks: 'Все още не сте създали нито една задача',
+    noCreatedTasksDesc: 'Кликнете "Създай задача" за да започнете',
     
     // Task Status
-    pending: 'Чакащ',
+    pending: 'Чакаща',
     inProgress: 'В процес',
     completed: 'Завършена',
     cancelled: 'Отменена',
-    onHold: 'На пауза',
+    onHold: 'Спряна',
     
     // Task Priority
     low: 'Нисък',
@@ -736,9 +902,144 @@ export const translations: Record<string, Translations> = {
     allStatuses: 'Всички статуси',
     allPriorities: 'Всички приоритети',
     
+    // Task Details Modal
+    details: 'Детайли',
+    description: 'Описание',
+    tags: 'Тагове',
+    actions: 'Действия',
+    
+    // AI Assistant
+    aiTaskAssistant: 'AI Асистент за задачата',
+    aiAnalyzeContext: 'Анализирам контекста на тази задача и мога да помогна с планиране, препоръки и оптимизация на изпълнението.',
+    exampleQuestions: 'Примерни въпроси:',
+    howToBest: 'Как най-добре да изпълня тази задача?',
+    breakIntoSubtasks: 'Раздели на подзадачи',
+    giveRecommendations: 'Дай препоръки',
+    askAiAboutTask: 'Попитайте AI асистента за задачата...',
+    enterToSend: 'Enter - изпрати',
+    shiftEnterNewLine: 'Shift+Enter - нов ред',
+    tigerAI: 'Tiger AI',
+    aiGreeting: 'Здравей! Аз съм Tiger AI - твоят персонален асистент за задача',
+    aiKnowDetails: 'Знам всички детайли на тази задача:',
+    aiPriority: 'Приоритет',
+    aiStatus: 'Статус',
+    aiAssignee: 'Изпълнител',
+    aiEstimated: 'Планирано време',
+    aiTags: 'Тагове',
+    aiNoTags: 'Няма тагове',
+    aiCanHelp: 'С какво мога да помогна? Мога да:',
+    aiBreakTask: '✓ Разделя задачата на подзадачи',
+    aiGiveRecommendations: '✓ Дам препоръки за изпълнение',
+    aiHelpPlanning: '✓ Помогна с планирането на времето',
+    aiAnswerQuestions: '✓ Отговоря на въпроси по контекста',
+    aiSuggestApproach: '✓ Предложа оптимален подход',
+    
+    // Task Comments
+    taskComments: 'Коментари',
+    taskCommentsDescription: 'Екипен чат за тази задача',
+    taskCommentsWelcome: 'Чатът на задача "{taskTitle}" е създаден. Можете да обсъждате детайли, прикачвате файлове и каните членове на екипа.',
+    taskCommentsInviteTeam: 'Покани член на екипа',
+    taskCommentsSelectTeamMember: 'Изберете член на екипа...',
+    taskCommentsInvite: 'Покани',
+    taskCommentsInvited: '{email} е поканен в чата на задачата',
+    taskCommentsWriteComment: 'Напишете коментар...',
+    taskCommentsAttachFiles: 'Прикачете файлове',
+    taskCommentsAttachedFiles: 'Прикачени файлове',
+    taskCommentsSend: 'Изпрати',
+    taskCommentsUploading: 'Качване...',
+    taskCommentsUploadedBy: 'качено от',
+    taskCommentsLoading: 'Зареждане на членове на екипа...',
+    taskCommentsSending: 'Изпращане...',
+    
+    // Task Invitations
+    taskInvitationsPending: 'Чакащи покани за задачи',
+    taskInvitationsDescription: 'Поканени сте да се присъедините към чатове на задачи',
+    taskChatInvitation: 'Покана за чат на задача',
+    task: 'Задача',
+    accept: 'Приеми',
+    decline: 'Откажи',
+    accepting: 'Приемане...',
+    declining: 'Отказване...',
+    
     // Messages
     taskStatusUpdated: 'Статусът на задачата е актуализиран',
-    taskStatusUpdateError: 'Неуспешно актуализиране на статуса на задачата',
+    taskStatusUpdateError: 'Неуспешна актуализация на статуса на задачата',
     tasksLoadError: 'Неуспешно зареждане на задачите',
   },
 };
+
+// Demo task translations for multilingual support
+export const demoTaskTranslations: Record<string, Record<string, { title: string; description: string; tags: string[] }>> = {
+  en: {
+    'test-system-operation': {
+      title: 'Conduct test system operation',
+      description: '1. Launch test scenario using standard Tiger Technology AI parameters. 2. Track execution logs and record any anomalies. 3. Check correctness of all scenario stages execution. 4. Prepare brief report with findings and recommendations for optimization. 5. Submit report to team by end of day.',
+      tags: ['testing', 'report', 'analysis']
+    },
+    'xuesoc': {
+      title: 'XUESOC',
+      description: 'TEST',
+      tags: ['test']
+    },
+    'system-testing': {
+      title: 'System testing tasks',
+      description: 'Conduct aggressive testing of system task setting functionality Tiger Technology AI. Steps: 1) Create test task; 2) Check correctness of display and statuses; 3) Test scenarios with different priorities and deadlines; 4) Record bugs and inconsistencies; 5) Prepare report with optimization recommendations.',
+      tags: ['testing', 'system', 'optimization']
+    }
+  },
+  ru: {
+    'test-system-operation': {
+      title: 'Провести тестовую операцию системы',
+      description: '1. Запусти тестовый сценарий, используя стандартные параметры Tiger Technology AI. 2. Отследи логи выполнения и зафиксируй любые аномалии. 3. Проверь корректность выполнения всех этапов сценария. 4. Подготовь краткий отчет с выводами и предложениями по оптимизации. 5. Передай отчет тимлиду до конца дня.',
+      tags: ['тестирование', 'отчет', 'анализ']
+    },
+    'xuesoc': {
+      title: 'ХУЕСОС',
+      description: 'ТЕСТ',
+      tags: ['тест']
+    },
+    'system-testing': {
+      title: 'Тестирование системы задач',
+      description: 'Проведи агрессивный тест функциональности системы постановки задач Tiger Technology AI. Шаги: 1) Создай тестовую задачу; 2) Проверь корректность отображения и статусов; 3) Протестируй сценарии с разными приоритетами и дедлайнами; 4) Зафиксируй баги и несоответствия; 5) Подготовь отчет с предложениями по оптимизации.',
+      tags: ['тестирование', 'система', 'оптимизация']
+    }
+  },
+  bg: {
+    'test-system-operation': {
+      title: 'Проведи тестова операция на системата',
+      description: '1. Стартирай тестов сценарий, използвайки стандартните параметри на Tiger Technology AI. 2. Проследи логовете на изпълнението и фиксирай всички аномалии. 3. Провери правилността на изпълнението на всички етапи от сценария. 4. Подготви кратък отчет с изводи и предложения за оптимизация. 5. Предай отчета на екипа до края на деня.',
+      tags: ['тестване', 'отчет', 'анализ']
+    },
+    'xuesoc': {
+      title: 'ХУЕСОС',
+      description: 'ТЕСТ',
+      tags: ['тест']
+    },
+    'system-testing': {
+      title: 'Тестване на системата за задачи',
+      description: 'Проведи агресивен тест на функционалността на системата за поставяне на задачи Tiger Technology AI. Стъпки: 1) Създай тестова задача; 2) Провери правилността на показването и статусите; 3) Тествай сценарии с различни приоритети и крайни срокове; 4) Фиксирай бъгове и несъответствия; 5) Подготви отчет с предложения за оптимизация.',
+      tags: ['тестване', 'система', 'оптимизация']
+    }
+  }
+};
+
+// Function to translate task content based on current language
+export const translateTaskContent = (task: any, language: string) => {
+  // Create a unique key for the task based on its title or id
+  const taskKey = task.title?.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') || task.id;
+  
+  // Check if we have translations for this task
+  const translations = demoTaskTranslations[language];
+  if (translations && translations[taskKey]) {
+    return {
+      ...task,
+      title: translations[taskKey].title,
+      description: translations[taskKey].description,
+      tags: translations[taskKey].tags
+    };
+  }
+  
+  // If no translation found, return original task
+  return task;
+};
+
