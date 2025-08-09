@@ -23,6 +23,7 @@ import Awards from "./pages/Awards";
 import CreateDemoUsers from "./pages/CreateDemoUsers";
 import Integrations from "./pages/Integrations";
 import NotFound from "./pages/NotFound";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +38,12 @@ const queryClient = new QueryClient({
   },
 });
 
+const NotificationsBoot = () => {
+  // Initialize native push notifications when available
+  usePushNotifications();
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -45,6 +52,7 @@ const App = () => (
           <SafeAreaContainer>
             <TooltipProvider>
               <ConnectionStatus />
+              <NotificationsBoot />
               <Toaster />
               <Sonner />
               <BrowserRouter>
