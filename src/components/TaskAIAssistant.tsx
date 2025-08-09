@@ -159,7 +159,8 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
         <Button
           variant="outline"
           size="sm"
-          onClick={addWelcomeMessage}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); addWelcomeMessage(); }}
           className="flex items-center gap-2"
         >
           <Bot className="h-4 w-4" />
