@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Users, ArrowLeft, Plus, Mail, Phone, Calendar, UserCheck, UserX, Loader2 } from "lucide-react";
+import { Users, ArrowLeft, Plus, Mail, Phone, Calendar, UserCheck, UserX, Loader2, AtSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTeamDataWithPresence } from "@/hooks/use-team-data-with-presence";
 import { useLanguage } from "@/hooks/use-language";
@@ -159,6 +159,20 @@ const Team = () => {
                     <div className="flex items-center gap-2 text-sm">
                       <Phone className="h-3 w-3 text-muted-foreground" />
                       <span>{member.phone}</span>
+                    </div>
+                  )}
+
+                  {member.telegram_username && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <AtSign className="h-3 w-3 text-muted-foreground" />
+                      <a
+                        href={`https://t.me/${member.telegram_username.replace(/^@/, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        @{member.telegram_username.replace(/^@/, '')}
+                      </a>
                     </div>
                   )}
 
