@@ -431,27 +431,43 @@ const Tasks = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                        {task.status === 'pending' && (
+                        {/* Быстрое изменение статуса */}
+                        {task.status !== 'pending' && (
                           <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateTaskStatus(task.id, 'in_progress');
-                            }}
+                            onClick={(e) => { e.stopPropagation(); updateTaskStatus(task.id, 'pending'); }}
                           >
-                            {t.startWork}
+                            {t.pending}
                           </DropdownMenuItem>
                         )}
-                        {task.status === 'in_progress' && (
+                        {task.status !== 'in_progress' && (
                           <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateTaskStatus(task.id, 'completed');
-                            }}
+                            onClick={(e) => { e.stopPropagation(); updateTaskStatus(task.id, 'in_progress'); }}
                           >
-                            {t.complete}
+                            {t.inProgress}
                           </DropdownMenuItem>
                         )}
-                        
+                        {task.status !== 'on_hold' && (
+                          <DropdownMenuItem
+                            onClick={(e) => { e.stopPropagation(); updateTaskStatus(task.id, 'on_hold'); }}
+                          >
+                            Проблема
+                          </DropdownMenuItem>
+                        )}
+                        {task.status !== 'cancelled' && (
+                          <DropdownMenuItem
+                            onClick={(e) => { e.stopPropagation(); updateTaskStatus(task.id, 'cancelled'); }}
+                          >
+                            {t.cancelled}
+                          </DropdownMenuItem>
+                        )}
+                        {task.status !== 'completed' && (
+                          <DropdownMenuItem
+                            onClick={(e) => { e.stopPropagation(); updateTaskStatus(task.id, 'completed'); }}
+                          >
+                            {t.completed}
+                          </DropdownMenuItem>
+                        )}
+
                         {isAdmin && (
                           <>
                             <DropdownMenuSeparator />
