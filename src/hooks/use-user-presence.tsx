@@ -29,8 +29,8 @@ export const useUserPresence = () => {
         supabase.removeChannel(channel);
       }
 
-      // Создаем уникальный канал для каждого пользователя
-      const channelName = `user_presence_${user.id}`;
+      // Создаем общий канал присутствия для всех пользователей
+      const channelName = 'user_presence';
       channel = supabase.channel(channelName, {
         config: {
           presence: {
@@ -105,7 +105,7 @@ export const useUserPresence = () => {
 
     // Обновляем статус реже и только при активной вкладке
     statusInterval = setInterval(async () => {
-      if (document.visibilityState === 'visible' && isConnected && channel) {
+      if (document.visibilityState === 'visible' && channel) {
         const userStatus: UserPresence = {
           user_id: user.id,
           email: user.email || '',
@@ -136,7 +136,7 @@ export const useUserPresence = () => {
           status: 'away'
         };
         channel.track(userStatus).catch(() => {});
-      } else if (document.visibilityState === 'visible' && channel && isConnected) {
+      } else if (document.visibilityState === 'visible' && channel) {
         // При возвращении на страницу отмечаем как online
         const userStatus: UserPresence = {
           user_id: user.id,
@@ -177,7 +177,7 @@ export const useUserPresence = () => {
       
       setIsConnected(false);
     };
-  }, [user, isConnected]);
+  }, [user]);
 
   return {
     onlineUsers,
