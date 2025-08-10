@@ -21,6 +21,7 @@ import TaskDetails from '@/components/TaskDetails';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import NotificationCenter from '@/components/NotificationCenter';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useAdmin } from '@/hooks/use-admin';
 import {
   ArrowLeft,
   Calendar,
@@ -33,6 +34,8 @@ import {
   Timer,
   Tag,
   MoreVertical,
+  Trash2,
+  UserPlus,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -67,6 +70,7 @@ const Tasks = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   const { toast } = useToast();
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -153,6 +157,40 @@ const Tasks = () => {
       toast({
         title: t.error,
         description: t.taskStatusUpdateError,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const deleteTask = async (taskId: string) => {
+    if (!isAdmin) {
+      toast({
+        title: 'Доступ запрещен',
+        description: 'Только администраторы могут удалять задачи',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Задача удалена',
+        description: 'Задача была успешно удалена',
+      });
+
+      loadTasks();
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось удалить задачу',
         variant: 'destructive',
       });
     }
@@ -309,6 +347,38 @@ const Tasks = () => {
                           >
                             {t.complete}
                           </DropdownMenuItem>
+                        )}
+                        
+                        {isAdmin && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // TODO: Implement assign additional employee
+                                toast({
+                                  title: 'Функция в разработке',
+                                  description: 'Назначение дополнительного сотрудника будет доступно в следующем обновлении',
+                                });
+                              }}
+                              className="text-blue-600"
+                            >
+                              <UserPlus className="h-4 w-4 mr-2" />
+                              Назначить сотрудника
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
+                                  deleteTask(task.id);
+                                }
+                              }}
+                              className="text-red-600"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Удалить задачу
+                            </DropdownMenuItem>
+                          </>
                         )}
                       </DropdownMenuContent>
                     </DropdownMenu>
