@@ -82,6 +82,7 @@ const Tasks = () => {
   const [assignTaskId, setAssignTaskId] = useState<string | null>(null);
   const [assigneeFilter, setAssigneeFilter] = useState<string>('self');
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const [collaboratedTasks, setCollaboratedTasks] = useState<Task[]>([]);
 
   useEffect(() => {
     const loadProfileId = async () => {
@@ -102,6 +103,10 @@ const Tasks = () => {
   useEffect(() => {
     loadTasks();
   }, []);
+
+  useEffect(() => {
+    loadCollaboratedTasks();
+  }, [currentProfileId]);
 
   const loadCommentCounts = async (taskIds: string[]) => {
     if (!taskIds || taskIds.length === 0) { setCommentCounts({}); return; }
@@ -150,6 +155,44 @@ const Tasks = () => {
     }
   };
 
+  const loadCollaboratedTasks = async () => {
+    try {
+      if (!currentProfileId) { setCollaboratedTasks([]); return; }
+      const { data: links, error: linksError } = await supabase
+        .from('task_participants')
+        .select('task_id')
+        .eq('user_id', currentProfileId);
+      if (linksError) { console.error('Error loading collaborations:', linksError); setCollaboratedTasks([]); return; }
+
+      const ids = Array.from(new Set((links || []).map((l: any) => l.task_id)));
+      if (ids.length === 0) { setCollaboratedTasks([]); return; }
+
+      const { data, error } = await supabase
+        .from('tasks')
+        .select(`
+          id,
+          title,
+          description,
+          status,
+          priority,
+          due_date,
+          created_at,
+          estimated_hours,
+          actual_hours,
+          tags,
+          assigned_to:profiles!tasks_assigned_to_fkey(id, full_name, position),
+          created_by:profiles!tasks_created_by_fkey(id, full_name)
+        `)
+        .in('id', ids)
+        .order('created_at', { ascending: false });
+
+      if (error) { console.error('Error loading collaborated tasks:', error); setCollaboratedTasks([]); return; }
+      setCollaboratedTasks(data || []);
+      await loadCommentCounts(ids);
+    } catch (e) {
+      console.error('Unexpected error loading collaborated tasks:', e);
+    }
+  };
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
     try {
       const updateData: any = { status: newStatus };
@@ -171,11 +214,14 @@ const Tasks = () => {
       });
 
       loadTasks();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating task:', error);
+      const msg = String(error?.message || '').includes('row-level security') || String(error).includes('permission')
+        ? 'Недостаточно прав для изменения статуса задачи'
+        : t.taskStatusUpdateError;
       toast({
         title: t.error,
-        description: t.taskStatusUpdateError,
+        description: msg,
         variant: 'destructive',
       });
     }
@@ -205,11 +251,14 @@ const Tasks = () => {
       });
 
       loadTasks();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting task:', error);
+      const msg = String(error?.message || '').includes('row-level security') || String(error).includes('permission')
+        ? 'Недостаточно прав для удаления задачи'
+        : 'Не удалось удалить задачу';
       toast({
         title: 'Ошибка',
-        description: 'Не удалось удалить задачу',
+        description: msg,
         variant: 'destructive',
       });
     }
@@ -248,6 +297,20 @@ const Tasks = () => {
       const matchesAssignee = !targetId || task.assigned_to?.id === targetId;
       return matchesCompleted && matchesSearch && matchesPriority && matchesAssignee;
     });
+  };
+
+  const getCollaboratedTasks = () => {
+    // Фильтруем по поиску и статусам/приоритетам
+    const base = collaboratedTasks.filter((task) => {
+      const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
+      const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
+      return matchesSearch && matchesStatus && matchesPriority;
+    });
+    // Исключаем мои и созданные мной, чтобы не было дублей
+    const exclude = new Set([...getMyTasks(), ...getCreatedTasks()].map(t => t.id));
+    return base.filter(t => !exclude.has(t.id));
   };
 
   const statusLabels = {
@@ -535,9 +598,10 @@ const Tasks = () => {
         </div>
 
         <Tabs defaultValue="my" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="my">{t.myTasks} ({getMyTasks().length})</TabsTrigger>
             <TabsTrigger value="created">{t.createdByMe} ({getCreatedTasks().length})</TabsTrigger>
+            <TabsTrigger value="collab">Совместно ({getCollaboratedTasks().length})</TabsTrigger>
             <TabsTrigger value="completed">{t.completed} ({getCompletedTasks().length})</TabsTrigger>
           </TabsList>
 
@@ -576,6 +640,21 @@ const Tasks = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="collab" className="mt-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {getCollaboratedTasks().map((task) => (
+                <TaskCard key={task.id} task={task} />
+              ))}
+            </div>
+            {getCollaboratedTasks().length === 0 && (
+              <div className="text-center py-12">
+                <Timer className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Совместных задач нет</h3>
+                <p className="text-muted-foreground">Вас еще не приглашали в задачи.</p>
+              </div>
+            )}
+          </TabsContent>
+
           <TabsContent value="completed" className="mt-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {getCompletedTasks().map((task) => (
@@ -599,6 +678,7 @@ const Tasks = () => {
             setAssignOpen(false);
             toast({ title: 'Участник добавлен', description: 'Сотрудник добавлен к задаче' });
             loadTasks();
+            loadCollaboratedTasks();
           }}
         />
       </div>

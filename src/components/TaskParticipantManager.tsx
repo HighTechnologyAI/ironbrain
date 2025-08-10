@@ -115,11 +115,14 @@ const TaskParticipantManager = ({
       setSelectedUserId('');
       setOpen(false);
       onParticipantsChange();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error inviting participant:', error);
+      const msg = String(error?.message || '').includes('row-level security') || String(error).includes('permission')
+        ? 'Недостаточно прав: добавлять участников может только администратор'
+        : 'Не удалось назначить участника';
       toast({
         title: t.error,
-        description: t.addParticipantFailed,
+        description: msg,
         variant: 'destructive',
       });
     } finally {
