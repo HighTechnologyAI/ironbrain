@@ -212,10 +212,12 @@ const Tasks = () => {
   });
 
   const getMyTasks = () => {
-    if (assigneeFilter === 'all') return filteredTasks;
+    if (assigneeFilter === 'all') {
+      return filteredTasks.filter(task => task.status !== 'completed');
+    }
     const targetId = assigneeFilter === 'self' ? currentProfileId : assigneeFilter;
     if (!targetId) return [];
-    return filteredTasks.filter(task => task.assigned_to?.id === targetId);
+    return filteredTasks.filter(task => task.assigned_to?.id === targetId && task.status !== 'completed');
   };
 
   const getCreatedTasks = () => {
