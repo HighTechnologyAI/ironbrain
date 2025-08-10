@@ -3,13 +3,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Users, ArrowLeft, Plus, Mail, Phone, Calendar, UserCheck, UserX, Loader2, AtSign } from "lucide-react";
+import { Users, ArrowLeft, Plus, Mail, Phone, Calendar, UserCheck, UserX, Loader2, AtSign, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTeamDataWithPresence } from "@/hooks/use-team-data-with-presence";
 import { useLanguage } from "@/hooks/use-language";
 import CreateTeamMemberForm from "@/components/CreateTeamMemberForm";
 import AppNavigation from "@/components/AppNavigation";
 import { useAdmin } from "@/hooks/use-admin";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Team = () => {
   const navigate = useNavigate();
@@ -17,11 +22,15 @@ const Team = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const { teamMembers, loading, error } = useTeamDataWithPresence();
   const { isAdmin } = useAdmin();
+  const { toast } = useToast();
 
   // State and functions for team member management will go here
   // For example, state for filtering, sorting, and searching
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
+  const [editDeptOpen, setEditDeptOpen] = useState(false);
+  const [editMemberId, setEditMemberId] = useState<string | null>(null);
+  const [deptValue, setDeptValue] = useState("");
 
   // Function to handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +41,6 @@ const Team = () => {
   const handleRoleFilterChange = (role: string) => {
     setRoleFilter(role);
   };
-
   // Function to filter team members based on search term
   const filteredTeam = teamMembers?.filter(member => {
     const searchMatch = member.full_name?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -75,6 +83,23 @@ const Team = () => {
       case 'intern': return t.intern || 'Стажер';
       default: return t.unknown || 'Неизвестно';
     }
+  };
+
+  const handleSaveDept = async () => {
+    if (!editMemberId) return;
+    const { error } = await supabase
+      .from('profiles')
+      .update({ department: deptValue || null })
+      .eq('id', editMemberId);
+
+    if (error) {
+      toast({ title: t.error || 'Ошибка', description: error.message || 'Не удалось сохранить отдел', variant: 'destructive' });
+      return;
+    }
+
+    toast({ title: 'Сохранено', description: 'Отдел обновлён' });
+    setEditDeptOpen(false);
+    window.location.reload();
   };
 
   return (
@@ -149,11 +174,26 @@ const Team = () => {
                     </Badge>
                   </div>
 
-                  {member.department && (
-                    <div className="text-sm text-muted-foreground">
-                      {t.department || 'Отдел'}: {member.department}
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <div>
+                      {t.department || 'Отдел'}: {member.department || 'Не указан'}
                     </div>
-                  )}
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2"
+                        onClick={() => {
+                          setEditMemberId(member.id);
+                          setDeptValue(member.department || '');
+                          setEditDeptOpen(true);
+                        }}
+                      >
+                        <Pencil className="h-3 w-3 mr-1" />
+                        {t.edit || 'Изм.'}
+                      </Button>
+                    )}
+                  </div>
 
                   {member.phone && (
                     <div className="flex items-center gap-2 text-sm">
@@ -206,6 +246,22 @@ const Team = () => {
           </Card>
         )}
       </div>
+
+      <Dialog open={editDeptOpen} onOpenChange={setEditDeptOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{'Изменение отдела'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="dept">{t.department || 'Отдел'}</Label>
+            <Input id="dept" value={deptValue} onChange={(e) => setDeptValue(e.target.value)} placeholder="Введите отдел" />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDeptOpen(false)}>Отмена</Button>
+            <Button onClick={handleSaveDept}>Сохранить</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {isAdmin && (
         <CreateTeamMemberForm
