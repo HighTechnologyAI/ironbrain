@@ -35,7 +35,7 @@ export const useAdmin = () => {
           setIsAdmin(false);
           setAdminProfile(null);
         } else if (data) {
-          const isUserAdmin = data.role === 'admin' || data.role === 'manager';
+          const isUserAdmin = data.role === 'admin';
           setIsAdmin(isUserAdmin);
           setAdminProfile(data);
         } else {

@@ -22,6 +22,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import NotificationCenter from '@/components/NotificationCenter';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAdmin } from '@/hooks/use-admin';
+import AssignParticipantDialog from '@/components/AssignParticipantDialog';
 import {
   ArrowLeft,
   Calendar,
@@ -76,6 +77,8 @@ const Tasks = () => {
   const navigate = useNavigate();
 
   const [currentProfileId, setCurrentProfileId] = useState<string | null>(null);
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [assignTaskId, setAssignTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadProfileId = async () => {
@@ -355,11 +358,8 @@ const Tasks = () => {
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
-                                // TODO: Implement assign additional employee
-                                toast({
-                                  title: 'Функция в разработке',
-                                  description: 'Назначение дополнительного сотрудника будет доступно в следующем обновлении',
-                                });
+                                setAssignTaskId(task.id);
+                                setAssignOpen(true);
                               }}
                               className="text-blue-600"
                             >
@@ -555,6 +555,16 @@ const Tasks = () => {
             )}
           </TabsContent>
         </Tabs>
+
+        <AssignParticipantDialog
+          open={assignOpen}
+          onOpenChange={setAssignOpen}
+          taskId={assignTaskId}
+          onAssigned={() => {
+            setAssignOpen(false);
+            toast({ title: 'Участник добавлен', description: 'Сотрудник добавлен к задаче' });
+          }}
+        />
       </div>
     </div>
   );
