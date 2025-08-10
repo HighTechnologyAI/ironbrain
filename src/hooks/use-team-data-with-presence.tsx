@@ -93,25 +93,12 @@ export const useTeamDataWithPresence = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Обновляем статусы присутствия отдельно, без перезагрузки всех данных
   useEffect(() => {
     if (teamMembers.length > 0) {
       setTeamMembers(prevMembers => 
         prevMembers.map(member => {
-          // Определяем статус присутствия
-          let status: 'online' | 'away' | 'offline' = 'offline';
-          
-          if (member.id && isOnline(member.id)) {
-            status = 'online';
-          } else {
-            // Проверяем время последней активности
-            const lastActive = new Date(member.hire_date || Date.now());
-            const timeDiff = Date.now() - lastActive.getTime();
-            if (timeDiff < 5 * 60 * 1000) { // 5 минут
-              status = 'away';
-            }
-          }
-          
+          const online = member.id && isOnline(member.id);
+          const status: 'online' | 'away' | 'offline' = online ? 'online' : 'offline';
           return { ...member, status };
         })
       );

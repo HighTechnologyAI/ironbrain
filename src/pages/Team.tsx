@@ -19,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const Team = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const { teamMembers, loading, error } = useTeamDataWithPresence();
   const { isAdmin } = useAdmin();
@@ -33,6 +33,9 @@ const Team = () => {
   const [editMemberId, setEditMemberId] = useState<string | null>(null);
   const [deptValue, setDeptValue] = useState("");
   const [roleValue, setRoleValue] = useState("");
+  const roleOptions = language === 'ru'
+    ? ['Основатель', 'Сотрудник', 'Разработчик', 'Директор', 'Менеджер']
+    : ['Founder', 'Employee', 'Developer', 'Director', 'Manager'];
 
   // Function to handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +102,7 @@ const Team = () => {
       return;
     }
 
-    toast({ title: 'Сохранено', description: 'Профиль обновлён' });
+    toast({ title: t.success, description: t.edited });
     setEditDeptOpen(false);
     window.location.reload();
   };
@@ -253,7 +256,7 @@ const Team = () => {
       <Dialog open={editDeptOpen} onOpenChange={setEditDeptOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Редактирование профиля</DialogTitle>
+            <DialogTitle>{t.edit}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -263,22 +266,20 @@ const Team = () => {
                   <SelectValue placeholder="Выберите роль" />
                 </SelectTrigger>
                 <SelectContent className="z-[1000]">
-                  <SelectItem value="Основатель">Основатель</SelectItem>
-                  <SelectItem value="Сотрудник">Сотрудник</SelectItem>
-                  <SelectItem value="Разработчик">Разработчик</SelectItem>
-                  <SelectItem value="Директор">Директор</SelectItem>
-                  <SelectItem value="Менеджер">Менеджер</SelectItem>
+                  {roleOptions.map((opt) => (
+                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="dept">{t.department || 'Отдел'}</Label>
-              <Input id="dept" value={deptValue} onChange={(e) => setDeptValue(e.target.value)} placeholder="Введите отдел" />
+              <Input id="dept" value={deptValue} onChange={(e) => setDeptValue(e.target.value)} placeholder={language === 'ru' ? 'Введите отдел' : 'Enter department'} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDeptOpen(false)}>Отмена</Button>
-            <Button onClick={handleSaveDept}>Сохранить</Button>
+            <Button variant="outline" onClick={() => setEditDeptOpen(false)}>{t.cancel}</Button>
+            <Button onClick={handleSaveDept}>{t.save}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
