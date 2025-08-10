@@ -9,12 +9,14 @@ import { useTeamDataWithPresence } from "@/hooks/use-team-data-with-presence";
 import { useLanguage } from "@/hooks/use-language";
 import CreateTeamMemberForm from "@/components/CreateTeamMemberForm";
 import AppNavigation from "@/components/AppNavigation";
+import { useAdmin } from "@/hooks/use-admin";
 
 const Team = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const { teamMembers, loading, error } = useTeamDataWithPresence();
+  const { isAdmin } = useAdmin();
 
   // State and functions for team member management will go here
   // For example, state for filtering, sorting, and searching
@@ -79,16 +81,18 @@ const Team = () => {
     <>
       <AppNavigation title={t.team || "Команда"} subtitle={t.teamManagement || "Управление участниками команды"} />
       <div className="min-h-screen bg-background p-6">
-        {/* Action Button */}
-        <div className="flex justify-end mb-6">
-          <Button 
-            className="cyber-glow"
-            onClick={() => setShowCreateForm(true)}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {t.addEmployee || 'Добавить сотрудника'}
-          </Button>
-        </div>
+        {/* Action Button (admin only) */}
+        {isAdmin && (
+          <div className="flex justify-end mb-6">
+            <Button 
+              className="cyber-glow"
+              onClick={() => setShowCreateForm(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {t.addEmployee || 'Добавить сотрудника'}
+            </Button>
+          </div>
+        )}
 
         {/* Loading State */}
         {loading && (
@@ -189,11 +193,13 @@ const Team = () => {
         )}
       </div>
 
-      <CreateTeamMemberForm
-        open={showCreateForm}
-        onOpenChange={setShowCreateForm}
-        onMemberCreated={() => window.location.reload()}
-      />
+      {isAdmin && (
+        <CreateTeamMemberForm
+          open={showCreateForm}
+          onOpenChange={setShowCreateForm}
+          onMemberCreated={() => window.location.reload()}
+        />
+      )}
     </>
   );
 };
