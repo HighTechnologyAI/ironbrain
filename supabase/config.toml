@@ -2,3 +2,6 @@ project_id = "zqnjgwrvvrqaenzmlvfx"
 
 [functions.admin-api]
 verify_jwt = false
+
+[functions.translate]
+verify_jwt = true

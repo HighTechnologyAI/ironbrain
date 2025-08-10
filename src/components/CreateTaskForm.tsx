@@ -5,6 +5,7 @@ import * as z from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/use-language';
 import {
   Dialog,
   DialogContent,
@@ -67,6 +68,7 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { language, t } = useLanguage();
 
   const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
@@ -118,10 +120,30 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
 
       if (profileError) throw profileError;
 
+      // Переводим текст под выбранный язык пользователя
+      const originalTitle = data.title;
+      const originalDescription = data.description || '';
+
+      let translatedTitle = originalTitle;
+      let translatedDescription = originalDescription;
+      try {
+        const [titleRes, descRes] = await Promise.all([
+          supabase.functions.invoke('translate', { body: { text: originalTitle, target: language } }),
+          originalDescription
+            ? supabase.functions.invoke('translate', { body: { text: originalDescription, target: language } })
+            : Promise.resolve({ data: { translated: originalDescription } } as any),
+        ]);
+        translatedTitle = (titleRes.data as any)?.translated || originalTitle;
+        translatedDescription = (descRes as any)?.data?.translated || originalDescription;
+      } catch (e) {
+        // Если перевод не удался — используем исходный текст
+        console.warn('Translation failed, fallback to original:', e);
+      }
+
       // Подготавливаем данные задачи
       const taskData = {
-        title: data.title,
-        description: data.description,
+        title: translatedTitle,
+        description: translatedDescription,
         assigned_to: data.assigned_to,
         created_by: currentProfile.id,
         priority: data.priority,
@@ -175,7 +197,7 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="h-4 w-4" />
-          Создать задачу
+          {t.createTask}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -373,10 +395,10 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
                 variant="outline"
                 onClick={() => setOpen(false)}
               >
-                Отмена
+                {t.cancel}
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? 'Создание...' : 'Создать задачу'}
+                {loading ? t.sending : t.createTask}
               </Button>
             </div>
           </form>
