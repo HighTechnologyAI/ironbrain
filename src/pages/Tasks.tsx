@@ -29,10 +29,8 @@ import {
   Calendar,
   Clock,
   Search,
-  Filter,
   User,
   CheckCircle,
-  AlertCircle,
   Timer,
   Tag,
   MoreVertical,
@@ -533,44 +531,16 @@ const Tasks = () => {
               <SelectItem value="high">{t.high}</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
-            <SelectTrigger className="w-56">
-              <SelectValue placeholder={t.assignee || 'Исполнитель'} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="self">Я</SelectItem>
-              <SelectItem value="all">Все исполнители</SelectItem>
-              {teamMembers.map((m) => (
-                <SelectItem key={m.id} value={m.id}>{m.full_name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Индивидуальный режим: фильтр по исполнителю скрыт, показываем только задачи текущего пользователя */}
         </div>
 
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="all">{t.allTasks} ({filteredTasks.length})</TabsTrigger>
+        <Tabs defaultValue="my" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="my">{t.myTasks} ({getMyTasks().length})</TabsTrigger>
             <TabsTrigger value="created">{t.createdByMe} ({getCreatedTasks().length})</TabsTrigger>
             <TabsTrigger value="completed">{t.completed} ({getCompletedTasks().length})</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="all" className="mt-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredTasks.map((task) => (
-                <TaskCard key={task.id} task={task} />
-              ))}
-            </div>
-            {filteredTasks.length === 0 && (
-              <div className="text-center py-12">
-                <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">{t.noTasksFound}</h3>
-                <p className="text-muted-foreground">
-                  {t.noTasksFoundDesc}
-                </p>
-              </div>
-            )}
-          </TabsContent>
 
           <TabsContent value="my" className="mt-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -616,9 +586,6 @@ const Tasks = () => {
               <div className="text-center py-12">
                 <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Завершённых задач нет</h3>
-                <p className="text-muted-foreground">
-                  Используйте фильтр исполнителя, чтобы посмотреть завершённые задачи по сотрудникам.
-                </p>
               </div>
             )}
           </TabsContent>
