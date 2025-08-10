@@ -38,6 +38,7 @@ import {
   MoreVertical,
   Trash2,
   UserPlus,
+  MessageSquare,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -82,6 +83,7 @@ const Tasks = () => {
   const [assignOpen, setAssignOpen] = useState(false);
   const [assignTaskId, setAssignTaskId] = useState<string | null>(null);
   const [assigneeFilter, setAssigneeFilter] = useState<string>('self');
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     const loadProfileId = async () => {
@@ -102,6 +104,18 @@ const Tasks = () => {
   useEffect(() => {
     loadTasks();
   }, []);
+
+  const loadCommentCounts = async (taskIds: string[]) => {
+    if (!taskIds || taskIds.length === 0) { setCommentCounts({}); return; }
+    const { data, error } = await supabase
+      .from('task_comments')
+      .select('task_id')
+      .in('task_id', taskIds);
+    if (error) { console.error('Error loading comment counts:', error); return; }
+    const map: Record<string, number> = {};
+    (data || []).forEach((row: any) => { map[row.task_id] = (map[row.task_id] || 0) + 1; });
+    setCommentCounts(map);
+  };
 
   const loadTasks = async () => {
     try {
@@ -125,6 +139,7 @@ const Tasks = () => {
 
       if (error) throw error;
       setTasks(data || []);
+      await loadCommentCounts((data || []).map((t: any) => t.id));
     } catch (error) {
       console.error('Error loading tasks:', error);
       toast({
@@ -303,6 +318,10 @@ const Tasks = () => {
                     <span>{t.dueDate}: {format(new Date(task.due_date), 'dd MMMM yyyy', { locale: ru })}</span>
                   </div>
                 )}
+                <div className="flex items-center gap-1">
+                  <MessageSquare className="h-4 w-4" />
+                  <span>{commentCounts[task.id] ?? 0}</span>
+                </div>
               </div>
 
               {task.estimated_hours && (
