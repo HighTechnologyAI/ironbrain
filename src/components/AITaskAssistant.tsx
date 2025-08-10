@@ -97,14 +97,38 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
     if (!aiResponse || !selectedEmployee) return;
 
     try {
-      const { data: profile } = await supabase
+      // Профиль выбранного исполнителя (валидация)
+      const { data: profile, error: profileErr } = await supabase
         .from('profiles')
         .select('id')
         .eq('id', selectedEmployee)
         .single();
 
-      if (!profile) {
+      if (profileErr || !profile) {
         throw new Error('Профиль сотрудника не найден');
+      }
+
+      // Текущий пользователь (создатель задачи)
+      const { data: me, error: meError } = await supabase.rpc('get_current_user_profile');
+      if (meError || !me) {
+        throw new Error('Не удалось получить профиль текущего пользователя');
+      }
+
+      // Нормализуем оценку времени
+      let estimated: number | null = null;
+      if (typeof aiResponse.estimated_hours === 'number') {
+        estimated = Math.round(aiResponse.estimated_hours);
+      } else if (typeof aiResponse.estimated_hours === 'string') {
+        const m = aiResponse.estimated_hours.match(/\d+(?:[\.,]\d+)?/);
+        if (m) estimated = Math.round(parseFloat(m[0].replace(',', '.')));
+      }
+
+      // Нормализуем теги
+      let tags: string[] = [];
+      if (Array.isArray(aiResponse.tags)) {
+        tags = aiResponse.tags.map((t: any) => String(t));
+      } else if (typeof aiResponse.tags === 'string') {
+        tags = aiResponse.tags.split(',').map((s: string) => s.trim()).filter(Boolean);
       }
 
       const taskData = {
@@ -113,15 +137,17 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
         assigned_to: selectedEmployee,
         status: 'pending' as const,
         priority: (aiResponse.priority as 'low' | 'medium' | 'high' | 'critical') || 'medium',
-        estimated_hours: aiResponse.estimated_hours || null,
-        tags: aiResponse.tags || [],
-        created_by: selectedEmployee, // В демо - создатель = исполнитель. В реальной системе: auth.uid()
-        company_id: null // Убираем обязательность компании для демо
+        estimated_hours: estimated,
+        tags,
+        created_by: (me as any).id,
+        company_id: null
       };
 
-      const { error } = await supabase
+      const { data: inserted, error } = await supabase
         .from('tasks')
-        .insert(taskData);
+        .insert(taskData)
+        .select()
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -134,13 +160,13 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
       setAiResponse(null);
       
       if (onTaskCreated) {
-        onTaskCreated(taskData);
+        onTaskCreated(inserted || taskData);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Task creation error:', error);
       toast({
         title: "Ошибка создания",
-        description: "Не удалось создать задачу",
+        description: error?.message || "Не удалось создать задачу",
         variant: "destructive"
       });
     }

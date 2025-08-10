@@ -59,6 +59,7 @@ interface TaskChatProps {
 const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
   const [comments, setComments] = useState<TaskComment[]>([]);
   const [participants, setParticipants] = useState<TaskParticipant[]>([]);
+  const [coreParticipantIds, setCoreParticipantIds] = useState<string[]>([]);
   const [newComment, setNewComment] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -76,6 +77,7 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
   useEffect(() => {
     loadComments();
     loadParticipants();
+    loadCoreParticipants();
     subscribeToUpdates();
   }, [taskId]);
 
@@ -146,6 +148,26 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
     }
   };
 
+  const loadCoreParticipants = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select(`
+          assigned_to:profiles!tasks_assigned_to_fkey(id),
+          created_by:profiles!tasks_created_by_fkey(id)
+        `)
+        .eq('id', taskId)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      const ids = [data?.assigned_to?.id, data?.created_by?.id].filter(Boolean) as string[];
+      setCoreParticipantIds([...new Set(ids)]);
+    } catch (error) {
+      console.error('Error loading core participants:', error);
+    }
+  };
+
   const subscribeToUpdates = () => {
     const commentsChannel = supabase
       .channel('task-comments')
@@ -171,9 +193,22 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
       })
       .subscribe();
 
+    const taskCoreChannel = supabase
+      .channel('task-core-'+taskId)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'tasks',
+        filter: `id=eq.${taskId}`
+      }, () => {
+        loadCoreParticipants();
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(commentsChannel);
       supabase.removeChannel(participantsChannel);
+      supabase.removeChannel(taskCoreChannel);
     };
   };
 
@@ -323,6 +358,8 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
     return imageExtensions.some(ext => fileName.toLowerCase().endsWith(ext));
   };
 
+  const totalParticipantCount = new Set([...coreParticipantIds, ...participants.map(p => p.user_id)]).size;
+
   return (
     <div className="space-y-4">
       {/* Участники задачи */}
@@ -330,7 +367,7 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-2">
             <Users className="h-4 w-4" />
-            {t.participants} ({participants.length})
+            {t.participants} ({totalParticipantCount})
           </CardTitle>
         </CardHeader>
         <CardContent>

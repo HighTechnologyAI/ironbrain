@@ -148,7 +148,7 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
         created_by: currentProfile.id,
         priority: data.priority,
         due_date: data.due_date?.toISOString(),
-        estimated_hours: data.estimated_hours,
+        estimated_hours: typeof data.estimated_hours === 'number' ? Math.round(data.estimated_hours) : null,
         tags: data.tags ? data.tags.split(',').map(tag => tag.trim()) : null,
       };
 
