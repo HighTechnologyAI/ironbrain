@@ -21,7 +21,8 @@ interface Item {
 }
 
 export function AppSidebar() {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
+  const collapsed = state === 'collapsed';
   const location = useLocation();
   const { isAdmin } = useAdmin();
   const currentPath = location.pathname;
@@ -42,9 +43,9 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path;
 
   return (
-    <Sidebar className={collapsed ? 'w-14' : 'w-60'} collapsible>
+    <Sidebar collapsible="icon">
       <SidebarContent>
-        <SidebarGroup open={true}>
+        <SidebarGroup>
           <SidebarGroupLabel>Навигация</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -59,8 +60,8 @@ export function AppSidebar() {
                       }
                     >
                       <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                      {item.badge && !collapsed && (
+                      {state !== 'collapsed' && <span>{item.title}</span>}
+                      {item.badge && state !== 'collapsed' && (
                         <span className="ml-auto rounded-full border px-2 py-0.5 text-xs text-muted-foreground">
                           {item.badge}
                         </span>

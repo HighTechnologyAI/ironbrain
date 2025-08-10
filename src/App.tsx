@@ -53,15 +53,15 @@ const App = () => (
         <OfflineProvider>
           <SafeAreaContainer>
             <TooltipProvider>
-              <SidebarProvider collapsedWidth={56}>
-                <div className="flex min-h-screen w-full">
-                  <AppSidebar />
-                  <main className="flex-1">
-                    <ConnectionStatus />
-                    <NotificationsBoot />
-                    <Toaster />
-                    <Sonner />
-                    <BrowserRouter>
+              <BrowserRouter>
+                <SidebarProvider>
+                  <div className="flex min-h-screen w-full">
+                    <AppSidebar />
+                    <main className="flex-1">
+                      <ConnectionStatus />
+                      <NotificationsBoot />
+                      <Toaster />
+                      <Sonner />
                       <Routes>
                         <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                         <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
@@ -77,10 +77,10 @@ const App = () => (
                         <Route path="/create-demo-users" element={<CreateDemoUsers />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
-                    </BrowserRouter>
-                  </main>
-                </div>
-              </SidebarProvider>
+                    </main>
+                  </div>
+                </SidebarProvider>
+              </BrowserRouter>
             </TooltipProvider>
           </SafeAreaContainer>
         </OfflineProvider>
