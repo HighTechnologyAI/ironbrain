@@ -149,32 +149,115 @@ const Analytics = () => {
     ];
   };
 
+  // Данные по отделам и производительности рассчитываем на основе БД
+  const getDepartmentStats = () => {
+    if (!analyticsData) return [] as { name: string; tasks: number; members: number; efficiency: number }[];
+    const { tasks, profiles } = analyticsData as any;
 
-  const departmentStats = [
-    { name: "Разработка", tasks: 347, members: 8, efficiency: 89 },
-    { name: "Дизайн", tasks: 156, members: 4, efficiency: 92 },
-    { name: "Тестирование", tasks: 234, members: 5, efficiency: 86 },
-    { name: "Управление", tasks: 189, members: 3, efficiency: 94 },
-    { name: "Маркетинг", tasks: 98, members: 2, efficiency: 78 }
-  ];
+    const start = (() => {
+      const now = new Date();
+      const map: Record<string, number> = { '7d': 7, '30d': 30, '90d': 90, '1y': 365 };
+      return new Date(now.getTime() - (map[dateRange] || 30) * 24 * 60 * 60 * 1000);
+    })();
 
-  const weeklyPerformance = [
-    { week: "Нед 1", completed: 45, planned: 50 },
-    { week: "Нед 2", completed: 52, planned: 55 },
-    { week: "Нед 3", completed: 48, planned: 52 },
-    { week: "Нед 4", completed: 67, planned: 60 },
-    { week: "Нед 5", completed: 71, planned: 65 },
-    { week: "Нед 6", completed: 58, planned: 62 }
-  ];
+    const activeProfiles = profiles.filter((p: any) => p.is_active);
+    const departments = Array.from(new Set(activeProfiles.map((p: any) => p.department).filter(Boolean)));
 
-  const topPerformers = [
-    { name: "Мария Иванова", tasks: 34, efficiency: 96, department: "Управление" },
-    { name: "Александр Петров", tasks: 28, efficiency: 94, department: "Разработка" },
-    { name: "Елена Козлова", tasks: 31, efficiency: 92, department: "Тестирование" },
-    { name: "Дмитрий Сидоров", tasks: 25, efficiency: 90, department: "Дизайн" },
-    { name: "Анна Морозова", tasks: 23, efficiency: 88, department: "Разработка" }
-  ];
+    const stats = departments.map((dept: string) => {
+      const deptMembers = activeProfiles.filter((p: any) => p.department === dept).length;
+      const deptTasks = tasks.filter((t: any) => {
+        const assignedDept = t.assigned_to?.department;
+        const ts = new Date(t.updated_at || t.created_at);
+        return assignedDept === dept && ts >= start;
+      });
+      const total = deptTasks.length;
+      const completed = deptTasks.filter((t: any) => t.status === 'completed').length;
+      const efficiency = total > 0 ? Math.round((completed / total) * 100) : 0;
+      return { name: dept, tasks: total, members: deptMembers, efficiency };
+    });
 
+    // Фильтр выбранного отдела
+    if (department !== 'all') {
+      return stats.filter((s) => s.name === department);
+    }
+    return stats;
+  };
+
+  const getWeeklyPerformance = () => {
+    if (!analyticsData) return [] as { week: string; completed: number; planned: number }[];
+    const { tasks } = analyticsData as any;
+
+    const start = (() => {
+      const now = new Date();
+      const map: Record<string, number> = { '7d': 7, '30d': 30, '90d': 90, '1y': 365 };
+      return new Date(now.getTime() - (map[dateRange] || 30) * 24 * 60 * 60 * 1000);
+    })();
+
+    const tasksInRange = tasks.filter((t: any) => new Date(t.created_at) >= start);
+
+    const weekKey = (d: Date) => {
+      const dt = new Date(d);
+      const first = new Date(dt);
+      first.setDate(dt.getDate() - dt.getDay()); // начало недели
+      return first.toLocaleDateString('ru-RU');
+    };
+
+    const buckets = new Map<string, { completed: number; planned: number }>();
+    tasksInRange.forEach((t: any) => {
+      const key = weekKey(new Date(t.created_at));
+      const bucket = buckets.get(key) || { completed: 0, planned: 0 };
+      bucket.planned += 1;
+      if (t.status === 'completed') bucket.completed += 1;
+      buckets.set(key, bucket);
+    });
+
+    // Преобразуем в массив и отсортируем по дате
+    const entries = Array.from(buckets.entries()).sort((a, b) => {
+      const [da] = a; const [db] = b;
+      return new Date(da).getTime() - new Date(db).getTime();
+    });
+
+    return entries.map(([week, v]) => ({ week, ...v }));
+  };
+
+  const getTopPerformers = () => {
+    if (!analyticsData) return [] as { id: string; name: string; tasks: number; efficiency: number; department?: string }[];
+    const { tasks, profiles } = analyticsData as any;
+
+    const start = (() => {
+      const now = new Date();
+      const map: Record<string, number> = { '7d': 7, '30d': 30, '90d': 90, '1y': 365 };
+      return new Date(now.getTime() - (map[dateRange] || 30) * 24 * 60 * 60 * 1000);
+    })();
+
+    const profilesMap = new Map<string, any>();
+    profiles.forEach((p: any) => profilesMap.set(p.id, p));
+
+    const perf = new Map<string, { total: number; completed: number }>();
+
+    tasks.forEach((t: any) => {
+      const ts = new Date(t.updated_at || t.created_at);
+      if (ts < start) return;
+      const assigneeId = t.assigned_to?.id;
+      if (!assigneeId) return;
+      const bucket = perf.get(assigneeId) || { total: 0, completed: 0 };
+      bucket.total += 1;
+      if (t.status === 'completed') bucket.completed += 1;
+      perf.set(assigneeId, bucket);
+    });
+
+    const arr = Array.from(perf.entries()).map(([id, v]) => {
+      const p = profilesMap.get(id);
+      if (!p) return null;
+      const efficiency = v.total > 0 ? Math.round((v.completed / v.total) * 100) : 0;
+      return { id, name: p.full_name, tasks: v.completed, efficiency, department: p.department };
+    }).filter(Boolean) as any[];
+
+    // Фильтр отдела
+    const filtered = department === 'all' ? arr : arr.filter((x) => x.department === department);
+
+    return filtered.sort((a, b) => b.tasks - a.tasks).slice(0, 5);
+  };
   const getEfficiencyColor = (efficiency: number) => {
     if (efficiency >= 90) return "text-green-600";
     if (efficiency >= 80) return "text-amber-600";
@@ -185,6 +268,12 @@ const Analytics = () => {
     if (efficiency >= 90) return "bg-green-600";
     if (efficiency >= 80) return "bg-amber-500";
     return "bg-destructive";
+  };
+
+  const getDepartments = () => {
+    if (!analyticsData) return [] as string[];
+    const { profiles } = analyticsData as any;
+    return Array.from(new Set((profiles || []).filter((p: any) => p.is_active && p.department).map((p: any) => p.department)));
   };
 
   if (loading) {
@@ -246,11 +335,9 @@ const Analytics = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Все отделы</SelectItem>
-            <SelectItem value="development">Разработка</SelectItem>
-            <SelectItem value="design">Дизайн</SelectItem>
-            <SelectItem value="testing">Тестирование</SelectItem>
-            <SelectItem value="management">Управление</SelectItem>
-            <SelectItem value="marketing">Маркетинг</SelectItem>
+            {getDepartments().map((dept: string) => (
+              <SelectItem key={String(dept)} value={String(dept)}>{String(dept)}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -297,7 +384,7 @@ const Analytics = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {weeklyPerformance.map((week, index) => (
+              {getWeeklyPerformance().map((week, index) => (
                 <div key={index} className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">{week.week}</span>
@@ -335,7 +422,7 @@ const Analytics = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {departmentStats.map((dept, index) => (
+              {getDepartmentStats().map((dept, index) => (
                 <div key={index} className="space-y-2">
                   <div className="flex justify-between items-center">
                     <div>
@@ -376,7 +463,7 @@ const Analytics = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {topPerformers.map((performer, index) => (
+            {getTopPerformers().map((performer, index) => (
               <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
                 <div className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
@@ -388,7 +475,7 @@ const Analytics = () => {
                   </div>
                   <div>
                     <div className="font-medium">{performer.name}</div>
-                    <div className="text-sm text-muted-foreground">{performer.department}</div>
+                    <div className="text-sm text-muted-foreground">{performer.department || '—'}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-6 text-sm">
