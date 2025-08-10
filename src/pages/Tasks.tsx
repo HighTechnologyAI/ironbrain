@@ -31,6 +31,7 @@ import {
   Search,
   User,
   CheckCircle,
+  AlertCircle,
   Timer,
   Tag,
   MoreVertical,
@@ -598,13 +599,34 @@ const Tasks = () => {
         </div>
 
         <Tabs defaultValue="my" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
+            {isAdmin && (
+              <TabsTrigger value="all">{t.allTasks} ({filteredTasks.length})</TabsTrigger>
+            )}
             <TabsTrigger value="my">{t.myTasks} ({getMyTasks().length})</TabsTrigger>
             <TabsTrigger value="created">{t.createdByMe} ({getCreatedTasks().length})</TabsTrigger>
             <TabsTrigger value="collab">Совместно ({getCollaboratedTasks().length})</TabsTrigger>
             <TabsTrigger value="completed">{t.completed} ({getCompletedTasks().length})</TabsTrigger>
           </TabsList>
 
+          {isAdmin && (
+            <TabsContent value="all" className="mt-6">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {filteredTasks.map((task) => (
+                  <TaskCard key={task.id} task={task} />
+                ))}
+              </div>
+              {filteredTasks.length === 0 && (
+                <div className="text-center py-12">
+                  <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">{t.noTasksFound}</h3>
+                  <p className="text-muted-foreground">
+                    {t.noTasksFoundDesc}
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+          )}
 
           <TabsContent value="my" className="mt-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
