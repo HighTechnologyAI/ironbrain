@@ -22,7 +22,9 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CreateIssueForm from "@/components/CreateIssueForm";
+
 import AppNavigation from "@/components/AppNavigation";
+import { supabase } from "@/integrations/supabase/client";
 
 const Issues = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,56 +35,64 @@ const Issues = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Mock data for demo purposes
-  const mockIssues = [
-    {
-      id: 1,
-      title: "Ошибка авторизации пользователей",
-      description: "Пользователи не могут войти в систему после обновления",
-      priority: "high",
-      status: "open",
-      type: "bug",
-      createdBy: "Иван Петров",
-      assignedTo: "Анна Сидорова",
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
-    },
-    {
-      id: 2,
-      title: "Добавить функцию экспорта отчетов",
-      description: "Необходимо добавить возможность экспорта отчетов в PDF и Excel",
-      priority: "medium",
-      status: "in-progress",
-      type: "feature",
-      createdBy: "Мария Иванова",
-      assignedTo: "Петр Сидоров",
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-    },
-    {
-      id: 3,
-      title: "Проблема безопасности в API",
-      description: "Обнаружена уязвимость в API аутентификации",
-      priority: "critical",
-      status: "open",
-      type: "security",
-      createdBy: "Алексей Козлов",
-      assignedTo: "Ольга Петрова",
-      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date(Date.now() - 12 * 60 * 60 * 1000)
+
+  const loadIssues = async () => {
+    setLoading(true);
+    try {
+      const { data: dbIssues, error } = await supabase
+        .from('issues')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+
+      const createdIds = Array.from(new Set((dbIssues || []).map(i => i.reported_by).filter(Boolean)));
+      const assignedIds = Array.from(new Set((dbIssues || []).map(i => i.assigned_to).filter(Boolean)));
+      const profileIds = Array.from(new Set([...(createdIds as string[]), ...(assignedIds as string[])]));
+
+      const profilesMap = new Map<string, string>();
+      if (profileIds.length) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .in('id', profileIds);
+        profiles?.forEach((p: any) => profilesMap.set(p.id, p.full_name));
+      }
+
+      const taskIds = Array.from(new Set((dbIssues || []).map(i => i.task_id).filter(Boolean)));
+      const tasksMap = new Map<string, { title: string; description: string }>();
+      if (taskIds.length) {
+        const { data: tasks } = await supabase
+          .from('tasks')
+          .select('id, title, description')
+          .in('id', taskIds);
+        tasks?.forEach((t: any) => tasksMap.set(t.id, { title: t.title, description: t.description || '' }));
+      }
+
+      const hydrated = (dbIssues || []).map((i: any) => ({
+        ...i,
+        createdByName: i.reported_by ? (profilesMap.get(i.reported_by) || '—') : '—',
+        assignedToName: i.assigned_to ? (profilesMap.get(i.assigned_to) || '—') : '—',
+        taskTitle: i.task_id ? tasksMap.get(i.task_id)?.title : undefined,
+        taskDescription: i.task_id ? tasksMap.get(i.task_id)?.description : undefined,
+      }));
+
+      setIssues(hydrated);
+    } catch (e) {
+      console.error('Failed to load issues', e);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   useEffect(() => {
-    setIssues(mockIssues);
+    loadIssues();
   }, []);
 
   const refreshIssues = () => {
-    setIssues([...mockIssues]);
+    loadIssues();
   };
-
-  const getPriorityInfo = (priority: string) => {
-    switch (priority) {
+  const getSeverityInfo = (severity: string) => {
+    switch (severity) {
       case 'low':
         return { label: 'Низкий', variant: 'secondary' as const, color: 'text-green-600' };
       case 'medium':
@@ -92,12 +102,13 @@ const Issues = () => {
       case 'critical':
         return { label: 'Критический', variant: 'destructive' as const, color: 'text-red-600' };
       default:
-        return { label: 'Неизвестно', variant: 'secondary' as const, color: 'text-muted-foreground' };
+        return { label: 'Средний', variant: 'default' as const, color: 'text-amber-600' };
     }
   };
 
   const getStatusInfo = (status: string) => {
-    switch (status) {
+    const normalized = (status || '').replace('_', '-');
+    switch (normalized) {
       case 'open':
         return { label: 'Открыта', variant: 'destructive' as const, icon: AlertTriangle };
       case 'in-progress':
@@ -145,10 +156,11 @@ const Issues = () => {
   };
 
   const filteredIssues = issues.filter(issue => {
-    const matchesSearch = issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         issue.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || issue.status === statusFilter;
-    const matchesPriority = priorityFilter === 'all' || issue.priority === priorityFilter;
+    const haystack = `${issue.title || ''} ${issue.description || ''} ${issue.taskTitle || ''} ${issue.taskDescription || ''}`.toLowerCase();
+    const matchesSearch = haystack.includes(searchTerm.toLowerCase());
+    const statusNorm = (issue.status || '').replace('_', '-');
+    const matchesStatus = statusFilter === 'all' || statusNorm === statusFilter;
+    const matchesPriority = priorityFilter === 'all' || (issue.severity || 'medium') === priorityFilter;
     return matchesSearch && matchesStatus && matchesPriority;
   });
 
@@ -232,14 +244,12 @@ const Issues = () => {
           </Card>
         </div>
 
-        {/* Issues List */}
         <div className="space-y-4">
           {filteredIssues.map((issue) => {
-            const priorityInfo = getPriorityInfo(issue.priority);
+            const severityInfo = getSeverityInfo(issue.severity || 'medium');
             const statusInfo = getStatusInfo(issue.status);
-            const typeInfo = getTypeInfo(issue.type);
             const StatusIcon = statusInfo.icon;
-            const TypeIcon = typeInfo.icon;
+            const createdDate = new Date(issue.created_at);
 
             return (
               <Card key={issue.id} className="hover:border-primary/50 transition-all duration-300 group">
@@ -251,17 +261,18 @@ const Issues = () => {
                           <StatusIcon className="h-3 w-3" />
                           {statusInfo.label}
                         </Badge>
-                        <Badge variant={priorityInfo.variant}>
-                          {priorityInfo.label}
+                        <Badge variant={severityInfo.variant}>
+                          {severityInfo.label}
                         </Badge>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <TypeIcon className={`h-3 w-3 ${typeInfo.color}`} />
-                          <span className="text-xs">{typeInfo.label}</span>
-                        </div>
                       </div>
                       <CardTitle className="text-xl group-hover:cyber-text transition-colors">
                         {issue.title}
                       </CardTitle>
+                      {issue.taskTitle && (
+                        <CardDescription className="mt-1">
+                          Задача: {issue.taskTitle}
+                        </CardDescription>
+                      )}
                       <CardDescription className="mt-1">
                         {issue.description}
                       </CardDescription>
@@ -276,14 +287,14 @@ const Issues = () => {
                         <User className="h-3 w-3" />
                         <span>Создал:</span>
                       </div>
-                      <div className="font-mono">{issue.createdBy}</div>
+                      <div className="font-mono">{issue.createdByName}</div>
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-1 text-muted-foreground">
                         <User className="h-3 w-3" />
                         <span>Назначено:</span>
                       </div>
-                      <div className="font-mono">{issue.assignedTo}</div>
+                      <div className="font-mono">{issue.assignedToName}</div>
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-1 text-muted-foreground">
@@ -291,8 +302,8 @@ const Issues = () => {
                         <span>Создано:</span>
                       </div>
                       <div className="space-y-1">
-                        <div className="font-mono text-xs">{formatDate(issue.createdAt)}</div>
-                        <div className="text-xs text-muted-foreground">{getTimeSince(issue.createdAt)}</div>
+                        <div className="font-mono text-xs">{formatDate(createdDate)}</div>
+                        <div className="text-xs text-muted-foreground">{getTimeSince(createdDate)}</div>
                       </div>
                     </div>
                   </div>

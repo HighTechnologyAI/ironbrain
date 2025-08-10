@@ -26,8 +26,7 @@ const CreateIssueForm: React.FC<CreateIssueFormProps> = ({
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    priority: 'medium',
-    type: 'bug'
+    severity: 'medium',
   });
 
   const { toast } = useToast();
@@ -65,17 +64,17 @@ const CreateIssueForm: React.FC<CreateIssueFormProps> = ({
     setLoading(true);
 
     try {
+      const { data: profile, error: profileError } = await supabase.rpc('get_current_user_profile');
+      if (profileError) throw profileError;
+
       const { error } = await supabase
         .from('issues')
         .insert([{
           title: formData.title.trim(),
           description: formData.description.trim(),
-          priority: formData.priority,
-          type: formData.type,
+          severity: formData.severity as any,
           status: 'open',
-          created_by: user.id,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          reported_by: (profile as any)?.id ?? null,
         }]);
 
       if (error) throw error;
@@ -89,8 +88,7 @@ const CreateIssueForm: React.FC<CreateIssueFormProps> = ({
       setFormData({
         title: '',
         description: '',
-        priority: 'medium',
-        type: 'bug'
+        severity: 'medium',
       });
 
       onOpenChange(false);
@@ -141,36 +139,19 @@ const CreateIssueForm: React.FC<CreateIssueFormProps> = ({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="priority">Приоритет</Label>
-              <Select value={formData.priority} onValueChange={(value) => handleInputChange('priority', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Выберите приоритет" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Низкий</SelectItem>
-                  <SelectItem value="medium">Средний</SelectItem>
-                  <SelectItem value="high">Высокий</SelectItem>
-                  <SelectItem value="critical">Критический</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="type">Тип проблемы</Label>
-              <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Выберите тип" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="bug">Ошибка</SelectItem>
-                  <SelectItem value="feature">Новая функция</SelectItem>
-                  <SelectItem value="improvement">Улучшение</SelectItem>
-                  <SelectItem value="security">Безопасность</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="severity">Серьезность</Label>
+            <Select value={formData.severity} onValueChange={(value) => handleInputChange('severity', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Выберите серьезность" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="low">Низкая</SelectItem>
+                <SelectItem value="medium">Средняя</SelectItem>
+                <SelectItem value="high">Высокая</SelectItem>
+                <SelectItem value="critical">Критическая</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
