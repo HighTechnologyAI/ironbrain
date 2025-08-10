@@ -23,6 +23,7 @@ import NotificationCenter from '@/components/NotificationCenter';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAdmin } from '@/hooks/use-admin';
 import AssignParticipantDialog from '@/components/AssignParticipantDialog';
+import { useTeamData } from '@/hooks/use-team-data';
 import {
   ArrowLeft,
   Calendar,
@@ -75,10 +76,12 @@ const Tasks = () => {
   const { toast } = useToast();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { teamMembers } = useTeamData();
 
   const [currentProfileId, setCurrentProfileId] = useState<string | null>(null);
   const [assignOpen, setAssignOpen] = useState(false);
   const [assignTaskId, setAssignTaskId] = useState<string | null>(null);
+  const [assigneeFilter, setAssigneeFilter] = useState<string>('self');
 
   useEffect(() => {
     const loadProfileId = async () => {
@@ -209,8 +212,10 @@ const Tasks = () => {
   });
 
   const getMyTasks = () => {
-    if (!currentProfileId) return [];
-    return filteredTasks.filter(task => task.assigned_to?.id === currentProfileId);
+    if (assigneeFilter === 'all') return filteredTasks;
+    const targetId = assigneeFilter === 'self' ? currentProfileId : assigneeFilter;
+    if (!targetId) return [];
+    return filteredTasks.filter(task => task.assigned_to?.id === targetId);
   };
 
   const getCreatedTasks = () => {
@@ -495,6 +500,18 @@ const Tasks = () => {
               <SelectItem value="high">{t.high}</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
+            <SelectTrigger className="w-56">
+              <SelectValue placeholder={t.assignee || 'Исполнитель'} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="self">Я</SelectItem>
+              <SelectItem value="all">Все исполнители</SelectItem>
+              {teamMembers.map((m) => (
+                <SelectItem key={m.id} value={m.id}>{m.full_name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <Tabs defaultValue="all" className="w-full">
@@ -563,6 +580,7 @@ const Tasks = () => {
           onAssigned={() => {
             setAssignOpen(false);
             toast({ title: 'Участник добавлен', description: 'Сотрудник добавлен к задаче' });
+            loadTasks();
           }}
         />
       </div>
