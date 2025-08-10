@@ -71,6 +71,24 @@ const Tasks = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
+  const [currentProfileId, setCurrentProfileId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadProfileId = async () => {
+      if (!user) { setCurrentProfileId(null); return; }
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (error) {
+        console.error('Error loading current profile id:', error);
+        return;
+      }
+      setCurrentProfileId(data?.id ?? null);
+    };
+    loadProfileId();
+  }, [user]);
   useEffect(() => {
     loadTasks();
   }, []);
@@ -150,13 +168,13 @@ const Tasks = () => {
   });
 
   const getMyTasks = () => {
-    if (!user) return [];
-    return filteredTasks.filter(task => task.assigned_to?.id === user.id);
+    if (!currentProfileId) return [];
+    return filteredTasks.filter(task => task.assigned_to?.id === currentProfileId);
   };
 
   const getCreatedTasks = () => {
-    if (!user) return [];
-    return filteredTasks.filter(task => task.created_by?.id === user.id);
+    if (!currentProfileId) return [];
+    return filteredTasks.filter(task => task.created_by?.id === currentProfileId);
   };
 
   const statusLabels = {
