@@ -31,6 +31,7 @@ import {
   AlertCircle,
   Timer,
   Tag,
+  MoreVertical,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -188,109 +189,123 @@ const Tasks = () => {
   };
 
   const TaskCard = ({ task }: { task: Task }) => (
-    <TaskDetails
-      task={task}
-      trigger={
-        <Card className="hover:shadow-md transition-shadow cursor-pointer">
-          <CardHeader className="pb-3">
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <CardTitle className="text-lg mb-1">{task.title}</CardTitle>
-                <CardDescription className="text-sm">
-                  {task.description}
-                </CardDescription>
-              </div>
-              <div className="flex gap-2 ml-4">
-                <Badge className={priorityColors[task.priority]}>
-                  {priorityLabels[task.priority]}
-                </Badge>
-                <Badge className={statusColors[task.status]}>
-                  {statusLabels[task.status]}
-                </Badge>
-              </div>
+    <Card className="hover:shadow-md transition-shadow">
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-start">
+          <div className="flex-1">
+            <CardTitle className="text-lg mb-1">{task.title}</CardTitle>
+            <CardDescription className="text-sm">
+              {task.description}
+            </CardDescription>
+          </div>
+          <div className="flex gap-2 ml-4">
+            <Badge className={priorityColors[task.priority]}>
+              {priorityLabels[task.priority]}
+            </Badge>
+            <Badge className={statusColors[task.status]}>
+              {statusLabels[task.status]}
+            </Badge>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="space-y-3">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <User className="h-4 w-4" />
+              <span>{t.assignee}: {task.assigned_to?.full_name}</span>
             </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-3">
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <User className="h-4 w-4" />
-                  <span>{t.assignee}: {task.assigned_to?.full_name}</span>
-                </div>
-                {task.due_date && (
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{t.dueDate}: {format(new Date(task.due_date), 'dd MMMM yyyy', { locale: ru })}</span>
+            {task.due_date && (
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                <span>{t.dueDate}: {format(new Date(task.due_date), 'dd MMMM yyyy', { locale: ru })}</span>
+              </div>
+            )}
+          </div>
+
+          {task.estimated_hours && (
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <Clock className="h-4 w-4" />
+              <span>{t.estimated}: {task.estimated_hours}{t.hours}</span>
+              {task.actual_hours && (
+                <span>• {t.actual}: {task.actual_hours}{t.hours}</span>
+              )}
+            </div>
+          )}
+
+          {task.tags && task.tags.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <Tag className="h-4 w-4 text-muted-foreground" />
+              {task.tags.map((tag, index) => (
+                <Badge key={index} variant="outline" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-2 pt-2">
+            <div className="text-xs text-muted-foreground">
+              {t.created}: {format(new Date(task.created_at), 'dd.MM.yyyy HH:mm', { locale: ru })}
+            </div>
+            
+            <div className="flex flex-wrap gap-2 justify-between items-center">
+              <TaskAIAssistant task={task} employeeId={task.assigned_to?.id} />
+
+              <div className="flex items-center gap-2">
+                <TaskDetails
+                  task={task}
+                  trigger={
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-2"
+                      aria-label="Меню задачи"
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                      Меню
+                    </Button>
+                  }
+                />
+
+                {task.status !== 'completed' && task.status !== 'cancelled' && (
+                  <div className="flex flex-wrap gap-2">
+                    {task.status === 'pending' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateTaskStatus(task.id, 'in_progress');
+                        }}
+                        className="text-xs"
+                      >
+                        {t.startWork}
+                      </Button>
+                    )}
+                    {task.status === 'in_progress' && (
+                      <Button
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateTaskStatus(task.id, 'completed');
+                        }}
+                        className="text-xs"
+                      >
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        {t.complete}
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>
-
-              {task.estimated_hours && (
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>{t.estimated}: {task.estimated_hours}{t.hours}</span>
-                  {task.actual_hours && (
-                    <span>• {t.actual}: {task.actual_hours}{t.hours}</span>
-                  )}
-                </div>
-              )}
-
-              {task.tags && task.tags.length > 0 && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Tag className="h-4 w-4 text-muted-foreground" />
-                  {task.tags.map((tag, index) => (
-                    <Badge key={index} variant="outline" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-
-              <div className="flex flex-col gap-2 pt-2">
-                <div className="text-xs text-muted-foreground">
-                  {t.created}: {format(new Date(task.created_at), 'dd.MM.yyyy HH:mm', { locale: ru })}
-                </div>
-                
-                <div className="flex flex-wrap gap-2 justify-between items-center">
-                  <TaskAIAssistant task={task} employeeId={task.assigned_to?.id} />
-                  
-                  {task.status !== 'completed' && task.status !== 'cancelled' && (
-                    <div className="flex flex-wrap gap-2">
-                      {task.status === 'pending' && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            updateTaskStatus(task.id, 'in_progress');
-                          }}
-                          className="text-xs"
-                        >
-                          {t.startWork}
-                        </Button>
-                      )}
-                      {task.status === 'in_progress' && (
-                        <Button
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            updateTaskStatus(task.id, 'completed');
-                          }}
-                          className="text-xs"
-                        >
-                          <CheckCircle className="h-4 w-4 mr-1" />
-                          {t.complete}
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
-          </CardContent>
-        </Card>
-      }
-    />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 
   if (loading) {
