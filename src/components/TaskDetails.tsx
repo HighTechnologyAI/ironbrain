@@ -9,10 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import TaskChat from '@/components/TaskChat';
 import {
   Eye,
@@ -60,6 +62,11 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
   const [isTaskCreator, setIsTaskCreator] = useState(false);
   const { user } = useAuth();
   const { t, language } = useLanguage();
+  const { toast } = useToast();
+
+  const [reportOpen, setReportOpen] = useState(false);
+  const [problemDescription, setProblemDescription] = useState('');
+  const [submittingProblem, setSubmittingProblem] = useState(false);
   
   const dateLocale = language === 'bg' ? bg : ru;
 
@@ -112,6 +119,47 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
     }
   };
 
+  const handleCreateIssue = async () => {
+    if (!problemDescription.trim()) {
+      toast({
+        title: language === 'ru' ? 'Опишите проблему' : 'Опишете проблема',
+        description: language === 'ru' ? 'Пожалуйста, введите описание.' : 'Моля, въведете описание.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setSubmittingProblem(true);
+    try {
+      const { data: profile, error: profileError } = await supabase.rpc('get_current_user_profile');
+      if (profileError) throw profileError;
+
+      const title = `Проблема по задаче: ${task.title}`;
+      const { error } = await supabase.from('issues').insert({
+        title,
+        description: problemDescription,
+        task_id: task.id,
+        reported_by: (profile as any)?.id ?? null,
+        status: 'open',
+      });
+      if (error) throw error;
+
+      toast({
+        title: language === 'ru' ? 'Проблема добавлена' : 'Проблемата е добавена',
+        description: language === 'ru' ? 'Запись доступна во вкладке «Проблемы».' : 'Записът е в раздел „Проблеми“.',
+      });
+      setReportOpen(false);
+      setProblemDescription('');
+    } catch (e: any) {
+      toast({
+        title: language === 'ru' ? 'Не удалось добавить проблему' : 'Неуспешно добавяне на проблема',
+        description: e.message ?? String(e),
+        variant: 'destructive',
+      });
+    } finally {
+      setSubmittingProblem(false);
+    }
+  };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -218,17 +266,56 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
 
             <Separator />
 
-            {/* Действия */}
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">{language === 'ru' ? 'Действия' : 'Действия'}</h3>
-              
-              {isTaskCreator && (
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <Settings className="h-4 w-4 mr-2" />
-                  {language === 'ru' ? 'Настройки задачи' : 'Настройки на задачата'}
-                </Button>
-              )}
-            </div>
+{/* Действия */}
+<div className="space-y-2">
+  <h3 className="text-sm font-medium">{language === 'ru' ? 'Действия' : 'Действия'}</h3>
+  
+  {isTaskCreator && (
+    <Button variant="outline" size="sm" className="w-full justify-start">
+      <Settings className="h-4 w-4 mr-2" />
+      {language === 'ru' ? 'Настройки задачи' : 'Настройки на задачата'}
+    </Button>
+  )}
+
+  <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+    <DialogTrigger asChild>
+      <Button variant="destructive" size="sm" className="w-full justify-start">
+        <AlertCircle className="h-4 w-4 mr-2" />
+        {language === 'ru' ? 'Проблема' : 'Проблема'}
+      </Button>
+    </DialogTrigger>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>{language === 'ru' ? 'Сообщить о проблеме' : 'Съобщаване за проблем'}</DialogTitle>
+        <DialogDescription>
+          {language === 'ru'
+            ? 'Опишите проблему. Запись появится во вкладке «Проблемы».'
+            : 'Опишете проблема. Записът ще се появи в „Проблеми“.'
+          }
+        </DialogDescription>
+      </DialogHeader>
+      <div className="space-y-2">
+        <label className="text-sm">
+          {language === 'ru' ? 'Описание проблемы' : 'Описание на проблема'}
+        </label>
+        <Textarea
+          value={problemDescription}
+          onChange={(e) => setProblemDescription(e.target.value)}
+          placeholder={language === 'ru' ? 'Свободная форма…' : 'Свободен текст…'}
+          rows={5}
+        />
+      </div>
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" onClick={() => setReportOpen(false)}>
+          {language === 'ru' ? 'Отмена' : 'Отказ'}
+        </Button>
+        <Button onClick={handleCreateIssue} disabled={submittingProblem}>
+          {language === 'ru' ? 'Создать проблему' : 'Създай проблем'}
+        </Button>
+      </div>
+    </DialogContent>
+  </Dialog>
+</div>
           </div>
         </div>
       </DialogContent>
