@@ -12,6 +12,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useAdmin } from '@/hooks/use-admin';
+import { useLanguage } from '@/hooks/use-language';
 
 interface Item {
   title: string;
@@ -25,19 +26,20 @@ export function AppSidebar() {
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const { isAdmin } = useAdmin();
+  const { t, language } = useLanguage();
   const currentPath = location.pathname;
 
   const items: Item[] = [
-    { title: 'Главная', url: '/', icon: Home },
-    { title: 'AI Помощник', url: '/ai-assistant', icon: Bot, badge: 'AI' },
-    { title: 'Задачи', url: '/tasks', icon: CheckSquare },
-    { title: 'Команда', url: '/team', icon: Users },
-    { title: 'Проекты', url: '/projects', icon: Target },
-    { title: 'Аналитика', url: '/analytics', icon: BarChart3 },
-    { title: 'Проблемы', url: '/issues', icon: Shield },
-    { title: 'Награды', url: '/awards', icon: Award },
-    { title: 'Интеграции', url: '/integrations', icon: ExternalLink },
-    ...(isAdmin ? [{ title: 'Админ', url: '/admin', icon: Settings, badge: 'SYS' } as Item] : []),
+    { title: t.dashboard || 'Главная', url: '/', icon: Home },
+    { title: t.aiAssistant || 'AI Помощник', url: '/ai-assistant', icon: Bot, badge: 'AI' },
+    { title: t.tasks || 'Задачи', url: '/tasks', icon: CheckSquare },
+    { title: t.team || 'Команда', url: '/team', icon: Users },
+    { title: t.projects || 'Проекты', url: '/projects', icon: Target },
+    { title: t.analytics || 'Аналитика', url: '/analytics', icon: BarChart3 },
+    { title: t.issues || 'Проблемы', url: '/issues', icon: Shield },
+    { title: t.awards || 'Награды', url: '/awards', icon: Award },
+    { title: language === 'en' ? 'Integrations' : 'Интеграции', url: '/integrations', icon: ExternalLink },
+    ...(isAdmin ? [{ title: t.admin || 'Админ', url: '/admin', icon: Settings, badge: 'SYS' } as Item] : []),
   ];
 
   const isActive = (path: string) => currentPath === path;
@@ -46,7 +48,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Навигация</SidebarGroupLabel>
+          <SidebarGroupLabel>{language === 'en' ? 'Navigation' : 'Навигация'}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (

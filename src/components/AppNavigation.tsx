@@ -61,7 +61,7 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
       key: 'tasks', 
       path: '/tasks', 
       icon: CheckSquare, 
-      label: t.myTasks || 'Задачи',
+      label: t.tasks || 'Задачи',
       badge: performanceData.pendingTasks > 0 ? performanceData.pendingTasks.toString() : null
     },
     { 
@@ -105,7 +105,7 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
       key: 'integrations', 
       path: '/integrations', 
       icon: ExternalLink, 
-      label: 'Интеграции',
+      label: language === 'en' ? 'Integrations' : 'Интеграции',
       badge: null
     },
     { 
@@ -143,11 +143,11 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
             <button
               onClick={() => navigate('/')}
               className="flex items-center gap-2 hover:opacity-90 transition-opacity"
-              aria-label="Главная"
+              aria-label={t.dashboard || 'Главная'}
             >
               <img
                 src="/lovable-uploads/b9c645a9-9cf4-49fc-9d3b-d74b8e43825e.png"
-                alt="Логотип TIGER CRM"
+                alt="TIGER CRM"
                 className="h-8 w-8"
                 loading="lazy"
               />
