@@ -167,7 +167,7 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
           Tiger AI
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl h-[600px] flex flex-col">
+      <DialogContent className="max-w-2xl h-[600px] flex flex-col" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Bot className="h-5 w-5 text-primary" />
