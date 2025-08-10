@@ -65,6 +65,7 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
   
   const { user } = useAuth();
   const { t, language } = useLanguage();
@@ -80,6 +81,30 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
 
   useEffect(() => {
     scrollToBottom();
+
+    const generateUrls = async () => {
+      const entries = await Promise.all(
+        comments
+          .filter(c => c.file_url && c.file_name)
+          .map(async (c) => {
+            try {
+              const { data, error } = await supabase
+                .storage
+                .from(APP_CONFIG.files.bucket)
+                .createSignedUrl(c.file_url!, 3600);
+              if (error || !data?.signedUrl) return [c.id, ''] as const;
+              return [c.id, data.signedUrl] as const;
+            } catch {
+              return [c.id, ''] as const;
+            }
+          })
+      );
+      const map: Record<string, string> = {};
+      entries.forEach(([id, url]) => { if (url) map[id] = url; });
+      setSignedUrls(map);
+    };
+
+    generateUrls();
   }, [comments]);
 
   const scrollToBottom = () => {
@@ -177,21 +202,17 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
     setSelectedFile(file);
   };
 
-  const uploadFile = async (file: File): Promise<{ url: string; name: string; size: number } | null> => {
+  const uploadFile = async (file: File): Promise<{ path: string; name: string; size: number } | null> => {
     try {
-      const fileName = `${taskId}/${Date.now()}-${file.name}`;
-      const { data, error } = await supabase.storage
+      const filePath = `${taskId}/${Date.now()}-${file.name}`;
+      const { error } = await supabase.storage
         .from(APP_CONFIG.files.bucket)
-        .upload(fileName, file);
+        .upload(filePath, file);
 
       if (error) throw error;
 
-      const { data: urlData } = supabase.storage
-        .from(APP_CONFIG.files.bucket)
-        .getPublicUrl(fileName);
-
       return {
-        url: urlData.publicUrl,
+        path: filePath,
         name: file.name,
         size: file.size
       };
@@ -217,13 +238,23 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
         }
       }
 
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (profileError || !profile) {
+        throw new Error('Profile not found');
+      }
+
       const { error } = await supabase
         .from('task_comments')
         .insert({
           task_id: taskId,
-          user_id: user.id,
+          user_id: profile.id,
           content: newComment.trim() || t.fileAttached,
-          file_url: fileData?.url,
+          file_url: fileData?.path,
           file_name: fileData?.name,
           file_size: fileData?.size,
         });
@@ -253,11 +284,15 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
     }
   };
 
-  const downloadFile = async (fileUrl: string, fileName: string) => {
+  const downloadFile = async (filePath: string, fileName: string) => {
     try {
-      const response = await fetch(fileUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const { data, error } = await supabase.storage
+        .from(APP_CONFIG.files.bucket)
+        .download(filePath);
+
+      if (error) throw error;
+
+      const url = window.URL.createObjectURL(data);
       const a = document.createElement('a');
       a.href = url;
       a.download = fileName;
@@ -345,9 +380,10 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
                     <div className="flex items-center gap-2 p-2 bg-muted rounded border">
                       {isImage(comment.file_name) ? (
                         <img 
-                          src={comment.file_url} 
-                          alt={comment.file_name}
+                          src={signedUrls[comment.id]}
+                          alt={`Вложение к задаче ${comment.file_name}`}
                           className="h-20 w-20 object-cover rounded"
+                          loading="lazy"
                         />
                       ) : (
                         <File className="h-6 w-6 text-muted-foreground" />
