@@ -24,6 +24,8 @@ import CreateDemoUsers from "./pages/CreateDemoUsers";
 import Integrations from "./pages/Integrations";
 import NotFound from "./pages/NotFound";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,27 +53,34 @@ const App = () => (
         <OfflineProvider>
           <SafeAreaContainer>
             <TooltipProvider>
-              <ConnectionStatus />
-              <NotificationsBoot />
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
-                <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
-                <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
-                <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
-                <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-                <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
-                <Route path="/awards" element={<ProtectedRoute><Awards /></ProtectedRoute>} />
-                <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/admin" element={<AdminPanel />} />
-                <Route path="/create-demo-users" element={<CreateDemoUsers />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
+              <SidebarProvider collapsedWidth={56}>
+                <div className="flex min-h-screen w-full">
+                  <AppSidebar />
+                  <main className="flex-1">
+                    <ConnectionStatus />
+                    <NotificationsBoot />
+                    <Toaster />
+                    <Sonner />
+                    <BrowserRouter>
+                      <Routes>
+                        <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                        <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
+                        <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
+                        <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
+                        <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+                        <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+                        <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
+                        <Route path="/awards" element={<ProtectedRoute><Awards /></ProtectedRoute>} />
+                        <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
+                        <Route path="/auth" element={<Auth />} />
+                        <Route path="/admin" element={<AdminPanel />} />
+                        <Route path="/create-demo-users" element={<CreateDemoUsers />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </BrowserRouter>
+                  </main>
+                </div>
+              </SidebarProvider>
             </TooltipProvider>
           </SafeAreaContainer>
         </OfflineProvider>

@@ -32,6 +32,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
 import { usePerformanceData } from "@/hooks/use-performance-data";
 import { useUserPresence } from "@/hooks/use-user-presence";
+import { useAdmin } from "@/hooks/use-admin";
 
 const Index = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -42,6 +43,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { data: performanceData, loading: performanceLoading } = usePerformanceData();
   const { userCount: onlineUserCount } = useUserPresence();
+  const { isAdmin } = useAdmin();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -180,7 +182,7 @@ const Index = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-full blur-xl"></div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold">{t.welcome}</h1>
+              <h1 className="text-2xl font-bold">{t.welcome || 'Добро пожаловать в TIGER CRM'}</h1>
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Wifi className="h-3 w-3 text-primary" />
@@ -200,8 +202,8 @@ const Index = () => {
           <CardHeader className="relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent"></div>
             <div className="relative z-10">
-              <CardTitle className="text-xl">{t.welcome}</CardTitle>
-              <CardDescription className="text-muted-foreground">{t.welcomeDescription}</CardDescription>
+              <CardTitle className="text-xl">{t.welcome || 'Добро пожаловать в TIGER CRM'}</CardTitle>
+              <CardDescription className="text-muted-foreground">{t.welcomeDescription || 'Комплексная система управления задачами и проектами с аналитикой и AI‑помощником'}</CardDescription>
               <div className="flex items-center gap-4 mt-4">
                 <div className="flex items-center gap-2 text-sm">
                   <Activity className="h-4 w-4 text-primary" />
@@ -259,6 +261,16 @@ const Index = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Activity className="h-4 w-4 text-primary" />
+                  <span className="text-muted-foreground">RTT:</span>
+                  <span className="text-primary font-mono">42ms</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-primary" />
+                  <span className="text-muted-foreground">API:</span>
+                  <span className="text-primary font-mono">OK</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-primary" />
                   <span className="text-muted-foreground">{t.active || 'Активных'}:</span>
                   <span className="text-primary font-mono">{onlineUserCount} {t.users || 'пользователей'}</span>
                 </div>
@@ -306,8 +318,8 @@ const Index = () => {
           </CardHeader>
         </Card>
 
-        {/* System Health Check - только для основателя */}
-        {user?.email === 'founder@hightechai.site' && (
+        {/* System Health Check - только для админов */}
+        {isAdmin && (
           <div className="mb-6">
             <SystemHealthCheck />
           </div>

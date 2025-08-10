@@ -7,9 +7,9 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/hooks/use-language';
 import { usePerformanceData } from '@/hooks/use-performance-data';
-import { 
-  ArrowLeft, 
-  LogOut, 
+import {
+  ArrowLeft,
+  LogOut,
   Home,
   CheckSquare,
   Users,
@@ -22,6 +22,7 @@ import {
   Bell,
   ExternalLink
 } from 'lucide-react';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 interface AppNavigationProps {
   showBackButton?: boolean;
@@ -137,7 +138,20 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left Section */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <SidebarTrigger />
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 hover:opacity-90 transition-opacity"
+              aria-label="Главная"
+            >
+              <img
+                src="/lovable-uploads/b9c645a9-9cf4-49fc-9d3b-d74b8e43825e.png"
+                alt="Логотип TIGER CRM"
+                className="h-8 w-8"
+                loading="lazy"
+              />
+            </button>
             {showBackButton && (
               <Button 
                 variant="ghost" 
@@ -148,7 +162,6 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             )}
-            
             {title && (
               <div>
                 <h1 className="text-lg font-semibold text-foreground">{title}</h1>
@@ -157,47 +170,6 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
                 )}
               </div>
             )}
-          </div>
-
-          {/* Center Navigation - Hidden on mobile */}
-          <div className="hidden lg:flex items-center gap-1 overflow-x-auto">
-            {navigationItems.map((item) => {
-              const isActive = isActivePath(item.path);
-              return (
-                <Button
-                  key={item.key}
-                  variant={isActive ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => navigate(item.path)}
-                  className={`
-                    flex items-center gap-2 whitespace-nowrap
-                    ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-primary/10'}
-                    ${item.special ? 'bg-gradient-to-r from-primary/20 to-accent/20 hover:from-primary/30 hover:to-accent/30' : ''}
-                  `}
-                >
-                  <item.icon className="h-4 w-4" />
-                  <span className="hidden xl:block">{item.label}</span>
-                  {item.badge && (
-                    <Badge 
-                      variant={
-                        item.variant === 'destructive' ? 'destructive' :
-                        item.variant === 'accent' ? 'secondary' :
-                        item.variant === 'secondary' ? 'outline' :
-                        'secondary'
-                      }
-                      className={`
-                        text-xs
-                        ${item.variant === 'destructive' ? 'bg-destructive/20 text-destructive border-destructive/30' : ''}
-                        ${item.variant === 'accent' ? 'bg-accent/20 text-accent border-accent/30' : ''}
-                        ${!item.variant ? 'bg-primary/20 text-primary border-primary/30' : ''}
-                      `}
-                    >
-                      {item.badge}
-                    </Badge>
-                  )}
-                </Button>
-              );
-            })}
           </div>
 
           {/* Right Section */}
@@ -219,36 +191,6 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
             >
               <LogOut className="h-4 w-4" />
             </Button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        <div className="lg:hidden pb-2">
-          <div className="flex gap-1 overflow-x-auto">
-            {navigationItems.slice(0, 6).map((item) => {
-              const isActive = isActivePath(item.path);
-              return (
-                <Button
-                  key={item.key}
-                  variant={isActive ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => navigate(item.path)}
-                  className={`
-                    flex items-center gap-1 whitespace-nowrap
-                    ${isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-primary/10'}
-                    ${item.special ? 'bg-gradient-to-r from-primary/20 to-accent/20' : ''}
-                  `}
-                >
-                  <item.icon className="h-4 w-4" />
-                  <span className="text-xs">{item.label}</span>
-                  {item.badge && (
-                    <Badge variant="secondary" className="text-xs">
-                      {item.badge}
-                    </Badge>
-                  )}
-                </Button>
-              );
-            })}
           </div>
         </div>
       </div>
