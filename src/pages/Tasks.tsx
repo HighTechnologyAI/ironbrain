@@ -223,6 +223,18 @@ const Tasks = () => {
     return filteredTasks.filter(task => task.created_by?.id === currentProfileId);
   };
 
+  const getCompletedTasks = () => {
+    const targetId = assigneeFilter === 'self' ? currentProfileId : (assigneeFilter === 'all' ? null : assigneeFilter);
+    return tasks.filter(task => {
+      const matchesCompleted = task.status === 'completed';
+      const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
+      const matchesAssignee = !targetId || task.assigned_to?.id === targetId;
+      return matchesCompleted && matchesSearch && matchesPriority && matchesAssignee;
+    });
+  };
+
   const statusLabels = {
     pending: t.pending,
     in_progress: t.inProgress,
@@ -515,10 +527,11 @@ const Tasks = () => {
         </div>
 
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="all">{t.allTasks} ({filteredTasks.length})</TabsTrigger>
             <TabsTrigger value="my">{t.myTasks} ({getMyTasks().length})</TabsTrigger>
             <TabsTrigger value="created">{t.createdByMe} ({getCreatedTasks().length})</TabsTrigger>
+            <TabsTrigger value="completed">{t.completed} ({getCompletedTasks().length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="mt-6">
@@ -567,6 +580,23 @@ const Tasks = () => {
                 <h3 className="text-lg font-semibold mb-2">{t.noCreatedTasks}</h3>
                 <p className="text-muted-foreground">
                   {t.noCreatedTasksDesc}
+                </p>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="completed" className="mt-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {getCompletedTasks().map((task) => (
+                <TaskCard key={task.id} task={task} />
+              ))}
+            </div>
+            {getCompletedTasks().length === 0 && (
+              <div className="text-center py-12">
+                <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Завершённых задач нет</h3>
+                <p className="text-muted-foreground">
+                  Используйте фильтр исполнителя, чтобы посмотреть завершённые задачи по сотрудникам.
                 </p>
               </div>
             )}
