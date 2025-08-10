@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Team = () => {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ const Team = () => {
   const [editDeptOpen, setEditDeptOpen] = useState(false);
   const [editMemberId, setEditMemberId] = useState<string | null>(null);
   const [deptValue, setDeptValue] = useState("");
+  const [roleValue, setRoleValue] = useState("");
 
   // Function to handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,7 +91,7 @@ const Team = () => {
     if (!editMemberId) return;
     const { error } = await supabase
       .from('profiles')
-      .update({ department: deptValue || null })
+      .update({ department: deptValue || null, position: roleValue || null })
       .eq('id', editMemberId);
 
     if (error) {
@@ -97,7 +99,7 @@ const Team = () => {
       return;
     }
 
-    toast({ title: 'Сохранено', description: 'Отдел обновлён' });
+    toast({ title: 'Сохранено', description: 'Профиль обновлён' });
     setEditDeptOpen(false);
     window.location.reload();
   };
@@ -167,7 +169,7 @@ const Team = () => {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <Badge className="bg-secondary text-secondary-foreground">
-                      {t.employee || 'Сотрудник'}
+                      {member.position || 'Сотрудник'}
                     </Badge>
                     <Badge variant="outline" className="text-xs">
                       {getStatusLabel(member.status || 'offline')}
@@ -186,6 +188,7 @@ const Team = () => {
                         onClick={() => {
                           setEditMemberId(member.id);
                           setDeptValue(member.department || '');
+                          setRoleValue(member.position || '');
                           setEditDeptOpen(true);
                         }}
                       >
@@ -250,11 +253,28 @@ const Team = () => {
       <Dialog open={editDeptOpen} onOpenChange={setEditDeptOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{'Изменение отдела'}</DialogTitle>
+            <DialogTitle>Редактирование профиля</DialogTitle>
           </DialogHeader>
-          <div className="space-y-2">
-            <Label htmlFor="dept">{t.department || 'Отдел'}</Label>
-            <Input id="dept" value={deptValue} onChange={(e) => setDeptValue(e.target.value)} placeholder="Введите отдел" />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="role">Роль</Label>
+              <Select value={roleValue} onValueChange={setRoleValue}>
+                <SelectTrigger id="role" className="w-full">
+                  <SelectValue placeholder="Выберите роль" />
+                </SelectTrigger>
+                <SelectContent className="z-[1000]">
+                  <SelectItem value="Основатель">Основатель</SelectItem>
+                  <SelectItem value="Сотрудник">Сотрудник</SelectItem>
+                  <SelectItem value="Разработчик">Разработчик</SelectItem>
+                  <SelectItem value="Директор">Директор</SelectItem>
+                  <SelectItem value="Менеджер">Менеджер</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="dept">{t.department || 'Отдел'}</Label>
+              <Input id="dept" value={deptValue} onChange={(e) => setDeptValue(e.target.value)} placeholder="Введите отдел" />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditDeptOpen(false)}>Отмена</Button>
