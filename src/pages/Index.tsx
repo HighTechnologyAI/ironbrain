@@ -309,11 +309,11 @@ const Index = () => {
         <OnlineUsersWidget />
 
         {/* Menu Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+        <div className="grid grid-cols-1 min-[430px]:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6">
         {menuItems.map((item, index) => (
           <Card 
             key={index}
-            className="bg-card border-border hover:border-primary/50 hover:cyber-glow transition-all duration-300 cursor-pointer group"
+            className="bg-card border-border hover:border-primary/50 hover:cyber-glow transition-all duration-300 cursor-pointer group min-h-[84px] active:scale-95"
             onClick={() => handleCardClick(item.title, (item as any).route)}
           >
               <CardHeader>
