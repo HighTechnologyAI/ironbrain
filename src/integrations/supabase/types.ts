@@ -88,6 +88,60 @@ export type Database = {
           },
         ]
       }
+      budget_entries: {
+        Row: {
+          actual_amount: number
+          category: string | null
+          created_at: string
+          created_by: string | null
+          entry_date: string
+          id: string
+          notes: string | null
+          objective_id: string
+          planned_amount: number
+          updated_at: string
+        }
+        Insert: {
+          actual_amount?: number
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          entry_date?: string
+          id?: string
+          notes?: string | null
+          objective_id: string
+          planned_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          actual_amount?: number
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          entry_date?: string
+          id?: string
+          notes?: string | null
+          objective_id?: string
+          planned_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_entries_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_entries_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "objectives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_invitations: {
         Row: {
           created_at: string | null
@@ -314,6 +368,184 @@ export type Database = {
           },
         ]
       }
+      key_results: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          current_value: number | null
+          description: string | null
+          id: string
+          objective_id: string
+          owner_id: string | null
+          progress: number
+          status: Database["public"]["Enums"]["kr_status"]
+          target_value: number | null
+          title: string
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          current_value?: number | null
+          description?: string | null
+          id?: string
+          objective_id: string
+          owner_id?: string | null
+          progress?: number
+          status?: Database["public"]["Enums"]["kr_status"]
+          target_value?: number | null
+          title: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          current_value?: number | null
+          description?: string | null
+          id?: string
+          objective_id?: string
+          owner_id?: string | null
+          progress?: number
+          status?: Database["public"]["Enums"]["kr_status"]
+          target_value?: number | null
+          title?: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "key_results_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "key_results_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "objectives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "key_results_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_hits: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          objective_id: string
+          outlet: string | null
+          published_at: string | null
+          reach: number
+          status: Database["public"]["Enums"]["media_status"]
+          title: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          objective_id: string
+          outlet?: string | null
+          published_at?: string | null
+          reach?: number
+          status?: Database["public"]["Enums"]["media_status"]
+          title: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          objective_id?: string
+          outlet?: string | null
+          published_at?: string | null
+          reach?: number
+          status?: Database["public"]["Enums"]["media_status"]
+          title?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_hits_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_hits_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "objectives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      milestones: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          due_date: string | null
+          id: string
+          objective_id: string
+          progress: number
+          status: Database["public"]["Enums"]["milestone_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          due_date?: string | null
+          id?: string
+          objective_id: string
+          progress?: number
+          status?: Database["public"]["Enums"]["milestone_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          due_date?: string | null
+          id?: string
+          objective_id?: string
+          progress?: number
+          status?: Database["public"]["Enums"]["milestone_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milestones_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "milestones_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "objectives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -355,6 +587,59 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      objectives: {
+        Row: {
+          budget_planned: number | null
+          company_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          location: string | null
+          status: Database["public"]["Enums"]["objective_status"]
+          strategic_importance: string | null
+          target_date: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          budget_planned?: number | null
+          company_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          status?: Database["public"]["Enums"]["objective_status"]
+          strategic_importance?: string | null
+          target_date?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          budget_planned?: number | null
+          company_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          status?: Database["public"]["Enums"]["objective_status"]
+          strategic_importance?: string | null
+          target_date?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objectives_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -463,6 +748,70 @@ export type Database = {
           },
         ]
       }
+      risks: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          likelihood: Database["public"]["Enums"]["risk_likelihood"]
+          mitigation: string | null
+          objective_id: string
+          owner_id: string | null
+          severity: Database["public"]["Enums"]["risk_severity"]
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          likelihood?: Database["public"]["Enums"]["risk_likelihood"]
+          mitigation?: string | null
+          objective_id: string
+          owner_id?: string | null
+          severity?: Database["public"]["Enums"]["risk_severity"]
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          likelihood?: Database["public"]["Enums"]["risk_likelihood"]
+          mitigation?: string | null
+          objective_id?: string
+          owner_id?: string | null
+          severity?: Database["public"]["Enums"]["risk_severity"]
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risks_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "objectives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risks_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_comments: {
         Row: {
           content: string
@@ -558,6 +907,58 @@ export type Database = {
           },
           {
             foreignKeyName: "task_history_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_kr_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          kr_id: string
+          rationale: string | null
+          task_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kr_id: string
+          rationale?: string | null
+          task_id: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kr_id?: string
+          rationale?: string | null
+          task_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_kr_links_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_kr_links_kr_id_fkey"
+            columns: ["kr_id"]
+            isOneToOne: false
+            referencedRelation: "key_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_kr_links_task_id_fkey"
             columns: ["task_id"]
             isOneToOne: false
             referencedRelation: "tasks"
@@ -718,6 +1119,66 @@ export type Database = {
           },
         ]
       }
+      vip_guests: {
+        Row: {
+          contact: string | null
+          country: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          notes: string | null
+          objective_id: string
+          organization: string | null
+          role: string | null
+          status: Database["public"]["Enums"]["vip_status"]
+          updated_at: string
+        }
+        Insert: {
+          contact?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          objective_id: string
+          organization?: string | null
+          role?: string | null
+          status?: Database["public"]["Enums"]["vip_status"]
+          updated_at?: string
+        }
+        Update: {
+          contact?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          objective_id?: string
+          organization?: string | null
+          role?: string | null
+          status?: Database["public"]["Enums"]["vip_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vip_guests_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vip_guests_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "objectives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       webhook_logs: {
         Row: {
           created_at: string
@@ -777,6 +1238,17 @@ export type Database = {
       achievement_type: "individual" | "team" | "company"
       employee_role: "admin" | "manager" | "employee" | "intern"
       issue_severity: "low" | "medium" | "high" | "critical"
+      kr_status: "on_track" | "at_risk" | "off_track" | "done"
+      media_status: "planned" | "published"
+      milestone_status: "planned" | "in_progress" | "done"
+      objective_status: "planned" | "active" | "done" | "on_hold"
+      risk_likelihood:
+        | "rare"
+        | "unlikely"
+        | "possible"
+        | "likely"
+        | "almost_certain"
+      risk_severity: "low" | "medium" | "high" | "critical"
       task_priority: "low" | "medium" | "high" | "critical"
       task_status:
         | "pending"
@@ -784,6 +1256,7 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "on_hold"
+      vip_status: "invited" | "confirmed" | "declined" | "attended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -914,6 +1387,18 @@ export const Constants = {
       achievement_type: ["individual", "team", "company"],
       employee_role: ["admin", "manager", "employee", "intern"],
       issue_severity: ["low", "medium", "high", "critical"],
+      kr_status: ["on_track", "at_risk", "off_track", "done"],
+      media_status: ["planned", "published"],
+      milestone_status: ["planned", "in_progress", "done"],
+      objective_status: ["planned", "active", "done", "on_hold"],
+      risk_likelihood: [
+        "rare",
+        "unlikely",
+        "possible",
+        "likely",
+        "almost_certain",
+      ],
+      risk_severity: ["low", "medium", "high", "critical"],
       task_priority: ["low", "medium", "high", "critical"],
       task_status: [
         "pending",
@@ -922,6 +1407,7 @@ export const Constants = {
         "cancelled",
         "on_hold",
       ],
+      vip_status: ["invited", "confirmed", "declined", "attended"],
     },
   },
 } as const
