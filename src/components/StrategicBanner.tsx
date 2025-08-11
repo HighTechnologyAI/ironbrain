@@ -75,13 +75,13 @@ export default function StrategicBanner() {
   return (
     <Card className="mb-8 bg-gradient-to-r from-primary/5 via-accent/5 to-transparent border-primary/30">
       <CardHeader>
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <CardTitle className="text-2xl leading-snug">{displayTitle}</CardTitle>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="min-w-0">
+            <CardTitle className="text-xl sm:text-2xl leading-snug break-words hyphens-auto">{displayTitle}</CardTitle>
             {displayDescription && (
-              <CardDescription className="mt-2 whitespace-pre-line">{displayDescription}</CardDescription>
+              <CardDescription className="mt-2 whitespace-pre-line text-sm sm:text-base break-words">{displayDescription}</CardDescription>
             )}
-        <div className="flex flex-wrap gap-4 mt-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap gap-2 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm text-muted-foreground">
           {objective.location && (
             <span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4 text-primary" />{t.location}: {objective.location}</span>
           )}
@@ -93,7 +93,7 @@ export default function StrategicBanner() {
           )}
         </div>
           </div>
-          <Badge variant="outline" className="h-7 self-start bg-primary/10 text-primary border-primary/30">{t.strategicStatus}: {(() => {
+          <Badge variant="outline" className="h-7 w-fit sm:self-start bg-primary/10 text-primary border-primary/30 mt-2 sm:mt-0">{t.strategicStatus}: {(() => {
             switch (objective.status) {
               case 'planned': return t.statusPlanned;
               case 'active': return t.statusActive;
@@ -105,22 +105,22 @@ export default function StrategicBanner() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {krs.map((kr, idx) => (
-            <div key={kr.id} className="rounded-lg border bg-card p-4 shadow-sm hover:border-primary/40 transition-colors">
+            <div key={kr.id} className="rounded-lg border bg-card p-3 sm:p-4 shadow-sm hover:border-primary/40 transition-colors">
               <div className="flex items-start justify-between gap-2 mb-2">
-                <div className="font-medium text-foreground leading-tight">{isStrategic ? (loc.krTitles[idx] ?? kr.title) : kr.title}</div>
-                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/30">{kr.status}</Badge>
+                <div className="font-medium text-foreground leading-tight text-sm sm:text-base">{isStrategic ? (loc.krTitles[idx] ?? kr.title) : kr.title}</div>
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/30 text-[10px] sm:text-xs">{kr.status}</Badge>
               </div>
               {(isStrategic ? (loc.krDescriptions[idx] ?? kr.description) : kr.description) && (
-                <div className="text-xs text-muted-foreground line-clamp-3 mb-3">{isStrategic ? (loc.krDescriptions[idx] ?? kr.description) : kr.description}</div>
+                <div className="text-xs text-muted-foreground line-clamp-4 sm:line-clamp-3 mb-3">{isStrategic ? (loc.krDescriptions[idx] ?? kr.description) : kr.description}</div>
               )}
               <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
                 <span>{t.strategicProgress}</span>
                 <span className="font-mono text-foreground">{kr.progress}%</span>
               </div>
               <Progress value={kr.progress} />
-              <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+              <div className="mt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-muted-foreground">
                 <span>{t.strategicTarget}: <span className="text-foreground font-mono">{kr.target_value ?? '-'} {kr.unit || ''}</span></span>
                 <span>{t.strategicCurrent}: <span className="text-foreground font-mono">{kr.current_value ?? 0} {kr.unit || ''}</span></span>
               </div>
