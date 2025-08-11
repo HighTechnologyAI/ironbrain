@@ -21,12 +21,12 @@ import {
   Settings,
   Bot,
   Sparkles,
-  Loader2,
   Home
 } from "lucide-react";
 import OnlineUsersWidget from "@/components/OnlineUsersWidget";
 import AppNavigation from "@/components/AppNavigation";
 import { SystemHealthCheck } from "@/components/SystemHealthCheck";
+import StrategicBanner from "@/components/StrategicBanner";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
@@ -197,28 +197,8 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Welcome Card */}
-        <Card className="mb-8 bg-card border-border hover:border-primary/50 transition-all duration-500">
-          <CardHeader className="relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent"></div>
-            <div className="relative z-10">
-              <CardTitle className="text-xl">{t.welcome || 'Добро пожаловать в TIGER CRM'}</CardTitle>
-              <CardDescription className="text-muted-foreground">{t.welcomeDescription || 'Комплексная система управления задачами и проектами с аналитикой и AI‑помощником'}</CardDescription>
-              <div className="flex items-center gap-4 mt-4">
-                <div className="flex items-center gap-2 text-sm">
-                  <Activity className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground">{t.performance}:</span>
-                  {performanceLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                  ) : (
-                    <span className="text-primary font-mono">{performanceData.performance}%</span>
-                  )}
-                </div>
-                <Progress value={performanceData.performance} className="flex-1 max-w-[200px]" />
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
+        {/* Strategic Banner */}
+        <StrategicBanner />
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
