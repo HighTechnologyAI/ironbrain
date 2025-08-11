@@ -341,29 +341,29 @@ const AIAssistant = () => {
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-2">
                   <Target className="h-4 w-4 text-primary" />
-                  <span>Персонализированные задачи</span>
+                  <span>{t.aiCapabilitiesPersonalized}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4 text-primary" />
-                  <span>Анализ рабочей нагрузки</span>
+                  <span>{t.aiCapabilitiesWorkload}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Zap className="h-4 w-4 text-primary" />
-                  <span>Оптимизация процессов</span>
+                  <span>{t.aiCapabilitiesOptimization}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Bot className="h-4 w-4 text-primary" />
-                  <span>Свободный диалог</span>
+                  <span>{t.aiCapabilitiesChat}</span>
                 </div>
               </div>
               
               <div className="mt-4 p-3 bg-primary/10 rounded-lg">
-                <div className="text-xs text-primary font-medium mb-1">
-                  💡 Совет Tiger AI
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Опишите задачу в свободной форме, и AI создаст персонализированное задание с учетом навыков и загрузки сотрудника.
-                </div>
+              <div className="text-xs text-primary font-medium mb-1">
+                {t.aiTipTitle}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {t.aiTipText}
+              </div>
               </div>
             </CardContent>
           </Card>

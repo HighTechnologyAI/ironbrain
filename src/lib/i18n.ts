@@ -191,6 +191,51 @@ export interface Translations {
   taskStatusUpdated: string;
   taskStatusUpdateError: string;
   tasksLoadError: string;
+
+  // AI Assistant
+  aiAssistantReadyTitle: string;
+  aiAssistantReadyDesc: string;
+  aiErrorTitle: string;
+  aiErrorDesc: string;
+  aiMessageRequired: string;
+  aiEmployeeRequired: string;
+  aiProcessing: string;
+  aiRequest: string;
+  aiModeLabel: string;
+  aiModePlaceholder: string;
+  aiEmployeePlaceholder: string;
+  aiTaskDescriptionLabel: string;
+  aiMessageLabel: string;
+  aiPlaceholderCreateTask: string;
+  aiPlaceholderSuggestOptimization: string;
+  aiPlaceholderChat: string;
+  aiResponseTitle: string;
+  aiBadgeTask: string;
+  aiBadgeAnalysis: string;
+  aiBadgeOptimization: string;
+  aiBadgeChat: string;
+  aiTaskName: string;
+  aiDescription: string;
+  aiPriority: string;
+  aiTime: string;
+  aiTags: string;
+  aiRecommendations: string;
+  aiOptimizations: string;
+  aiSkillDevelopment: string;
+  aiAnswer: string;
+  aiModeCreateTask: string;
+  aiModeAnalyzeWorkload: string;
+  aiModeSuggestOptimization: string;
+  aiModeChat: string;
+  aiCapabilitiesPersonalized: string;
+  aiCapabilitiesWorkload: string;
+  aiCapabilitiesOptimization: string;
+  aiCapabilitiesChat: string;
+  aiTipTitle: string;
+  aiTipText: string;
+  taskCreatedTitle: string;
+  taskAssigned: string;
+  taskCreationError: string;
 }
 
 export const translations: Record<string, Translations> = {
@@ -227,6 +272,51 @@ export const translations: Record<string, Translations> = {
     achievements_page: 'Awards',
     lastUpdate: 'Last Update',
     aiAssistant: 'AI Assistant',
+
+    // AI Assistant
+    aiAssistantReadyTitle: 'AI analysis ready',
+    aiAssistantReadyDesc: 'Tiger AI has responded with insights',
+    aiErrorTitle: 'AI Error',
+    aiErrorDesc: 'Failed to get a response from AI',
+    aiMessageRequired: 'Enter a message for the AI assistant',
+    aiEmployeeRequired: 'Select an employee',
+    aiProcessing: 'AI processing...',
+    aiRequest: 'Ask Tiger AI',
+    aiModeLabel: 'AI Assistant Mode',
+    aiModePlaceholder: 'Select mode',
+    aiEmployeePlaceholder: 'Select an employee',
+    aiTaskDescriptionLabel: 'Task description',
+    aiMessageLabel: 'Message for AI',
+    aiPlaceholderCreateTask: 'Describe the task in free form. AI will create a personalized task considering the employee\'s skills...',
+    aiPlaceholderSuggestOptimization: 'Describe a problem or an area to optimize...',
+    aiPlaceholderChat: 'Ask any question about task management...',
+    aiResponseTitle: 'Tiger AI Response',
+    aiBadgeTask: 'Task',
+    aiBadgeAnalysis: 'Analysis',
+    aiBadgeOptimization: 'Optimization',
+    aiBadgeChat: 'Chat',
+    aiTaskName: 'Task name:',
+    aiDescription: 'Description:',
+    aiPriority: 'Priority',
+    aiTime: 'Time',
+    aiTags: 'Tags:',
+    aiRecommendations: 'Recommendations:',
+    aiOptimizations: 'Optimizations:',
+    aiSkillDevelopment: 'Skill development:',
+    aiAnswer: 'Answer:',
+    aiModeCreateTask: 'Create task',
+    aiModeAnalyzeWorkload: 'Workload analysis',
+    aiModeSuggestOptimization: 'Optimization suggestions',
+    aiModeChat: 'Free chat',
+    aiCapabilitiesPersonalized: 'Personalized tasks',
+    aiCapabilitiesWorkload: 'Workload analysis',
+    aiCapabilitiesOptimization: 'Process optimization',
+    aiCapabilitiesChat: 'Free dialog',
+    aiTipTitle: 'Tip from Tiger AI',
+    aiTipText: 'Describe the task in free form and AI will create a personalized assignment considering skills and workload.',
+    taskCreatedTitle: 'Task created!',
+    taskAssigned: 'Assigned to employee',
+    taskCreationError: 'Failed to create task',
     
     // Notifications
     notifications: 'Notifications',
@@ -409,6 +499,51 @@ export const translations: Record<string, Translations> = {
     achievements_page: 'Награды',
     lastUpdate: 'Последнее обновление',
     aiAssistant: 'AI Помощник',
+
+    // AI Assistant
+    aiAssistantReadyTitle: 'AI анализ готов',
+    aiAssistantReadyDesc: 'Получен ответ от Tiger AI',
+    aiErrorTitle: 'Ошибка AI',
+    aiErrorDesc: 'Не удалось получить ответ от AI',
+    aiMessageRequired: 'Введите сообщение для AI помощника',
+    aiEmployeeRequired: 'Выберите сотрудника',
+    aiProcessing: 'AI обрабатывает...',
+    aiRequest: 'Запросить Tiger AI',
+    aiModeLabel: 'Режим AI помощника',
+    aiModePlaceholder: 'Выберите режим',
+    aiEmployeePlaceholder: 'Выберите сотрудника',
+    aiTaskDescriptionLabel: 'Описание задачи',
+    aiMessageLabel: 'Сообщение для AI',
+    aiPlaceholderCreateTask: 'Опишите задачу в свободной форме. AI создаст персонализированную задачу с учетом навыков сотрудника...',
+    aiPlaceholderSuggestOptimization: 'Опишите проблему или область для оптимизации...',
+    aiPlaceholderChat: 'Задайте любой вопрос по управлению задачами...',
+    aiResponseTitle: 'Ответ Tiger AI',
+    aiBadgeTask: 'Задача',
+    aiBadgeAnalysis: 'Анализ',
+    aiBadgeOptimization: 'Оптимизация',
+    aiBadgeChat: 'Чат',
+    aiTaskName: 'Название задачи:',
+    aiDescription: 'Описание:',
+    aiPriority: 'Приоритет',
+    aiTime: 'Время',
+    aiTags: 'Теги:',
+    aiRecommendations: 'Рекомендации:',
+    aiOptimizations: 'Оптимизации:',
+    aiSkillDevelopment: 'Развитие навыков:',
+    aiAnswer: 'Ответ:',
+    aiModeCreateTask: 'Создать задачу',
+    aiModeAnalyzeWorkload: 'Анализ нагрузки',
+    aiModeSuggestOptimization: 'Оптимизация',
+    aiModeChat: 'Свободный чат',
+    aiCapabilitiesPersonalized: 'Персонализированные задачи',
+    aiCapabilitiesWorkload: 'Анализ рабочей нагрузки',
+    aiCapabilitiesOptimization: 'Оптимизация процессов',
+    aiCapabilitiesChat: 'Свободный диалог',
+    aiTipTitle: 'Совет Tiger AI',
+    aiTipText: 'Опишите задачу в свободной форме, и AI создаст персонализированное задание с учетом навыков и загрузки сотрудника.',
+    taskCreatedTitle: 'Задача создана!',
+    taskAssigned: 'Назначена сотруднику',
+    taskCreationError: 'Не удалось создать задачу',
     
     // Notifications
     notifications: 'Уведомления',
@@ -592,6 +727,51 @@ export const translations: Record<string, Translations> = {
     achievements_page: 'Награди',
     lastUpdate: 'Последна актуализация',
     aiAssistant: 'AI Асистент',
+
+    // AI Assistant
+    aiAssistantReadyTitle: 'AI анализът е готов',
+    aiAssistantReadyDesc: 'Получен е отговор от Tiger AI',
+    aiErrorTitle: 'AI Грешка',
+    aiErrorDesc: 'Неуспешно получаване на отговор от AI',
+    aiMessageRequired: 'Въведете съобщение за AI асистента',
+    aiEmployeeRequired: 'Изберете служител',
+    aiProcessing: 'AI обработва...',
+    aiRequest: 'Попитай Tiger AI',
+    aiModeLabel: 'Режим на AI асистента',
+    aiModePlaceholder: 'Изберете режим',
+    aiEmployeePlaceholder: 'Изберете служител',
+    aiTaskDescriptionLabel: 'Описание на задачата',
+    aiMessageLabel: 'Съобщение за AI',
+    aiPlaceholderCreateTask: 'Опишете задачата свободно. AI ще създаде персонализирана задача според уменията на служителя...',
+    aiPlaceholderSuggestOptimization: 'Опишете проблем или област за оптимизация...',
+    aiPlaceholderChat: 'Задайте въпрос относно управлението на задачи...',
+    aiResponseTitle: 'Отговор от Tiger AI',
+    aiBadgeTask: 'Задача',
+    aiBadgeAnalysis: 'Анализ',
+    aiBadgeOptimization: 'Оптимизация',
+    aiBadgeChat: 'Чат',
+    aiTaskName: 'Име на задачата:',
+    aiDescription: 'Описание:',
+    aiPriority: 'Приоритет',
+    aiTime: 'Време',
+    aiTags: 'Етикети:',
+    aiRecommendations: 'Препоръки:',
+    aiOptimizations: 'Оптимизации:',
+    aiSkillDevelopment: 'Развитие на умения:',
+    aiAnswer: 'Отговор:',
+    aiModeCreateTask: 'Създай задача',
+    aiModeAnalyzeWorkload: 'Анализ на натоварването',
+    aiModeSuggestOptimization: 'Предложения за оптимизация',
+    aiModeChat: 'Свободен чат',
+    aiCapabilitiesPersonalized: 'Персонализирани задачи',
+    aiCapabilitiesWorkload: 'Анализ на натоварването',
+    aiCapabilitiesOptimization: 'Оптимизация на процеси',
+    aiCapabilitiesChat: 'Свободен диалог',
+    aiTipTitle: 'Съвет от Tiger AI',
+    aiTipText: 'Опишете задачата свободно и AI ще създаде персонализирано задание, отчитайки уменията и натоварването.',
+    taskCreatedTitle: 'Задачата е създадена!',
+    taskAssigned: 'Възложена на служител',
+    taskCreationError: 'Неуспешно създаване на задача',
     
     // Notifications
     notifications: 'Известия',
