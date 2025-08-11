@@ -15,12 +15,13 @@ serve(async (req) => {
   }
 
   try {
-    const { message, taskContext, employeeId } = await req.json();
+    const { message, taskContext, employeeId, language } = await req.json();
 
     console.log('Task AI Assistant called with:', {
       message,
       taskId: taskContext.id,
-      employeeId
+      employeeId,
+      language
     });
 
     if (!openAIApiKey) {
@@ -66,6 +67,7 @@ serve(async (req) => {
         model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
+          { role: 'system', content: `Отвечай на языке пользователя. Если не уверен — используй язык интерфейса: ${language || 'ru'}.` },
           { role: 'user', content: message }
         ],
         temperature: 0.7,
