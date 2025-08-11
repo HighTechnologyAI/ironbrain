@@ -238,6 +238,23 @@ export interface Translations {
   taskCreatedTitle: string;
   taskAssigned: string;
   taskCreationError: string;
+
+  // Strategic Banner
+  strategicLoadingTitle: string;
+  strategicLoadingDesc: string;
+  strategicFocusTitle: string;
+  strategicNotFound: string;
+  strategicStatus: string;
+  strategicBudgetPlanned: string;
+  strategicProgress: string;
+  strategicTarget: string;
+  strategicCurrent: string;
+  location: string;
+  targetDate: string;
+  statusPlanned: string;
+  statusActive: string;
+  statusDone: string;
+  statusOnHold: string;
 }
 
 export const translations: Record<string, Translations> = {
@@ -469,6 +486,22 @@ export const translations: Record<string, Translations> = {
     taskStatusUpdated: 'Task status updated',
     taskStatusUpdateError: 'Failed to update task status',
     tasksLoadError: 'Failed to load tasks',
+    // Strategic Banner
+    strategicLoadingTitle: 'Loading strategy…',
+    strategicLoadingDesc: 'Fetching objective and key results',
+    strategicFocusTitle: 'Strategic focus',
+    strategicNotFound: 'Strategic objective not found',
+    strategicStatus: 'Status',
+    strategicBudgetPlanned: 'Planned budget',
+    strategicProgress: 'Progress',
+    strategicTarget: 'Target',
+    strategicCurrent: 'Current',
+    location: 'Location',
+    targetDate: 'Target date',
+    statusPlanned: 'Planned',
+    statusActive: 'Active',
+    statusDone: 'Done',
+    statusOnHold: 'On hold',
   },
   ru: {
     // Common
@@ -698,6 +731,22 @@ export const translations: Record<string, Translations> = {
     taskStatusUpdated: 'Статус задачи обновлен',
     taskStatusUpdateError: 'Не удалось обновить статус задачи',
     tasksLoadError: 'Не удалось загрузить задачи',
+    // Strategic Banner
+    strategicLoadingTitle: 'Загрузка стратегии…',
+    strategicLoadingDesc: 'Получаем цель и ключевые результаты',
+    strategicFocusTitle: 'Стратегический фокус',
+    strategicNotFound: 'Стратегическая цель не найдена',
+    strategicStatus: 'Статус',
+    strategicBudgetPlanned: 'Плановый бюджет',
+    strategicProgress: 'Прогресс',
+    strategicTarget: 'Цель',
+    strategicCurrent: 'Текущее',
+    location: 'Локация',
+    targetDate: 'Целевая дата',
+    statusPlanned: 'Запланирована',
+    statusActive: 'Активна',
+    statusDone: 'Завершена',
+    statusOnHold: 'Приостановлена',
   },
   
   bg: {
@@ -928,5 +977,21 @@ export const translations: Record<string, Translations> = {
     taskStatusUpdated: 'Статусът на задачата е актуализиран',
     taskStatusUpdateError: 'Неуспешно актуализиране на статуса на задачата',
     tasksLoadError: 'Неуспешно зареждане на задачите',
+    // Strategic Banner
+    strategicLoadingTitle: 'Зареждане на стратегия…',
+    strategicLoadingDesc: 'Получаваме цел и ключови резултати',
+    strategicFocusTitle: 'Стратегически фокус',
+    strategicNotFound: 'Стратегическата цел не е намерена',
+    strategicStatus: 'Статус',
+    strategicBudgetPlanned: 'Планиран бюджет',
+    strategicProgress: 'Прогрес',
+    strategicTarget: 'Цел',
+    strategicCurrent: 'Текущо',
+    location: 'Локация',
+    targetDate: 'Целева дата',
+    statusPlanned: 'Планирана',
+    statusActive: 'Активна',
+    statusDone: 'Завършена',
+    statusOnHold: 'На пауза',
   },
 };

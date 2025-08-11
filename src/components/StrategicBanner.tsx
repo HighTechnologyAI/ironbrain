@@ -2,17 +2,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useStrategy } from "@/hooks/use-strategy";
+import { useLanguage } from "@/hooks/use-language";
 import { Calendar, MapPin, Wallet } from "lucide-react";
 
 export default function StrategicBanner() {
   const { loading, error, objective, krs } = useStrategy(true);
-
+  const { t } = useLanguage();
   if (loading) {
     return (
       <Card className="mb-8 bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-xl">Загрузка стратегии…</CardTitle>
-          <CardDescription className="text-muted-foreground">Получаем цель и ключевые результаты</CardDescription>
+          <CardTitle className="text-xl">{t.strategicLoadingTitle}</CardTitle>
+          <CardDescription className="text-muted-foreground">{t.strategicLoadingDesc}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -22,8 +23,8 @@ export default function StrategicBanner() {
     return (
       <Card className="mb-8 bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-xl">Стратегический фокус</CardTitle>
-          <CardDescription className="text-muted-foreground">{error || 'Стратегическая цель не найдена'}</CardDescription>
+          <CardTitle className="text-xl">{t.strategicFocusTitle}</CardTitle>
+          <CardDescription className="text-muted-foreground">{error || t.strategicNotFound}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -38,19 +39,27 @@ export default function StrategicBanner() {
             {objective.description && (
               <CardDescription className="mt-2 whitespace-pre-line">{objective.description}</CardDescription>
             )}
-            <div className="flex flex-wrap gap-4 mt-4 text-sm text-muted-foreground">
-              {objective.location && (
-                <span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4 text-primary" />{objective.location}</span>
-              )}
-              {objective.target_date && (
-                <span className="inline-flex items-center gap-1"><Calendar className="h-4 w-4 text-primary" />{new Date(objective.target_date).toLocaleDateString()}</span>
-              )}
-              {objective.budget_planned != null && (
-                <span className="inline-flex items-center gap-1"><Wallet className="h-4 w-4 text-primary" />План: {objective.budget_planned.toLocaleString()} лв</span>
-              )}
-            </div>
+        <div className="flex flex-wrap gap-4 mt-4 text-sm text-muted-foreground">
+          {objective.location && (
+            <span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4 text-primary" />{t.location}: {objective.location}</span>
+          )}
+          {objective.target_date && (
+            <span className="inline-flex items-center gap-1"><Calendar className="h-4 w-4 text-primary" />{t.targetDate}: {new Date(objective.target_date).toLocaleDateString()}</span>
+          )}
+          {objective.budget_planned != null && (
+            <span className="inline-flex items-center gap-1"><Wallet className="h-4 w-4 text-primary" />{t.strategicBudgetPlanned}: {objective.budget_planned.toLocaleString()} лв</span>
+          )}
+        </div>
           </div>
-          <Badge variant="outline" className="h-7 self-start bg-primary/10 text-primary border-primary/30">{objective.status}</Badge>
+          <Badge variant="outline" className="h-7 self-start bg-primary/10 text-primary border-primary/30">{t.strategicStatus}: {(() => {
+            switch (objective.status) {
+              case 'planned': return t.statusPlanned;
+              case 'active': return t.statusActive;
+              case 'done': return t.statusDone;
+              case 'on_hold': return t.statusOnHold;
+              default: return objective.status;
+            }
+          })()}</Badge>
         </div>
       </CardHeader>
       <CardContent>
@@ -65,13 +74,13 @@ export default function StrategicBanner() {
                 <div className="text-xs text-muted-foreground line-clamp-3 mb-3">{kr.description}</div>
               )}
               <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                <span>Прогресс</span>
+                <span>{t.strategicProgress}</span>
                 <span className="font-mono text-foreground">{kr.progress}%</span>
               </div>
               <Progress value={kr.progress} />
               <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                <span>Цель: <span className="text-foreground font-mono">{kr.target_value ?? '-'} {kr.unit || ''}</span></span>
-                <span>Текущее: <span className="text-foreground font-mono">{kr.current_value ?? 0} {kr.unit || ''}</span></span>
+                <span>{t.strategicTarget}: <span className="text-foreground font-mono">{kr.target_value ?? '-'} {kr.unit || ''}</span></span>
+                <span>{t.strategicCurrent}: <span className="text-foreground font-mono">{kr.current_value ?? 0} {kr.unit || ''}</span></span>
               </div>
             </div>
           ))}
