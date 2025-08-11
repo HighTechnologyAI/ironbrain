@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/use-language';
 import { Bot, Send, MessageCircle, X } from 'lucide-react';
 import {
   Dialog,
@@ -44,6 +45,8 @@ const TaskAIAssistant = ({ task, employeeId }: TaskAIAssistantProps) => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const locale = language === 'ru' ? 'ru-RU' : language === 'bg' ? 'bg-BG' : 'en-US';
 
   const addWelcomeMessage = () => {
     if (messages.length === 0) {
@@ -100,6 +103,7 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
             assigned_to: task.assigned_to,
           },
           employeeId,
+          language,
         },
       });
 
@@ -197,7 +201,7 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
                     <div className="flex-1">
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                       <p className="text-xs opacity-70 mt-1">
-                        {message.timestamp.toLocaleTimeString('ru-RU', { 
+                        {message.timestamp.toLocaleTimeString(locale, { 
                           hour: '2-digit', 
                           minute: '2-digit' 
                         })}

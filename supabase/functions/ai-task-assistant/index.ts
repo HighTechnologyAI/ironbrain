@@ -24,7 +24,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    const { action, employeeId, message, taskContext } = await req.json();
+    const { action, employeeId, message, taskContext, language } = await req.json();
 
     console.log('AI Task Assistant called with:', { action, employeeId, message });
 
@@ -152,7 +152,13 @@ ${employeeContext}
 
 Отвечай конструктивно и по делу, используя агрессивный кибер-стиль Tiger Technology AI.`;
         userPrompt = message;
+
+        break;
     }
+
+    const targetLanguage = ['ru','bg','en'].includes(language) ? language : 'en';
+    const langInstruction = `Language policy:\n- Respond in the same language as the user's last message when possible.\n- If unclear, respond in ${'${targetLanguage.toUpperCase()}'} .\n- Keep JSON keys and enum values in English; translate only human-readable text fields.`;
+    systemPrompt = `${systemPrompt}\n\n${langInstruction}`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',

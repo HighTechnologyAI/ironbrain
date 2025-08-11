@@ -40,7 +40,7 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
   const [aiResponse, setAiResponse] = useState<any>(null);
   const [mode, setMode] = useState<'create_task' | 'analyze_workload' | 'suggest_optimization' | 'chat'>('create_task');
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const handleAIRequest = async () => {
     if (!message.trim() && mode !== 'analyze_workload') {
@@ -68,7 +68,8 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
           action: mode,
           employeeId: selectedEmployee || null,
           message: message.trim(),
-          taskContext: "Mode: " + mode
+          taskContext: "Mode: " + mode,
+          language,
         }
       });
 
