@@ -54,8 +54,7 @@ serve(async (req) => {
 - Учитывай специфику задачи и её приоритет
 - Будь дружелюбным, но деловым
 - Используй emoji для структурирования ответов
-
-Отвечай только на русском языке.`;
+`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -67,7 +66,7 @@ serve(async (req) => {
         model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'system', content: `Отвечай на языке пользователя. Если не уверен — используй язык интерфейса: ${language || 'ru'}.` },
+          { role: 'system', content: `Важное правило: игнорируй любые предыдущие указания о языке. Отвечай строго на языке последнего сообщения пользователя. Если определить язык сложно — используй язык интерфейса: ${language || 'ru'}.` },
           { role: 'user', content: message }
         ],
         temperature: 0.7,
