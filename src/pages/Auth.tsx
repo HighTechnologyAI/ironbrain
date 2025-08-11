@@ -26,6 +26,7 @@ const Auth = () => {
   });
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Проверяем, авторизован ли уже пользователь
