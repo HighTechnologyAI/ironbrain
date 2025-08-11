@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/hooks/use-auth";
 import { LanguageProvider } from "@/hooks/use-language";
 import { OfflineProvider } from "@/hooks/use-offline";
@@ -46,6 +46,39 @@ const NotificationsBoot = () => {
   return null;
 };
 
+const AppShell = () => {
+  const location = useLocation();
+  const hideSidebar = location.pathname === '/auth';
+  return (
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        {!hideSidebar && <AppSidebar />}
+        <main className="flex-1">
+          <ConnectionStatus />
+          <NotificationsBoot />
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
+            <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
+            <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
+            <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+            <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
+            <Route path="/awards" element={<ProtectedRoute><Awards /></ProtectedRoute>} />
+            <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/create-demo-users" element={<CreateDemoUsers />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+      </div>
+    </SidebarProvider>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -54,32 +87,7 @@ const App = () => (
           <SafeAreaContainer>
             <TooltipProvider>
               <BrowserRouter>
-                <SidebarProvider>
-                  <div className="flex min-h-screen w-full">
-                    <AppSidebar />
-                    <main className="flex-1">
-                      <ConnectionStatus />
-                      <NotificationsBoot />
-                      <Toaster />
-                      <Sonner />
-                      <Routes>
-                        <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                        <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
-                        <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
-                        <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
-                        <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
-                        <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-                        <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
-                        <Route path="/awards" element={<ProtectedRoute><Awards /></ProtectedRoute>} />
-                        <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
-                        <Route path="/auth" element={<Auth />} />
-                        <Route path="/admin" element={<AdminPanel />} />
-                        <Route path="/create-demo-users" element={<CreateDemoUsers />} />
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                    </main>
-                  </div>
-                </SidebarProvider>
+                <AppShell />
               </BrowserRouter>
             </TooltipProvider>
           </SafeAreaContainer>
