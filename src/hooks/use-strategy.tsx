@@ -33,7 +33,7 @@ interface UseStrategyReturn {
   krs: KeyResult[];
 }
 
-const STRATEGIC_TITLE = "Провести впечатляющее демонстрационное дрон-шоу для высокопоставленных гостей и заключить ключевой контракт стоимостью несколько миллионов левов";
+export const STRATEGIC_TITLE = "Провести впечатляющее демонстрационное дрон-шоу для высокопоставленных гостей и заключить ключевой контракт стоимостью несколько миллионов левов";
 
 export function useStrategy(autoSeed = true): UseStrategyReturn {
   const { user } = useAuth();
@@ -93,7 +93,7 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
             .insert({
               title: STRATEGIC_TITLE,
               description: `Локация: Timarevo Airfield (43°23'20.2"N 26°53'07.6"E)\nБюджет: 50,000 лв\nФормат: 19:30-20:30 (закат + ночные эффекты)\nТехнологии: Модульная трансформация дрона\nДата: Август 2025\nБезопасность: Медицинская команда + пожарная машина\nСтратегическое значение: Переломный момент для превращения Tiger Technology в признанного игрока с многомиллионными контрактами!`,
-              target_date: '2025-08-15',
+              target_date: '2025-09-15',
               location: 'Timarevo Airfield (43°23\'20.2"N 26°53\'07.6"E)',
               budget_planned: 50000,
               strategic_importance: 'Переломный момент для выхода на многомиллионные контракты',
@@ -163,6 +163,14 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
 
         // fetch objective and KRs
         if (obj) {
+          // ensure target date matches requested 15/09/2025
+          if (obj.target_date !== '2025-09-15') {
+            try {
+              await supabase.from('objectives').update({ target_date: '2025-09-15' }).eq('id', obj.id);
+              obj = { ...obj, target_date: '2025-09-15' };
+            } catch {}
+          }
+
           const { data: krsData } = await supabase
             .from('key_results')
             .select('*')
