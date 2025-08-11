@@ -293,7 +293,7 @@ const Index = () => {
                 <Bot className="h-6 w-6 text-primary animate-pulse" />
                 <Sparkles className="h-3 w-3 text-accent absolute -top-1 -right-1 animate-bounce" />
               </div>
-              Tiger AI Assistant
+              {t.aiAssistant}
               <Badge variant="outline" className="bg-accent/20 text-accent border-accent/30 animate-pulse">
                 NEW
               </Badge>

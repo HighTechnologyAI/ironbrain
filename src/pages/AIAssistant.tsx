@@ -137,8 +137,8 @@ const AIAssistant = () => {
     } catch (error) {
       console.error('Error loading data:', error);
       toast({
-        title: "Ошибка загрузки", 
-        description: "Не удалось загрузить данные",
+        title: t.error,
+        description: t.tasksLoadError,
         variant: "destructive"
       });
     } finally {
@@ -146,13 +146,33 @@ const AIAssistant = () => {
     }
   };
 
+  const trStatus = (status: string) => {
+    switch (status) {
+      case 'pending': return t.pending;
+      case 'in_progress': return t.inProgress;
+      case 'completed': return t.completed;
+      case 'cancelled': return t.cancelled;
+      case 'on_hold': return t.onHold;
+      default: return status;
+    }
+  };
+
+  const trPriority = (p?: string) => {
+    switch (p) {
+      case 'low': return t.low;
+      case 'medium': return t.medium;
+      case 'high': return t.high;
+      case 'critical': return t.critical;
+      default: return p || '';
+    }
+  };
   const handleTaskCreated = (task: any) => {
     // Обновляем список недавних задач
     setRecentTasks(prev => [task, ...prev.slice(0, 4)]);
     
     toast({
-      title: "🎯 Задача создана!",
-      description: `AI создал персонализированную задачу для сотрудника`,
+      title: t.success,
+      description: t.create || 'Создано',
     });
   };
 
@@ -161,7 +181,7 @@ const AIAssistant = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex items-center gap-2 text-primary">
           <Brain className="h-6 w-6 animate-pulse" />
-          <span>Загрузка Tiger AI...</span>
+          <span>{t.loading} {t.aiAssistant}...</span>
         </div>
       </div>
     );
@@ -170,8 +190,8 @@ const AIAssistant = () => {
   return (
     <div className="min-h-screen bg-background">
       <AppNavigation 
-        title="Tiger AI Assistant"
-        subtitle="Персональный помощник для управления задачами команды"
+        title={t.aiAssistant}
+        subtitle={t.aiAssistantDesc}
       />
       
       <div className="max-w-7xl mx-auto p-6">
@@ -181,15 +201,15 @@ const AIAssistant = () => {
             <div className="flex items-center gap-3">
               <Bot className="h-6 w-6 text-primary animate-pulse" />
               <div>
-                <h3 className="font-semibold text-primary">Tiger AI Assistant активен</h3>
+                <h3 className="font-semibold text-primary">{t.aiAssistant} — {t.online}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Готов к созданию персонализированных задач для вашей команды
+                  {t.aiAssistantDesc}
                 </p>
               </div>
               <div className="ml-auto flex items-center gap-2">
                 <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30">
                   <Activity className="h-3 w-3 mr-1" />
-                  Онлайн
+                  {t.online}
                 </Badge>
               </div>
             </div>
@@ -212,9 +232,9 @@ const AIAssistant = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Users className="h-5 w-5 text-primary" />
-                Команда
+                {t.team}
               </CardTitle>
-              <CardDescription>Активные сотрудники в системе</CardDescription>
+              <CardDescription>{t.teamDesc}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 max-h-80 overflow-y-auto">
@@ -242,7 +262,7 @@ const AIAssistant = () => {
                 
                 <div className="pt-2 border-t border-border">
                   <div className="text-xs text-muted-foreground text-center">
-                    Всего сотрудников: {employees.length}
+                    {t.teamMembers}: {employees.length}
                   </div>
                 </div>
               </div>
@@ -254,9 +274,9 @@ const AIAssistant = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <CheckSquare className="h-5 w-5 text-primary" />
-                Недавние задачи
+                {t.tasks}
               </CardTitle>
-              <CardDescription>Последние созданные AI задачи</CardDescription>
+              <CardDescription>{t.tasksDescription}</CardDescription>
             </CardHeader>
             <CardContent>
               {recentTasks.length > 0 ? (
@@ -273,21 +293,21 @@ const AIAssistant = () => {
                              variant={task.status === 'completed' ? 'default' : 'outline'}
                              className="text-xs"
                            >
-                             {task.status}
-                           </Badge>
-                           {task.priority && (
-                             <Badge 
-                               variant="outline" 
-                               className={`text-xs ${
-                                 task.priority === 'critical' ? 'border-red-500 text-red-500' :
-                                 task.priority === 'high' ? 'border-orange-500 text-orange-500' :
-                                 task.priority === 'medium' ? 'border-yellow-500 text-yellow-500' :
-                                 'border-green-500 text-green-500'
-                               }`}
-                             >
-                               {task.priority}
-                             </Badge>
-                           )}
+                              {trStatus(task.status)}
+                            </Badge>
+                            {task.priority && (
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs ${
+                                  task.priority === 'critical' ? 'border-red-500 text-red-500' :
+                                  task.priority === 'high' ? 'border-orange-500 text-orange-500' :
+                                  task.priority === 'medium' ? 'border-yellow-500 text-yellow-500' :
+                                  'border-green-500 text-green-500'
+                                }`}
+                              >
+                                {trPriority(task.priority)}
+                              </Badge>
+                            )}
                          </div>
                          <div className="text-xs text-muted-foreground">
                            {new Date(task.created_at).toLocaleDateString()}
@@ -299,10 +319,10 @@ const AIAssistant = () => {
               ) : (
                 <div className="text-center py-4">
                   <div className="text-muted-foreground text-sm">
-                    Пока нет созданных задач
+                    {t.noTasksFound}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    Используйте AI для создания первой задачи
+                    {t.createTask}
                   </div>
                 </div>
               )}
@@ -314,7 +334,7 @@ const AIAssistant = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2 cyber-text">
                 <Sparkles className="h-5 w-5" />
-                Возможности AI
+                {t.aiAssistant}
               </CardTitle>
             </CardHeader>
             <CardContent>
