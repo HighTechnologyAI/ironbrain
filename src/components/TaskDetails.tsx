@@ -165,7 +165,12 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent 
+        className="w-[94vw] sm:w-auto max-w-[430px] sm:max-w-4xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {getStatusIcon(task.status)}

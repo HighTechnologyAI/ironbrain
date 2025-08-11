@@ -171,7 +171,14 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
           Tiger AI
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl h-[600px] flex flex-col" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+      <DialogContent 
+        className="w-[92vw] sm:w-auto max-w-[430px] sm:max-w-2xl h-[80vh] sm:h-[600px] flex flex-col"
+        onMouseDown={(e) => e.stopPropagation()} 
+        onClick={(e) => e.stopPropagation()}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Bot className="h-5 w-5 text-primary" />
