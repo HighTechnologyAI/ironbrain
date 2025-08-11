@@ -220,6 +220,8 @@ export interface Translations {
   aiTime: string;
   aiTags: string;
   aiRecommendations: string;
+  aiWorkloadStatus: string;
+  aiAnalysis: string;
   aiOptimizations: string;
   aiSkillDevelopment: string;
   aiAnswer: string;
@@ -301,6 +303,8 @@ export const translations: Record<string, Translations> = {
     aiTime: 'Time',
     aiTags: 'Tags:',
     aiRecommendations: 'Recommendations:',
+    aiWorkloadStatus: 'Workload status:',
+    aiAnalysis: 'Analysis:',
     aiOptimizations: 'Optimizations:',
     aiSkillDevelopment: 'Skill development:',
     aiAnswer: 'Answer:',
@@ -528,6 +532,8 @@ export const translations: Record<string, Translations> = {
     aiTime: 'Время',
     aiTags: 'Теги:',
     aiRecommendations: 'Рекомендации:',
+    aiWorkloadStatus: 'Статус нагрузки:',
+    aiAnalysis: 'Анализ:',
     aiOptimizations: 'Оптимизации:',
     aiSkillDevelopment: 'Развитие навыков:',
     aiAnswer: 'Ответ:',
@@ -756,6 +762,8 @@ export const translations: Record<string, Translations> = {
     aiTime: 'Време',
     aiTags: 'Етикети:',
     aiRecommendations: 'Препоръки:',
+    aiWorkloadStatus: 'Състояние на натоварването:',
+    aiAnalysis: 'Анализ:',
     aiOptimizations: 'Оптимизации:',
     aiSkillDevelopment: 'Развитие на умения:',
     aiAnswer: 'Отговор:',
