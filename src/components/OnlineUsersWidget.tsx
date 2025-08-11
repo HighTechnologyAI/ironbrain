@@ -11,27 +11,30 @@ import {
   Wifi
 } from "lucide-react";
 import { useUserPresence } from "@/hooks/use-user-presence";
+import { useLanguage } from "@/hooks/use-language";
 
 const OnlineUsersWidget = () => {
   const { onlineUsers, userCount } = useUserPresence();
+  const { t, language } = useLanguage();
+  const locale = language === 'ru' ? 'ru-RU' : language === 'bg' ? 'bg-BG' : 'en-US';
 
   return (
     <Card className="bg-card border-border">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <Activity className="h-5 w-5 text-primary" />
-          Пользователи онлайн
+          {t.onlineUsersTitle}
           <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
             {userCount}
           </Badge>
         </CardTitle>
-        <CardDescription>Активные пользователи в системе</CardDescription>
+        <CardDescription>{t.activeUsersInSystem}</CardDescription>
       </CardHeader>
       <CardContent>
         {userCount === 0 ? (
           <div className="text-center py-4 text-muted-foreground">
             <Wifi className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p>Нет активных пользователей</p>
+            <p>{t.noActiveUsers}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -52,7 +55,7 @@ const OnlineUsersWidget = () => {
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Clock className="h-3 w-3" />
                     <span>
-                      {new Date(user.online_at).toLocaleTimeString('ru-RU', { 
+                      {new Date(user.online_at).toLocaleTimeString(locale, { 
                         hour: '2-digit', 
                         minute: '2-digit' 
                       })}
@@ -68,7 +71,7 @@ const OnlineUsersWidget = () => {
             {userCount > 5 && (
               <div className="text-center pt-2 border-t">
                 <p className="text-xs text-muted-foreground">
-                  +{userCount - 5} больше пользователей онлайн
+                  {t.moreUsersOnlinePrefix}{userCount - 5}{t.moreUsersOnlineSuffix}
                 </p>
               </div>
             )}

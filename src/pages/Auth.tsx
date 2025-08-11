@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Zap, Shield, Lock, Mail, User, Eye, EyeOff, Building, Briefcase, Phone, MessageCircle } from "lucide-react";
+import { useLanguage } from "@/hooks/use-language";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);

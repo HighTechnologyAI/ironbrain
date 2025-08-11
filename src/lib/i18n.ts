@@ -240,22 +240,65 @@ export interface Translations {
   taskCreationError: string;
 
   // Strategic Banner
-  strategicLoadingTitle: string;
-  strategicLoadingDesc: string;
-  strategicFocusTitle: string;
-  strategicNotFound: string;
-  strategicStatus: string;
-  strategicBudgetPlanned: string;
-  strategicProgress: string;
-  strategicTarget: string;
-  strategicCurrent: string;
-  location: string;
-  targetDate: string;
-  statusPlanned: string;
-  statusActive: string;
-  statusDone: string;
-  statusOnHold: string;
-}
+    strategicLoadingTitle: string;
+    strategicLoadingDesc: string;
+    strategicFocusTitle: string;
+    strategicNotFound: string;
+    strategicStatus: string;
+    strategicBudgetPlanned: string;
+    strategicProgress: string;
+    strategicTarget: string;
+    strategicCurrent: string;
+    location: string;
+    targetDate: string;
+    statusPlanned: string;
+    statusActive: string;
+    statusDone: string;
+    statusOnHold: string;
+
+    // Auth
+    authTitle: string;
+    authDesc: string;
+    signIn: string;
+    signUp: string;
+    email: string;
+    password: string;
+    fullName: string;
+    position: string;
+    phone: string;
+    telegram: string;
+    signInCta: string;
+    signingIn: string;
+    signUpCta: string;
+    signingUp: string;
+    selectDepartment: string;
+    loginSuccessTitle: string;
+    loginSuccessDesc: string;
+    loginErrorTitle: string;
+    loginInvalidCredentials: string;
+    loginEmailNotConfirmed: string;
+    signupSuccessTitle: string;
+    signupSuccessDesc: string;
+    signupErrorTitle: string;
+    signupUserExists: string;
+    signupWeakPassword: string;
+
+    // Department options
+    depManagement: string;
+    depMarketing: string;
+    depExpertise: string;
+    depProduction: string;
+    depLeadership: string;
+    depIT: string;
+    depConsulting: string;
+
+    // Online Users
+    onlineUsersTitle: string;
+    activeUsersInSystem: string;
+    noActiveUsers: string;
+    moreUsersOnlinePrefix: string;
+    moreUsersOnlineSuffix: string;
+  }
 
 export const translations: Record<string, Translations> = {
   en: {
