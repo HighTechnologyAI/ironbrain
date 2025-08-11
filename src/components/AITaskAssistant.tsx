@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,8 @@ import {
   Sparkles,
   MessageSquare,
   BarChart3,
-  Settings
+  Settings,
+  Send
 } from 'lucide-react';
 
 interface AITaskAssistantProps {
@@ -42,7 +43,129 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
   const { toast } = useToast();
   const { t, language } = useLanguage();
 
+  // Task-aware chat state
+  type Message = { id: string; content: string; isBot: boolean; timestamp: Date };
+  const [taskOptions, setTaskOptions] = useState<Array<{ id: string; title: string }>>([]);
+  const [selectedTaskId, setSelectedTaskId] = useState('');
+  const [selectedTaskCtx, setSelectedTaskCtx] = useState<any | null>(null);
+  const [chatMessages, setChatMessages] = useState<Message[]>([]);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [profileId, setProfileId] = useState<string | null>(null);
+
+  // Load own profile and a simple tasks list
+  useEffect(() => {
+    (async () => {
+      const [{ data: me }, { data: tasks }] = await Promise.all([
+        supabase.rpc('get_current_user_profile'),
+        supabase
+          .from('tasks')
+          .select('id, title')
+          .order('created_at', { ascending: false })
+          .limit(100)
+      ]);
+      if (me) setProfileId((me as any).id);
+      if (tasks) setTaskOptions(tasks as any);
+    })();
+  }, []);
+
+  const persistMessage = async (content: string, isBot: boolean) => {
+    if (!profileId || !selectedTaskId) return;
+    await supabase.from('task_ai_messages').insert({
+      task_id: selectedTaskId,
+      user_id: profileId,
+      is_bot: isBot,
+      content,
+      language
+    });
+  };
+
+  const loadMessages = async () => {
+    if (!profileId || !selectedTaskId) return;
+    const { data } = await supabase
+      .from('task_ai_messages')
+      .select('id, content, is_bot, created_at')
+      .eq('task_id', selectedTaskId)
+      .eq('user_id', profileId)
+      .order('created_at', { ascending: true });
+    if (data) {
+      setChatMessages(
+        data.map((m: any) => ({ id: m.id, content: m.content, isBot: m.is_bot, timestamp: new Date(m.created_at) }))
+      );
+    }
+  };
+
+  const loadSelectedTaskCtx = async (taskId: string) => {
+    const { data: task } = await supabase
+      .from('tasks')
+      .select('id, title, description, status, priority, tags, estimated_hours, assigned_to')
+      .eq('id', taskId)
+      .maybeSingle();
+    if (task) {
+      let assignee: any = null;
+      if (task.assigned_to) {
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('full_name, position, id')
+          .eq('id', task.assigned_to)
+          .maybeSingle();
+        if (prof) assignee = { full_name: prof.full_name, position: prof.position, id: prof.id };
+      }
+      setSelectedTaskCtx({ ...task, assigned_to: assignee });
+    }
+  };
+
+  useEffect(() => {
+    if (selectedTaskId) {
+      loadSelectedTaskCtx(selectedTaskId);
+      loadMessages();
+    } else {
+      setChatMessages([]);
+      setSelectedTaskCtx(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTaskId, profileId]);
+
+  const chatSend = async () => {
+    if (!selectedTaskId || !selectedTaskCtx) {
+      toast({ title: t.error, description: 'Выберите задачу для чата', variant: 'destructive' });
+      return;
+    }
+    if (!message.trim() || chatLoading) return;
+
+    const userMsg: Message = { id: Date.now().toString(), content: message, isBot: false, timestamp: new Date() };
+    setChatMessages((prev) => [...prev, userMsg]);
+    setMessage('');
+    setChatLoading(true);
+    await persistMessage(userMsg.content, false);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('task-ai-assistant', {
+        body: {
+          message: userMsg.content,
+          taskContext: selectedTaskCtx,
+          employeeId: selectedTaskCtx?.assigned_to?.id || null,
+          language,
+        },
+      });
+      if (error) throw error;
+      const botMsg: Message = { id: (Date.now() + 1).toString(), content: data.response, isBot: true, timestamp: new Date() };
+      setChatMessages((prev) => [...prev, botMsg]);
+      await persistMessage(botMsg.content, true);
+    } catch (e: any) {
+      console.error('AI chat error:', e);
+      toast({ title: t.aiErrorTitle, description: e.message || t.aiErrorDesc, variant: 'destructive' });
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
   const handleAIRequest = async () => {
+    // In chat mode we use the task-focused chat flow
+    if (mode === 'chat') {
+      await chatSend();
+      return;
+    }
+
     if (!message.trim() && mode !== 'analyze_workload') {
       toast({
         title: t.aiErrorTitle,
@@ -52,7 +175,7 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
       return;
     }
 
-    if (!selectedEmployee && mode !== 'chat') {
+    if (!selectedEmployee) {
       toast({
         title: t.aiErrorTitle, 
         description: t.aiEmployeeRequired,
@@ -77,20 +200,13 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
 
       if (data.success) {
         setAiResponse(data.data);
-        toast({
-          title: t.aiAssistantReadyTitle,
-          description: t.aiAssistantReadyDesc,
-        });
+        toast({ title: t.aiAssistantReadyTitle, description: t.aiAssistantReadyDesc });
       } else {
         throw new Error(data.error || 'Неизвестная ошибка');
       }
     } catch (error) {
       console.error('AI Assistant error:', error);
-      toast({
-        title: t.aiErrorTitle,
-        description: (error as any).message || t.aiErrorDesc,
-        variant: "destructive"
-      });
+      toast({ title: t.aiErrorTitle, description: (error as any).message || t.aiErrorDesc, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -215,6 +331,25 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
             </SelectContent>
           </Select>
         </div>
+
+        {/* Выбор задачи для режима чата */}
+        {mode === 'chat' && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">{t.tasks || 'Задачи'}</label>
+            <Select value={selectedTaskId} onValueChange={setSelectedTaskId}>
+              <SelectTrigger className="bg-input border-border">
+                <SelectValue placeholder={t.aiModeChat || 'Выберите задачу'} />
+              </SelectTrigger>
+              <SelectContent>
+                {taskOptions.map((task) => (
+                  <SelectItem key={task.id} value={task.id}>
+                    {task.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         {/* Выбор сотрудника */}
         {mode !== 'chat' && (
