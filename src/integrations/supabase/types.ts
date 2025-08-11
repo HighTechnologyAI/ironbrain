@@ -812,6 +812,36 @@ export type Database = {
           },
         ]
       }
+      task_ai_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_bot: boolean
+          language: string | null
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_bot?: boolean
+          language?: string | null
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_bot?: boolean
+          language?: string | null
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       task_comments: {
         Row: {
           content: string

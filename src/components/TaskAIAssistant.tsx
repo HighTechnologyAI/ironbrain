@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from '@/components/ui/dialog';
 
@@ -44,9 +45,57 @@ const TaskAIAssistant = ({ task, employeeId }: TaskAIAssistantProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [profileId, setProfileId] = useState<string | null>(null);
   const { toast } = useToast();
   const { language } = useLanguage();
   const locale = language === 'ru' ? 'ru-RU' : language === 'bg' ? 'bg-BG' : 'en-US';
+
+  // Persist and load chat history per task & user
+  const persistMessage = async (content: string, isBot: boolean) => {
+    if (!profileId) return;
+    await supabase.from('task_ai_messages').insert({
+      task_id: task.id,
+      user_id: profileId,
+      is_bot: isBot,
+      content,
+      language
+    });
+  };
+
+  const loadMessages = async () => {
+    if (!profileId) return;
+    const { data, error } = await supabase
+      .from('task_ai_messages')
+      .select('id, content, is_bot, created_at')
+      .eq('task_id', task.id)
+      .eq('user_id', profileId)
+      .order('created_at', { ascending: true });
+
+    if (!error && data) {
+      setMessages(
+        data.map((m: any) => ({
+          id: m.id,
+          content: m.content,
+          isBot: m.is_bot,
+          timestamp: new Date(m.created_at)
+        }))
+      );
+    }
+  };
+
+  useEffect(() => {
+    // Fetch current profile id once
+    (async () => {
+      const { data, error } = await supabase.rpc('get_current_user_profile');
+      if (!error && data) setProfileId((data as any).id);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (isOpen && profileId) {
+      loadMessages();
+    }
+  }, [isOpen, profileId, task.id]);
 
   const addWelcomeMessage = () => {
     if (messages.length === 0) {
@@ -85,6 +134,7 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
     };
 
     setMessages(prev => [...prev, userMessage]);
+    await persistMessage(userMessage.content, false);
     setInput('');
     setLoading(true);
 
@@ -117,6 +167,7 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
       };
 
       setMessages(prev => [...prev, botMessage]);
+      await persistMessage(botMessage.content, true);
     } catch (error: any) {
       console.error('Task AI Assistant error:', error);
       toast({
@@ -187,6 +238,9 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
               {task.title}
             </Badge>
           </DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground">
+            Персональный ассистент по этой задаче. История сообщений сохраняется.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="flex-1 flex flex-col gap-4 overflow-hidden">
