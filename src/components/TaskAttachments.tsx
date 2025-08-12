@@ -63,7 +63,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
         if (file.size > PROJECT_CONFIG.FILE_UPLOAD.MAX_FILE_SIZE) {
           toast({
             title: t.error,
-            description: `${t.fileTooLarge}: ${formatFileSize(file.size)}`,
+            description: `${t.fileTooLarge}: ${formatFileSize(file.size)} (max ${formatFileSize(PROJECT_CONFIG.FILE_UPLOAD.MAX_FILE_SIZE)})`,
             variant: 'destructive',
           });
           continue;
@@ -81,7 +81,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
         if (storageError) {
           toast({
             title: t.error,
-            description: t.uploadFailed,
+            description: `${t.uploadFailed}: ${storageError.message}`,
             variant: 'destructive',
           });
           continue;
@@ -123,7 +123,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
           
           toast({
             title: t.error,
-            description: t.uploadFailed,
+            description: `${t.uploadFailed}: ${dbError.message}`,
             variant: 'destructive',
           });
           continue;
@@ -139,7 +139,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
       console.error('Upload error:', error);
       toast({
         title: t.error,
-        description: t.uploadFailed,
+        description: error instanceof Error ? error.message : t.uploadFailed,
         variant: 'destructive',
       });
     } finally {

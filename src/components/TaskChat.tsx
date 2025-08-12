@@ -253,6 +253,12 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
       };
     } catch (error) {
       console.error('Error uploading file:', error);
+      // Show detailed error to the user to aid debugging
+      toast({
+        title: t.error,
+        description: error instanceof Error ? error.message : 'Ошибка загрузки файла',
+        variant: 'destructive',
+      });
       return null;
     }
   };
