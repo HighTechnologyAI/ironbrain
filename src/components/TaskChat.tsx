@@ -244,7 +244,12 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
 
   const uploadFile = async (file: File): Promise<{ path: string; name: string; size: number } | null> => {
     try {
-      const filePath = `${taskId}/${Date.now()}-${file.name}`;
+      const originalName = file.name || 'file';
+      const safeName = originalName
+        .normalize?.('NFKD')
+        .replace(/[\s]+/g, '_')
+        .replace(/[^\w.-]/g, '_');
+      const filePath = `${taskId}/${Date.now()}-${safeName}`;
       const { error } = await supabase.storage
         .from(APP_CONFIG.files.bucket)
         .upload(filePath, file);
