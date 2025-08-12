@@ -23,10 +23,13 @@ jobs:
         with:
           version: latest
 
-      - name: Link project
+      - name: "Login to Supabase CLI"
+        run: supabase login --token "$SUPABASE_ACCESS_TOKEN"
+
+      - name: "Link project"
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
 
-      - name: Set secrets for Edge Functions (OPENAI_API_KEY)
+      - name: "Set secrets for Edge Functions (OPENAI_API_KEY)"
         run: supabase secrets set OPENAI_API_KEY="$OPENAI_API_KEY" --project-ref "$SUPABASE_PROJECT_REF"
 
       - name: "Deploy Edge Function: translate"
@@ -43,5 +46,5 @@ jobs:
             echo "No lang-detect function directory yet (ok for first run)"
           fi
 
-      - name: Push database migrations
+      - name: "Push database migrations"
         run: supabase db push --project-ref "$SUPABASE_PROJECT_REF"
