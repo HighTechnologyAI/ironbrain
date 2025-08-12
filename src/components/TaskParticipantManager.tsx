@@ -186,7 +186,7 @@ const TaskParticipantManager = ({
 
       {/* Кнопка добавления участника */}
       {canManage && teamMembers.length > 0 && (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={setOpen} modal={false}>
           <DialogTrigger asChild>
             <Button size="sm" variant="outline" className="flex items-center gap-2">
               <UserPlus className="h-4 w-4" />
