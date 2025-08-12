@@ -1,0 +1,32 @@
+Apply these minimal edits to src/components/TaskChat.tsx:
+
+1) Add imports at the top:
+   import MessageText from '@/components/MessageText';
+   import { detectLanguage } from '@/lib/translation';
+
+2) Extend TaskComment interface:
+   interface TaskComment {
+     id: string;
+     content: string;
+     file_url?: string;
+     file_name?: string;
+     file_size?: number;
+     mentioned_users?: string[];
+     created_at: string;
+     user_id: string;
+     language?: string | null; // <-- add
+     user: { id: string; full_name: string; };
+   }
+
+3) In loadComments() select, '*' already includes the new column after migration.
+
+4) Replace the message text rendering:
+   {comment.content && (
+-    <p className="text-sm text-muted-foreground">{comment.content}</p>
++    <MessageText id={comment.id} text={comment.content} sourceLang={comment.language} />
+   )}
+
+5) In addComment(), before insert:
+   const lang = newComment.trim() ? await detectLanguage(newComment.trim()) : null;
+
+   and include 'language: lang' into the insert payload.

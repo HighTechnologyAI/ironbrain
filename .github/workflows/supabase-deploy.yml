@@ -1,0 +1,47 @@
+name: Supabase - Deploy (staging)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+env:
+  SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Set secrets for Edge Functions (OPENAI_API_KEY)
+        run: supabase secrets set OPENAI_API_KEY="$OPENAI_API_KEY" --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Deploy Edge Function: translate
+        run: supabase functions deploy translate --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Deploy Edge Function: task-ai-assistant
+        run: supabase functions deploy task-ai-assistant --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Deploy Edge Function: lang-detect
+        run: |
+          if [ -d "supabase/functions/lang-detect" ]; then
+            supabase functions deploy lang-detect --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
+          else
+            echo "No lang-detect function directory yet (ok for first run)"
+          fi
+
+      - name: Push database migrations
+        run: supabase db push --project-ref "$SUPABASE_PROJECT_REF"
