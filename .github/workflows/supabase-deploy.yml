@@ -29,13 +29,13 @@ jobs:
       - name: Set secrets for Edge Functions (OPENAI_API_KEY)
         run: supabase secrets set OPENAI_API_KEY="$OPENAI_API_KEY" --project-ref "$SUPABASE_PROJECT_REF"
 
-      - name: Deploy Edge Function: translate
+      - name: "Deploy Edge Function: translate"
         run: supabase functions deploy translate --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
 
-      - name: Deploy Edge Function: task-ai-assistant
+      - name: "Deploy Edge Function: task-ai-assistant"
         run: supabase functions deploy task-ai-assistant --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
 
-      - name: Deploy Edge Function: lang-detect
+      - name: "Deploy Edge Function: lang-detect"
         run: |
           if [ -d "supabase/functions/lang-detect" ]; then
             supabase functions deploy lang-detect --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
