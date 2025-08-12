@@ -90,12 +90,12 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
           .filter(c => c.file_url && c.file_name)
           .map(async (c) => {
             try {
-              const { data, error } = await supabase
+              const { data } = supabase
                 .storage
                 .from(APP_CONFIG.files.bucket)
-                .createSignedUrl(c.file_url!, 3600);
-              if (error || !data?.signedUrl) return [c.id, ''] as const;
-              return [c.id, data.signedUrl] as const;
+                .getPublicUrl(c.file_url!);
+              if (!data?.publicUrl) return [c.id, ''] as const;
+              return [c.id, data.publicUrl] as const;
             } catch {
               return [c.id, ''] as const;
             }
