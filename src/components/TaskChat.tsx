@@ -431,7 +431,7 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
                   
                   {comment.file_url && comment.file_name && (
                     <div className="flex items-center gap-2 p-2 bg-muted rounded border">
-                      {isImage(comment.file_name) ? (
+                      {isImage(comment.file_name) && signedUrls[comment.id] ? (
                         <img 
                           src={signedUrls[comment.id]}
                           alt={`Вложение к задаче ${comment.file_name}`}
