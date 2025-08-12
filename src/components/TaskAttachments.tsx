@@ -49,14 +49,18 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
     setIsUploading(true);
     try {
       for (const file of Array.from(files)) {
-        // Validate file type
         if (!PROJECT_CONFIG.FILE_UPLOAD.ALLOWED_TYPES.includes(file.type as any)) {
-          toast({
-            title: t.error,
-            description: `${t.unsupportedFileType}: ${file.type}`,
-            variant: 'destructive',
-          });
-          continue;
+          const lower = file.name.toLowerCase();
+          const allowedExts = ['.pdf','.jpg','.jpeg','.png','.gif','.webp','.doc','.docx','.xls','.xlsx','.txt','.csv'];
+          const isExtOk = allowedExts.some(ext => lower.endsWith(ext));
+          if (!isExtOk) {
+            toast({
+              title: t.error,
+              description: `${t.unsupportedFileType}: ${file.type}`,
+              variant: 'destructive',
+            });
+            continue;
+          }
         }
 
         // Validate file size
@@ -226,7 +230,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
               multiple
               onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
               className="hidden"
-              accept={PROJECT_CONFIG.FILE_UPLOAD.ALLOWED_TYPES.join(',')}
+              accept={[...PROJECT_CONFIG.FILE_UPLOAD.ALLOWED_TYPES, '.pdf','.jpg','.jpeg','.png','.gif','.webp','.doc','.docx','.xls','.xlsx','.txt','.csv'].join(',')}
             />
             <Button
               size="sm"

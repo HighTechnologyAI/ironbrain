@@ -226,12 +226,17 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
     }
 
     if (!APP_CONFIG.files.allowedTypes.includes(file.type as any)) {
-      toast({
-        title: t.error,
-        description: 'Неподдерживаемый тип файла',
-        variant: 'destructive',
-      });
-      return;
+      const lower = file.name.toLowerCase();
+      const allowedExts = ['.pdf','.jpg','.jpeg','.png','.gif','.webp','.doc','.docx','.xls','.xlsx','.txt','.csv'];
+      const isExtOk = allowedExts.some(ext => lower.endsWith(ext));
+      if (!isExtOk) {
+        toast({
+          title: t.error,
+          description: 'Неподдерживаемый тип файла',
+          variant: 'destructive',
+        });
+        return;
+      }
     }
 
     setSelectedFile(file);
@@ -489,7 +494,7 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
                   type="file"
                   onChange={handleFileSelect}
                   className="hidden"
-                  accept={APP_CONFIG.files.allowedTypes.join(',')}
+                  accept={[...APP_CONFIG.files.allowedTypes, '.pdf','.jpg','.jpeg','.png','.gif','.webp','.doc','.docx','.xls','.xlsx','.txt','.csv'].join(',')}
                 />
                 <Button
                   size="sm"
