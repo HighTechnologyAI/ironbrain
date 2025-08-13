@@ -13,9 +13,6 @@ export async function detectLanguage(text: string): Promise<string> {
 }
 
 export async function translateText(text: string, target: string): Promise<string> {
-  // First check cache using text hash
-  const textHash = btoa(text).slice(0, 50); // Simple hash for lookup
-  
   try {
     // Check cache first
     const { data: cached } = await supabase
