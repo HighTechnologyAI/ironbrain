@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/hooks/use-language';
 import { useToast } from '@/hooks/use-toast';
+import MessageText from '@/components/MessageText';
+import { detectLanguage } from '@/lib/translation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -34,6 +36,7 @@ interface TaskComment {
   mentioned_users?: string[];
   created_at: string;
   user_id: string;
+  language?: string | null;
   user: {
     id: string;
     full_name: string;
@@ -299,6 +302,8 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
         throw new Error('Profile not found');
       }
 
+      const lang = newComment.trim() ? await detectLanguage(newComment.trim()) : null;
+
       const { error } = await supabase
         .from('task_comments')
         .insert({
@@ -308,6 +313,7 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
           file_url: fileData?.path,
           file_name: fileData?.name,
           file_size: fileData?.size,
+          language: lang,
         });
 
       if (error) throw error;
@@ -426,7 +432,7 @@ const TaskChat = ({ taskId, isTaskCreator }: TaskChatProps) => {
                   </div>
                   
                   {comment.content && (
-                    <p className="text-sm text-muted-foreground">{comment.content}</p>
+                    <MessageText id={comment.id} text={comment.content} sourceLang={comment.language} />
                   )}
                   
                   {comment.file_url && comment.file_name && (
