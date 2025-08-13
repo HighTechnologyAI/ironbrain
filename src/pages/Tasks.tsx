@@ -361,7 +361,7 @@ const Tasks = () => {
                   text={task.title} 
                   type="title" 
                   sourceLang={task.language}
-                  className="text-lg font-semibold group-hover:cyber-text transition-colors truncate block" 
+                  className="text-lg font-semibold group-hover:cyber-text transition-colors leading-snug break-words" 
                 />
               </div>
               <div className="flex flex-col gap-2 flex-shrink-0">
