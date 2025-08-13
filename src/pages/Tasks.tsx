@@ -103,11 +103,11 @@ const Tasks = () => {
   }, [user]);
   useEffect(() => {
     loadTasks();
-  }, []);
+  }, [t]); // Перезагружаем задачи при смене языка
 
   useEffect(() => {
     loadCollaboratedTasks();
-  }, [currentProfileId]);
+  }, [currentProfileId, t]); // Перезагружаем коллаборативные задачи при смене языка
 
   const loadCommentCounts = async (taskIds: string[]) => {
     if (!taskIds || taskIds.length === 0) { setCommentCounts({}); return; }
