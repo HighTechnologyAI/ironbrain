@@ -127,7 +127,7 @@ const Analytics = () => {
     
     return [
       {
-        title: language === 'ru' ? 'Выполненных задач' : 'Завършени задачи',
+        title: t.completedTasksLabel,
         value: completedTasks.toString(),
         change: "+12.5%",
         trend: "up" as const,
@@ -136,7 +136,7 @@ const Analytics = () => {
         sparkline: generateSparklineData('up')
       },
       {
-        title: language === 'ru' ? 'Активных сотрудников' : 'Активни служители',
+        title: t.activeEmployeesLabel,
         value: profiles.length.toString(),
         change: "+8.3%", 
         trend: "up" as const,
@@ -145,8 +145,8 @@ const Analytics = () => {
         sparkline: generateSparklineData('up')
       },
       {
-        title: language === 'ru' ? 'Среднее время' : 'Средно време',
-        value: `${avgHours.toFixed(1)}${language === 'ru' ? ' ч' : ' ч'}`,
+        title: t.averageTimeLabel,
+        value: `${avgHours.toFixed(1)}${t.hours}`,
         change: "-15.2%",
         trend: "down" as const,
         icon: Clock,
@@ -154,7 +154,7 @@ const Analytics = () => {
         sparkline: generateSparklineData('down')
       },
       {
-        title: language === 'ru' ? 'Достижений' : 'Постижения',
+        title: t.achievementsLabel,
         value: achievements.length.toString(),
         change: "+23.1%",
         trend: "up" as const, 
@@ -318,16 +318,16 @@ const Analytics = () => {
           <div>
             <h1 className="text-3xl font-bold cyber-text flex items-center gap-3">
               <BarChart3 className="text-primary h-8 w-8" />
-              {t.analytics}
+              {t.analyticsTitle}
             </h1>
             <p className="text-muted-foreground mt-1">
-              {language === 'ru' ? 'Анализ производительности и метрики команды' : 'Анализ на производителността и метрики на екипа'}
+              {t.performanceAnalysisDesc}
             </p>
           </div>
         </div>
         <Button variant="outline" className="cyber-glow">
           <Download className="h-4 w-4 mr-2" />
-          Экспорт отчета
+          {t.exportReportLabel}
         </Button>
       </div>
 
@@ -335,22 +335,22 @@ const Analytics = () => {
       <div className="flex gap-4 mb-8">
         <Select value={dateRange} onValueChange={setDateRange}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="Период" />
+            <SelectValue placeholder={t.periodLabel} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="7d">Последние 7 дней</SelectItem>
-            <SelectItem value="30d">Последние 30 дней</SelectItem>
-            <SelectItem value="90d">Последние 3 месяца</SelectItem>
-            <SelectItem value="1y">Последний год</SelectItem>
+            <SelectItem value="7d">{t.last7DaysLabel}</SelectItem>
+            <SelectItem value="30d">{t.last30DaysLabel}</SelectItem>
+            <SelectItem value="90d">{t.last3MonthsLabel}</SelectItem>
+            <SelectItem value="1y">{t.lastYearLabel}</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={department} onValueChange={setDepartment}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="Отдел" />
+            <SelectValue placeholder={t.departmentLabel} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Все отделы</SelectItem>
+            <SelectItem value="all">{t.allDepartmentsLabel}</SelectItem>
             {getDepartments().map((dept: string) => (
               <SelectItem key={String(dept)} value={String(dept)}>{String(dept)}</SelectItem>
             ))}
@@ -387,7 +387,7 @@ const Analytics = () => {
                 <div className="flex items-center gap-1 text-xs">
                   <TrendIcon className={`h-3 w-3 ${trendColor}`} />
                   <span className={trendColor}>{stat.change}</span>
-                  <span className="text-muted-foreground">за период</span>
+                  <span className="text-muted-foreground">{t.forPeriodLabel}</span>
                 </div>
               </CardContent>
             </Card>
@@ -402,10 +402,10 @@ const Analytics = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <LineChart className="h-5 w-5 text-primary" />
-              Производительность по неделям
+              {t.weeklyPerformanceLabel}
             </CardTitle>
             <CardDescription>
-              Сравнение запланированных и выполненных задач
+              {t.plannedVsCompletedLabel}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -440,10 +440,10 @@ const Analytics = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <PieChart className="h-5 w-5 text-primary" />
-              Производительность отделов
+              {t.departmentPerformanceLabel}
             </CardTitle>
             <CardDescription>
-              Задачи и эффективность по отделам
+              {t.tasksAndEfficiencyLabel}
             </CardDescription>
           </CardHeader>
           <CardContent>

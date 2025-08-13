@@ -109,7 +109,7 @@ const Team = () => {
 
   return (
     <>
-      <AppNavigation title={t.team || "Команда"} subtitle={t.teamManagement || "Управление участниками команды"} />
+      <AppNavigation title={t.team || "Команда"} subtitle={t.teamManagementDesc || "Управление участниками команды"} />
       <div className="min-h-screen bg-background p-6">
         {/* Action Button (admin only) */}
         {isAdmin && (
@@ -119,7 +119,7 @@ const Team = () => {
               onClick={() => setShowCreateForm(true)}
             >
               <Plus className="h-4 w-4 mr-2" />
-              {t.addEmployee || 'Добавить сотрудника'}
+              {t.addEmployeeLabel || 'Добавить сотрудника'}
             </Button>
           </div>
         )}
@@ -128,7 +128,7 @@ const Team = () => {
         {loading && (
           <div className="flex justify-center items-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2 text-muted-foreground">{t.loadingTeam || 'Загрузка команды...'}</span>
+            <span className="ml-2 text-muted-foreground">{t.loadingTeamLabel || 'Загрузка команды...'}</span>
           </div>
         )}
 
@@ -136,9 +136,9 @@ const Team = () => {
         {error && (
           <Card className="border-destructive bg-destructive/5">
             <CardContent className="pt-6">
-              <p className="text-destructive mb-4">{t.dataLoadError || 'Ошибка загрузки данных'}: {error}</p>
+              <p className="text-destructive mb-4">{t.dataLoadErrorLabel || 'Ошибка загрузки данных'}: {error}</p>
               <Button onClick={() => window.location.reload()} variant="outline">
-                {t.tryAgain || 'Попробовать снова'}
+                {t.tryAgainLabel || 'Попробовать снова'}
               </Button>
             </CardContent>
           </Card>
@@ -181,7 +181,7 @@ const Team = () => {
 
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <div>
-                      {t.department || 'Отдел'}: {member.department || 'Не указан'}
+                      {t.departmentLabel || 'Отдел'}: {member.department || 'Не указан'}
                     </div>
                     {isAdmin && (
                       <Button
@@ -196,7 +196,7 @@ const Team = () => {
                         }}
                       >
                         <Pencil className="h-3 w-3 mr-1" />
-                        {t.edit || 'Изм.'}
+                        {t.editLabel || 'Изм.'}
                       </Button>
                     )}
                   </div>
@@ -225,7 +225,7 @@ const Team = () => {
                   {member.hire_date && (
                     <div className="flex items-center gap-2 text-sm">
                       <Calendar className="h-3 w-3 text-muted-foreground" />
-                      <span>{t.since || 'С'} {new Date(member.hire_date).toLocaleDateString()}</span>
+                      <span>{t.sinceLabel || 'С'} {new Date(member.hire_date).toLocaleDateString()}</span>
                     </div>
                   )}
 
@@ -246,7 +246,7 @@ const Team = () => {
             <CardContent>
               <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">
-                {t.noTeamMembers || 'Нет участников команды. Добавьте первого сотрудника.'}
+                {t.noTeamMembersLabel || 'Нет участников команды. Добавьте первого сотрудника.'}
               </p>
             </CardContent>
           </Card>
@@ -256,11 +256,11 @@ const Team = () => {
       <Dialog open={editDeptOpen} onOpenChange={setEditDeptOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t.edit}</DialogTitle>
+            <DialogTitle>{t.editLabel}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="role">Роль</Label>
+              <Label htmlFor="role">{t.roleLabel}</Label>
               <Select value={roleValue} onValueChange={setRoleValue}>
                 <SelectTrigger id="role" className="w-full">
                   <SelectValue placeholder="Выберите роль" />
@@ -273,13 +273,13 @@ const Team = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="dept">{t.department || 'Отдел'}</Label>
+              <Label htmlFor="dept">{t.departmentLabel || 'Отдел'}</Label>
               <Input id="dept" value={deptValue} onChange={(e) => setDeptValue(e.target.value)} placeholder={language === 'ru' ? 'Введите отдел' : 'Enter department'} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDeptOpen(false)}>{t.cancel}</Button>
-            <Button onClick={handleSaveDept}>{t.save}</Button>
+            <Button variant="outline" onClick={() => setEditDeptOpen(false)}>{t.cancelLabel}</Button>
+            <Button onClick={handleSaveDept}>{t.saveLabel}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

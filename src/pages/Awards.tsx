@@ -25,8 +25,10 @@ import {
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from '@/hooks/use-language';
 
 const Awards = () => {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [periodFilter, setPeriodFilter] = useState("all");
@@ -216,14 +218,14 @@ const Awards = () => {
           <div>
             <h1 className="text-3xl font-bold cyber-text flex items-center gap-3">
               <Award className="text-accent h-8 w-8" />
-              Награды и достижения
+              {t.awardsTitle}
             </h1>
-            <p className="text-muted-foreground mt-1">Система мотивации и признания заслуг</p>
+            <p className="text-muted-foreground mt-1">{t.motivationSystemDesc}</p>
           </div>
         </div>
         <Button className="cyber-glow">
           <Plus className="h-4 w-4 mr-2" />
-          Создать награду
+          {t.createAwardLabel}
         </Button>
       </div>
 
@@ -231,7 +233,7 @@ const Awards = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Всего достижений</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.totalAchievementsLabel}</CardTitle>
             <Award className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>

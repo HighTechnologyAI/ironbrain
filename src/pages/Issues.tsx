@@ -22,11 +22,13 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CreateIssueForm from "@/components/CreateIssueForm";
+import { useLanguage } from '@/hooks/use-language';
 
 import AppNavigation from "@/components/AppNavigation";
 import { supabase } from "@/integrations/supabase/client";
 
 const Issues = () => {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
@@ -166,7 +168,7 @@ const Issues = () => {
 
   return (
     <>
-      <AppNavigation title="Проблемы" subtitle="Система отслеживания проблем и ошибок" />
+      <AppNavigation title={t.issuesTitle} subtitle={t.issueTrackingDesc} />
       <div className="min-h-screen bg-background p-6">
         {/* Action Button */}
         <div className="flex justify-end mb-6">
@@ -176,7 +178,7 @@ const Issues = () => {
             onClick={() => setShowCreateForm(true)}
           >
             <Plus className="h-4 w-4 mr-2" />
-            Создать проблему
+            {t.createIssueLabel}
           </Button>
         </div>
 
@@ -186,12 +188,12 @@ const Issues = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2 cyber-text">
                 <Search className="h-4 w-4" />
-                Поиск
+                {t.search}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Input
-                placeholder="Поиск проблем..."
+                placeholder={t.searchIssuesPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="bg-background/50 border-primary/20 focus:border-primary/60"
@@ -203,20 +205,20 @@ const Issues = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2 cyber-text">
                 <Filter className="h-4 w-4" />
-                Статус
+                {t.statusLabel}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="bg-background/50 border-primary/20 focus:border-primary/60">
-                  <SelectValue placeholder="Выберите статус" />
+                  <SelectValue placeholder={t.statusLabel} />
                 </SelectTrigger>
                 <SelectContent className="glass-effect">
-                  <SelectItem value="all">Все статусы</SelectItem>
-                  <SelectItem value="open">Открытые</SelectItem>
-                  <SelectItem value="in-progress">В работе</SelectItem>
-                  <SelectItem value="resolved">Решенные</SelectItem>
-                  <SelectItem value="closed">Закрытые</SelectItem>
+                  <SelectItem value="all">{t.allStatusesLabel}</SelectItem>
+                  <SelectItem value="open">{t.openStatus}</SelectItem>
+                  <SelectItem value="in-progress">{t.inProgressStatus}</SelectItem>
+                  <SelectItem value="resolved">{t.resolvedStatus}</SelectItem>
+                  <SelectItem value="closed">{t.closedStatus}</SelectItem>
                 </SelectContent>
               </Select>
             </CardContent>
