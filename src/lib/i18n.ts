@@ -308,6 +308,52 @@ export interface Translations {
     complexity: string;
     timeEstimation: string;
     smartAITags: string;
+    
+    // Forms and Dialogs
+    formAssignParticipant: string;
+    formSelectEmployee: string;
+    formNoAvailableEmployees: string;
+    formAssign: string;
+    formCreateIssue: string;
+    formReportNewProblem: string;
+    formProblemTitle: string;
+    formProblemTitlePlaceholder: string;
+    formDetailedDescription: string;
+    formDetailedDescriptionPlaceholder: string;
+    formSeverity: string;
+    formSelectSeverity: string;
+    formCreateProblem: string;
+    formCreating: string;
+    formCreateNewProject: string;
+    formAddNewCompany: string;
+    formProjectName: string;
+    formProjectNamePlaceholder: string;
+    formIndustry: string;
+    formIndustryPlaceholder: string;
+    formDescriptionPlaceholder: string;
+    formContactPerson: string;
+    formContactPersonPlaceholder: string;
+    formEmailPlaceholder: string;
+    formPhonePlaceholder: string;
+    formWebsite: string;
+    formWebsitePlaceholder: string;
+    formProjectStatus: string;
+    formSelectStatus: string;
+    formPlanning: string;
+    formCreateProject: string;
+    formCreatingNewTask: string;
+    formFillTaskInfo: string;
+    formTaskTitle: string;
+    formTaskTitlePlaceholder: string;
+    formTaskDescription: string;
+    formTaskDescriptionPlaceholder: string;
+    formSelectAssignee: string;
+    formPlannedHours: string;
+    formHoursPlaceholder: string;
+    formSelectDate: string;
+    formOptionalDueDate: string;
+    formTagsPlaceholder: string;
+    formTagsDescription: string;
     aiActions: string;
     generateSummary: string;
     suggestSubtasks: string;
@@ -1068,6 +1114,52 @@ export const translations: Record<string, Translations> = {
     roleLabel: 'Role',
     cancelLabel: 'Cancel',
     saveLabel: 'Save',
+    
+    // Forms and Dialogs
+    formAssignParticipant: 'Assign Participant',
+    formSelectEmployee: 'Select employee',
+    formNoAvailableEmployees: 'No available employees',
+    formAssign: 'Assign',
+    formCreateIssue: 'Create Issue',
+    formReportNewProblem: 'Report a new problem or system error',
+    formProblemTitle: 'Problem Title *',
+    formProblemTitlePlaceholder: 'Brief description of the problem',
+    formDetailedDescription: 'Detailed Description *',
+    formDetailedDescriptionPlaceholder: 'Describe the problem in detail',
+    formSeverity: 'Severity',
+    formSelectSeverity: 'Select severity',
+    formCreateProblem: 'Create Problem',
+    formCreating: 'Creating...',
+    formCreateNewProject: 'Create New Project',
+    formAddNewCompany: 'Add a new company or project to the system',
+    formProjectName: 'Project Name *',
+    formProjectNamePlaceholder: 'Enter project name',
+    formIndustry: 'Industry',
+    formIndustryPlaceholder: 'e.g., IT, Manufacturing',
+    formDescriptionPlaceholder: 'Project description',
+    formContactPerson: 'Contact Person',
+    formContactPersonPlaceholder: 'Contact person name',
+    formEmailPlaceholder: 'email@example.com',
+    formPhonePlaceholder: '+1 (xxx) xxx-xxxx',
+    formWebsite: 'Website',
+    formWebsitePlaceholder: 'https://example.com',
+    formProjectStatus: 'Project Status',
+    formSelectStatus: 'Select status',
+    formPlanning: 'Planning',
+    formCreateProject: 'Create Project',
+    formCreatingNewTask: 'Creating New Task',
+    formFillTaskInfo: 'Fill in the information to create a task and assign an executor',
+    formTaskTitle: 'Task Title',
+    formTaskTitlePlaceholder: 'Enter task title',
+    formTaskDescription: 'Description',
+    formTaskDescriptionPlaceholder: 'Detailed task description',
+    formSelectAssignee: 'Select assignee',
+    formPlannedHours: 'Planned Hours',
+    formHoursPlaceholder: 'Hours',
+    formSelectDate: 'Select date',
+    formOptionalDueDate: 'Optional: set task deadline',
+    formTagsPlaceholder: 'frontend, urgent, bug (comma separated)',
+    formTagsDescription: 'Tags for task categorization (separate with commas)',
   },
   ru: {
     // Common
@@ -1596,6 +1688,52 @@ export const translations: Record<string, Translations> = {
     roleLabel: 'Роль',
     cancelLabel: 'Отмена',
     saveLabel: 'Сохранить',
+    
+    // Forms and Dialogs
+    formAssignParticipant: 'Назначить участника',
+    formSelectEmployee: 'Выберите сотрудника',
+    formNoAvailableEmployees: 'Нет доступных сотрудников',
+    formAssign: 'Назначить',
+    formCreateIssue: 'Создать проблему',
+    formReportNewProblem: 'Сообщите о новой проблеме или ошибке в системе',
+    formProblemTitle: 'Название проблемы *',
+    formProblemTitlePlaceholder: 'Краткое описание проблемы',
+    formDetailedDescription: 'Подробное описание *',
+    formDetailedDescriptionPlaceholder: 'Опишите проблему подробно',
+    formSeverity: 'Серьезность',
+    formSelectSeverity: 'Выберите серьезность',
+    formCreateProblem: 'Создать проблему',
+    formCreating: 'Создание...',
+    formCreateNewProject: 'Создать новый проект',
+    formAddNewCompany: 'Добавьте новую компанию или проект в систему',
+    formProjectName: 'Название проекта *',
+    formProjectNamePlaceholder: 'Введите название проекта',
+    formIndustry: 'Отрасль',
+    formIndustryPlaceholder: 'Например: IT, Производство',
+    formDescriptionPlaceholder: 'Описание проекта',
+    formContactPerson: 'Контактное лицо',
+    formContactPersonPlaceholder: 'Имя контактного лица',
+    formEmailPlaceholder: 'email@example.com',
+    formPhonePlaceholder: '+7 (xxx) xxx-xx-xx',
+    formWebsite: 'Веб-сайт',
+    formWebsitePlaceholder: 'https://example.com',
+    formProjectStatus: 'Статус проекта',
+    formSelectStatus: 'Выберите статус',
+    formPlanning: 'Планирование',
+    formCreateProject: 'Создать проект',
+    formCreatingNewTask: 'Создание новой задачи',
+    formFillTaskInfo: 'Заполните информацию для создания задачи и назначьте исполнителя',
+    formTaskTitle: 'Название задачи',
+    formTaskTitlePlaceholder: 'Введите название задачи',
+    formTaskDescription: 'Описание',
+    formTaskDescriptionPlaceholder: 'Подробное описание задачи',
+    formSelectAssignee: 'Выберите исполнителя',
+    formPlannedHours: 'Планируемые часы',
+    formHoursPlaceholder: 'Часы',
+    formSelectDate: 'Выберите дату',
+    formOptionalDueDate: 'Опционально: установите срок выполнения задачи',
+    formTagsPlaceholder: 'frontend, срочно, bug (через запятую)',
+    formTagsDescription: 'Теги для категоризации задачи (разделяйте запятыми)',
   },
   
   bg: {
@@ -2125,5 +2263,51 @@ export const translations: Record<string, Translations> = {
     roleLabel: 'Роля',
     cancelLabel: 'Отказ',
     saveLabel: 'Запази',
+    
+    // Forms and Dialogs
+    formAssignParticipant: 'Назначи участник',
+    formSelectEmployee: 'Изберете служител',
+    formNoAvailableEmployees: 'Няма налични служители',
+    formAssign: 'Назначи',
+    formCreateIssue: 'Създай проблем',
+    formReportNewProblem: 'Докладвайте нов проблем или грешка в системата',
+    formProblemTitle: 'Заглавие на проблема *',
+    formProblemTitlePlaceholder: 'Кратко описание на проблема',
+    formDetailedDescription: 'Подробно описание *',
+    formDetailedDescriptionPlaceholder: 'Опишете проблема подробно',
+    formSeverity: 'Сериозност',
+    formSelectSeverity: 'Изберете сериозност',
+    formCreateProblem: 'Създай проблем',
+    formCreating: 'Създаване...',
+    formCreateNewProject: 'Създай нов проект',
+    formAddNewCompany: 'Добавете нова компания или проект в системата',
+    formProjectName: 'Име на проекта *',
+    formProjectNamePlaceholder: 'Въведете име на проекта',
+    formIndustry: 'Индустрия',
+    formIndustryPlaceholder: 'напр.: IT, Производство',
+    formDescriptionPlaceholder: 'Описание на проекта',
+    formContactPerson: 'Контактно лице',
+    formContactPersonPlaceholder: 'Име на контактното лице',
+    formEmailPlaceholder: 'email@example.com',
+    formPhonePlaceholder: '+359 (xxx) xxx-xxx',
+    formWebsite: 'Уебсайт',
+    formWebsitePlaceholder: 'https://example.com',
+    formProjectStatus: 'Статус на проекта',
+    formSelectStatus: 'Изберете статус',
+    formPlanning: 'Планиране',
+    formCreateProject: 'Създай проект',
+    formCreatingNewTask: 'Създаване на нова задача',
+    formFillTaskInfo: 'Попълнете информацията за създаване на задача и назначете изпълнител',
+    formTaskTitle: 'Заглавие на задачата',
+    formTaskTitlePlaceholder: 'Въведете заглавие на задачата',
+    formTaskDescription: 'Описание',
+    formTaskDescriptionPlaceholder: 'Подробно описание на задачата',
+    formSelectAssignee: 'Изберете изпълнител',
+    formPlannedHours: 'Планирани часове',
+    formHoursPlaceholder: 'Часове',
+    formSelectDate: 'Изберете дата',
+    formOptionalDueDate: 'По избор: определете краен срок за задачата',
+    formTagsPlaceholder: 'frontend, спешно, грешка (разделени със запетая)',
+    formTagsDescription: 'Тагове за категоризация на задачата (разделете със запетаи)',
   },
 };

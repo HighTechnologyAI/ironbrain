@@ -207,9 +207,9 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Создание новой задачи</DialogTitle>
+          <DialogTitle>{t.formCreatingNewTask}</DialogTitle>
           <DialogDescription>
-            Заполните информацию для создания задачи и назначьте исполнителя
+            {t.formFillTaskInfo}
           </DialogDescription>
         </DialogHeader>
 
@@ -220,9 +220,9 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Название задачи</FormLabel>
+                  <FormLabel>{t.formTaskTitle}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Введите название задачи" {...field} />
+                    <Input placeholder={t.formTaskTitlePlaceholder} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -234,10 +234,10 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Описание</FormLabel>
+                  <FormLabel>{t.formTaskDescription}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Подробное описание задачи"
+                      placeholder={t.formTaskDescriptionPlaceholder}
                       rows={3}
                       {...field}
                     />

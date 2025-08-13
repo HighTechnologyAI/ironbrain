@@ -109,18 +109,18 @@ const CreateIssueForm: React.FC<CreateIssueFormProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Создать проблему</DialogTitle>
+          <DialogTitle>{t.formCreateIssue}</DialogTitle>
           <DialogDescription>
-            Сообщите о новой проблеме или ошибке в системе
+            {t.formReportNewProblem}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Название проблемы *</Label>
+            <Label htmlFor="title">{t.formProblemTitle}</Label>
             <Input
               id="title"
-              placeholder="Краткое описание проблемы"
+              placeholder={t.formProblemTitlePlaceholder}
               value={formData.title}
               onChange={(e) => handleInputChange('title', e.target.value)}
               required
@@ -128,10 +128,10 @@ const CreateIssueForm: React.FC<CreateIssueFormProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Подробное описание *</Label>
+            <Label htmlFor="description">{t.formDetailedDescription}</Label>
             <Textarea
               id="description"
-              placeholder="Опишите проблему подробно"
+              placeholder={t.formDetailedDescriptionPlaceholder}
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               rows={4}
@@ -140,16 +140,16 @@ const CreateIssueForm: React.FC<CreateIssueFormProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="severity">Серьезность</Label>
+            <Label htmlFor="severity">{t.formSeverity}</Label>
             <Select value={formData.severity} onValueChange={(value) => handleInputChange('severity', value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Выберите серьезность" />
+                <SelectValue placeholder={t.formSelectSeverity} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="low">Низкая</SelectItem>
-                <SelectItem value="medium">Средняя</SelectItem>
-                <SelectItem value="high">Высокая</SelectItem>
-                <SelectItem value="critical">Критическая</SelectItem>
+                <SelectItem value="low">{t.low}</SelectItem>
+                <SelectItem value="medium">{t.medium}</SelectItem>
+                <SelectItem value="high">{t.high}</SelectItem>
+                <SelectItem value="critical">{t.critical}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -160,16 +160,16 @@ const CreateIssueForm: React.FC<CreateIssueFormProps> = ({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Отмена
+              {t.cancel}
             </Button>
             <Button type="submit" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Создание...
+                  {t.formCreating}
                 </>
               ) : (
-                'Создать проблему'
+                t.formCreateProblem
               )}
             </Button>
           </div>

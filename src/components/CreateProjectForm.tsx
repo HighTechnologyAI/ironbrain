@@ -108,19 +108,19 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Создать новый проект</DialogTitle>
+          <DialogTitle>{t.formCreateNewProject}</DialogTitle>
           <DialogDescription>
-            Добавьте новую компанию или проект в систему
+            {t.formAddNewCompany}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Название проекта *</Label>
+              <Label htmlFor="name">{t.formProjectName}</Label>
               <Input
                 id="name"
-                placeholder="Введите название проекта"
+                placeholder={t.formProjectNamePlaceholder}
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 required
@@ -128,10 +128,10 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="industry">Отрасль</Label>
+              <Label htmlFor="industry">{t.formIndustry}</Label>
               <Input
                 id="industry"
-                placeholder="Например: IT, Производство"
+                placeholder={t.formIndustryPlaceholder}
                 value={formData.industry}
                 onChange={(e) => handleInputChange('industry', e.target.value)}
               />

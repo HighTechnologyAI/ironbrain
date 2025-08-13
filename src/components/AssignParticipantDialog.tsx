@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/use-language';
 
 interface AssignParticipantDialogProps {
   open: boolean;
@@ -20,6 +21,7 @@ interface TeamMember {
 
 const AssignParticipantDialog = ({ open, onOpenChange, taskId, onAssigned }: AssignParticipantDialogProps) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -82,17 +84,17 @@ const AssignParticipantDialog = ({ open, onOpenChange, taskId, onAssigned }: Ass
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle>Назначить участника</DialogTitle>
-          <DialogDescription>Выберите сотрудника для добавления к задаче</DialogDescription>
+          <DialogTitle>{t.formAssignParticipant}</DialogTitle>
+          <DialogDescription>{t.formSelectEmployee}</DialogDescription>
         </DialogHeader>
         <div className="py-2">
           <Select value={selectedUser ?? undefined} onValueChange={(v) => setSelectedUser(v)}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Выберите сотрудника" />
+              <SelectValue placeholder={t.formSelectEmployee} />
             </SelectTrigger>
             <SelectContent>
               {members.length === 0 ? (
-                <SelectItem disabled value="none">Нет доступных сотрудников</SelectItem>
+                <SelectItem disabled value="none">{t.formNoAvailableEmployees}</SelectItem>
               ) : (
                 members.map((m) => (
                   <SelectItem key={m.id} value={m.id}>
@@ -105,10 +107,10 @@ const AssignParticipantDialog = ({ open, onOpenChange, taskId, onAssigned }: Ass
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
-            Отмена
+            {t.cancel}
           </Button>
           <Button onClick={assign} disabled={!selectedUser || loading}>
-            Назначить
+            {t.formAssign}
           </Button>
         </DialogFooter>
       </DialogContent>
