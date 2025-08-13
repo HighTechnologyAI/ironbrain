@@ -5,26 +5,25 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium font-ui ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-[0_4px_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.4)] hover:scale-[1.02]",
-        cyber: "bg-gradient-to-r from-primary to-cyber-green-bright text-primary-foreground hover:shadow-[0_0_25px_hsl(var(--cyber-green)/0.8)] hover:scale-[1.02] cyber-glow",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-[0_4px_15px_hsl(var(--destructive)/0.3)]",
-        outline:
-          "border border-primary/30 bg-background/50 backdrop-blur-sm hover:bg-primary/10 hover:text-primary hover:border-primary/60 hover:shadow-[0_0_15px_hsl(var(--primary)/0.2)]",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-[0_2px_10px_hsl(var(--secondary)/0.3)]",
-        ghost: "hover:bg-primary/10 hover:text-primary transition-all duration-200",
-        link: "text-primary underline-offset-4 hover:underline hover:text-primary/80",
-        glass: "bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-md border border-border/50 hover:border-primary/30 hover:bg-card/90 shadow-[0_8px_32px_hsl(var(--background)/0.8)]",
+        default: "bg-primary text-primary-foreground hover:bg-primary-hover shadow-subtle hover:shadow-medium rounded-md",
+        mission: "bg-primary text-primary-foreground hover:bg-primary-hover shadow-mission-primary hover:shadow-mission-hover rounded-md",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-subtle rounded-md",
+        warning: "bg-warning text-warning-foreground hover:bg-warning/90 shadow-subtle rounded-md",
+        success: "bg-success text-success-foreground hover:bg-success/90 shadow-subtle rounded-md",
+        info: "bg-info text-info-foreground hover:bg-info/90 shadow-subtle rounded-md",
+        outline: "border border-border bg-surface-1 text-foreground hover:bg-surface-2 hover:border-primary/50 rounded-md",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-subtle rounded-md",
+        ghost: "hover:bg-surface-1 hover:text-foreground transition-all duration-200 rounded-md",
+        link: "text-primary underline-offset-4 hover:underline hover:text-primary-hover",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
+        sm: "h-9 px-3",
+        lg: "h-11 px-6",
         icon: "h-10 w-10",
       },
     },

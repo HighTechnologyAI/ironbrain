@@ -171,7 +171,7 @@ const Issues = () => {
         {/* Action Button */}
         <div className="flex justify-end mb-6">
           <Button 
-            variant="cyber"
+            variant="mission"
             size="lg"
             onClick={() => setShowCreateForm(true)}
           >

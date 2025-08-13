@@ -26,7 +26,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					hover: 'hsl(var(--primary-hover))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -52,6 +53,25 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// UAV Status Colors
+				warning: {
+					DEFAULT: 'hsl(var(--warning))',
+					foreground: 'hsl(var(--warning-foreground))'
+				},
+				info: {
+					DEFAULT: 'hsl(var(--info))',
+					foreground: 'hsl(var(--info-foreground))'
+				},
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					foreground: 'hsl(var(--success-foreground))'
+				},
+				// Surface hierarchy
+				surface: {
+					1: 'hsl(var(--surface-1))',
+					2: 'hsl(var(--surface-2))',
+					3: 'hsl(var(--surface-3))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -63,10 +83,33 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			fontFamily: {
+				ui: 'var(--font-ui)',
+				mono: 'var(--font-mono)'
+			},
+			fontSize: {
+				xs: ['11px', { lineHeight: '1.4' }],
+				sm: ['12px', { lineHeight: '1.4' }],
+				base: ['14px', { lineHeight: '1.5' }],
+				lg: ['16px', { lineHeight: '1.5' }],
+				xl: ['20px', { lineHeight: '1.4' }],
+				'2xl': ['24px', { lineHeight: '1.3' }],
+				'3xl': ['32px', { lineHeight: '1.2' }]
+			},
 			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				lg: 'var(--radius-lg)',
+				DEFAULT: 'var(--radius)',
+				md: 'var(--radius)',
+				sm: 'var(--radius-sm)'
+			},
+			boxShadow: {
+				subtle: 'var(--shadow-subtle)',
+				medium: 'var(--shadow-medium)',
+				strong: 'var(--shadow-strong)',
+				'glow-primary': 'var(--shadow-glow-primary)',
+				'glow-hover': 'var(--shadow-glow-hover)',
+				'mission-primary': 'var(--glow-mission-primary)',
+				'mission-hover': 'var(--glow-mission-hover)'
 			},
 			keyframes: {
 				'accordion-down': {

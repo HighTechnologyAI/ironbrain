@@ -7,40 +7,53 @@
 
 @layer base {
   :root {
-    /* Dark background foundation */
-    --background: 222 84% 4.5%;
-    --foreground: 120 100% 95%;
+    /* UAV Mission Control Design System - Precise color tokens */
+    --background: 216 100% 7%; /* #0B0F14 */
+    --foreground: 210 29% 85%; /* #D6E2F3 */
 
-    --card: 225 84% 6%;
-    --card-foreground: 120 100% 95%;
+    --card: 220 24% 10%; /* #0F141A surface1 */
+    --card-foreground: 210 29% 85%; /* #D6E2F3 */
 
-    --popover: 225 84% 6%;
-    --popover-foreground: 120 100% 95%;
+    --popover: 216 33% 12%; /* #121922 surface2 */
+    --popover-foreground: 210 29% 85%; /* #D6E2F3 */
 
-    /* Cyber green primary */
-    --primary: 120 100% 50%;
-    --primary-foreground: 222 84% 4.5%;
-    --primary-glow: 120 100% 70%;
+    /* Tiger neon accent - primary interactive */
+    --primary: 154 86% 42%; /* #16C172 */
+    --primary-foreground: 216 100% 7%; /* #0B0F14 */
+    --primary-hover: 154 74% 36%; /* #13A765 */
+    --primary-glow: 154 86% 42%; /* rgba(22,193,114,.35) for glow */
 
-    /* Dark secondary with subtle green tint */
-    --secondary: 225 30% 12%;
-    --secondary-foreground: 120 50% 85%;
+    /* Muted colors with better readability */
+    --secondary: 219 33% 16%; /* #1D2633 border tone */
+    --secondary-foreground: 210 29% 85%; /* #D6E2F3 */
 
-    --muted: 225 30% 10%;
-    --muted-foreground: 120 20% 65%;
+    --muted: 219 33% 16%; /* #1D2633 border */
+    --muted-foreground: 211 24% 70%; /* #9BB0C9 */
 
-    /* Accent with Tiger orange */
-    --accent: 25 100% 55%;
-    --accent-foreground: 222 84% 4.5%;
+    /* Status colors for UAV systems */
+    --accent: 154 86% 42%; /* Tiger neon for accent */
+    --accent-foreground: 216 100% 7%;
 
-    --destructive: 0 84% 60%;
+    --warning: 44 96% 63%; /* #F6C945 warn */
+    --warning-foreground: 216 100% 7%;
+
+    --destructive: 0 100% 67%; /* #FF5A5A danger */
     --destructive-foreground: 210 40% 98%;
 
-    --border: 225 30% 15%;
-    --input: 225 30% 8%;
-    --ring: 120 100% 50%;
+    --info: 207 100% 62%; /* #3FA7FF info */
+    --info-foreground: 216 100% 7%;
 
-    --radius: 0.5rem;
+    --success: 154 90% 47%; /* #1FD38A success */
+    --success-foreground: 216 100% 7%;
+
+    --border: 219 33% 16%; /* #1D2633 */
+    --input: 220 24% 10%; /* #0F141A */
+    --ring: 154 86% 42%; /* Tiger neon for focus rings */
+
+    /* Rounded corners - UAV interface style */
+    --radius: 0.875rem; /* 14px default */
+    --radius-lg: 1.25rem; /* 20px for cards */
+    --radius-sm: 0.625rem; /* 10px for small elements */
 
     /* Sidebar dark theme */
     --sidebar-background: 222 84% 3%;
@@ -52,30 +65,32 @@
     --sidebar-border: 225 30% 12%;
     --sidebar-ring: 120 100% 50%;
 
-    /* Custom Tiger AI colors */
-    --cyber-green: 120 100% 50%;
-    --cyber-green-dim: 120 80% 40%;
-    --cyber-green-bright: 120 100% 70%;
-    --tiger-orange: 25 100% 55%;
-    --dark-surface: 225 84% 6%;
-    --darker-surface: 222 84% 3%;
+    /* UAV System Status Colors */
+    --status-armed: 154 86% 42%; /* #16C172 */
+    --status-ready: 154 90% 47%; /* #1FD38A */
+    --status-warning: 44 96% 63%; /* #F6C945 */
+    --status-critical: 0 100% 67%; /* #FF5A5A */
+    --status-info: 207 100% 62%; /* #3FA7FF */
 
-    /* Enhanced Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(120 100% 50%), hsl(120 100% 70%));
-    --gradient-cyber: linear-gradient(135deg, hsl(120 100% 50% / 0.1), hsl(180 100% 50% / 0.1));
-    --gradient-surface: linear-gradient(180deg, hsl(225 84% 6%), hsl(222 84% 4.5%));
-    --gradient-card: linear-gradient(145deg, hsl(225 84% 7%), hsl(225 84% 5%));
-    --gradient-button: linear-gradient(135deg, hsl(120 100% 50%), hsl(120 80% 60%));
-    --gradient-hover: linear-gradient(135deg, hsl(120 100% 60%), hsl(120 90% 70%));
-    --gradient-glow: radial-gradient(circle at center, hsl(120 100% 50% / 0.1), transparent);
+    /* Surface hierarchy */
+    --surface-1: 220 24% 10%; /* #0F141A */
+    --surface-2: 216 33% 12%; /* #121922 */
+    --surface-3: 219 33% 16%; /* #1D2633 */
 
-    /* Enhanced Shadows and effects */
-    --shadow-cyber: 0 0 30px hsl(120 100% 50% / 0.2), 0 0 60px hsl(120 100% 50% / 0.1);
-    --shadow-surface: 0 8px 32px hsl(222 84% 2% / 0.8);
-    --shadow-card: 0 4px 20px hsl(222 84% 2% / 0.6), inset 0 1px 0 hsl(120 100% 50% / 0.1);
-    --shadow-button: 0 4px 15px hsl(120 100% 50% / 0.3), inset 0 1px 0 hsl(120 100% 70% / 0.2);
-    --glow-cyber: 0 0 15px hsl(120 100% 50% / 0.6), 0 0 30px hsl(120 100% 50% / 0.3);
-    --glow-hover: 0 0 25px hsl(120 100% 50% / 0.8), 0 0 50px hsl(120 100% 50% / 0.4);
+    /* Typography for UAV interface */
+    --font-ui: 'Inter', 'Manrope', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+    /* Enhanced shadows - softer, more Y-axis */
+    --shadow-subtle: 0 2px 8px hsl(var(--background) / 0.3);
+    --shadow-medium: 0 4px 16px hsl(var(--background) / 0.4);
+    --shadow-strong: 0 8px 32px hsl(var(--background) / 0.5);
+    --shadow-glow-primary: 0 0 24px hsl(var(--primary) / 0.35);
+    --shadow-glow-hover: 0 0 32px hsl(var(--primary) / 0.5);
+
+    /* Mission-critical button glow */
+    --glow-mission-primary: 0 0 24px hsl(var(--primary) / 0.35);
+    --glow-mission-hover: 0 0 32px hsl(var(--primary) / 0.5), 0 0 48px hsl(var(--primary) / 0.2);
 
     /* Animation durations */
     --transition-fast: 0.15s ease-out;
@@ -123,14 +138,16 @@
   }
 
   body {
-    @apply bg-background text-foreground font-mono;
-    background-image: var(--gradient-surface);
+    @apply bg-background text-foreground;
+    font-family: var(--font-ui);
+    background: hsl(var(--background));
     min-height: 100vh;
     position: relative;
-    /* iOS specific optimizations */
+    /* Typography optimizations */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overscroll-behavior: none; /* Предотвращает bounce эффект в iOS */
+    letter-spacing: -0.01em; /* Subtle negative tracking */
+    overscroll-behavior: none;
   }
 
   /* Улучшение тач-интерфейса для iOS */
