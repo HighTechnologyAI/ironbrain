@@ -85,31 +85,6 @@ const Tasks = () => {
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
   const [collaboratedTasks, setCollaboratedTasks] = useState<Task[]>([]);
 
-  useEffect(() => {
-    const loadProfileId = async () => {
-      if (!user) { setCurrentProfileId(null); return; }
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (error) {
-        console.error('Error loading current profile id:', error);
-        return;
-      }
-      setCurrentProfileId(data?.id ?? null);
-    };
-    loadProfileId();
-  }, [user]);
-
-  useEffect(() => {
-    loadTasks();
-  }, []);
-
-  useEffect(() => {
-    loadCollaboratedTasks();
-  }, [currentProfileId]);
-
   const loadCommentCounts = async (taskIds: string[]) => {
     if (!taskIds || taskIds.length === 0) { setCommentCounts({}); return; }
     const { data, error } = await supabase
@@ -195,6 +170,31 @@ const Tasks = () => {
       console.error('Unexpected error loading collaborated tasks:', e);
     }
   };
+
+  useEffect(() => {
+    const loadProfileId = async () => {
+      if (!user) { setCurrentProfileId(null); return; }
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (error) {
+        console.error('Error loading current profile id:', error);
+        return;
+      }
+      setCurrentProfileId(data?.id ?? null);
+    };
+    loadProfileId();
+  }, [user]);
+
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  useEffect(() => {
+    loadCollaboratedTasks();
+  }, [currentProfileId]);
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
     try {
       const updateData: any = { status: newStatus };
