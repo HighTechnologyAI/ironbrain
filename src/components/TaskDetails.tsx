@@ -90,11 +90,11 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
   };
 
   const statusColors = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    in_progress: 'bg-blue-100 text-blue-800',
-    completed: 'bg-green-100 text-green-800',
-    cancelled: 'bg-gray-100 text-gray-800',
-    on_hold: 'bg-orange-100 text-orange-800',
+    pending: 'border-transparent bg-accent text-accent-foreground',
+    in_progress: 'border-transparent bg-primary text-primary-foreground',
+    completed: 'border-transparent bg-secondary text-secondary-foreground',
+    cancelled: 'border-transparent bg-muted text-muted-foreground',
+    on_hold: 'border-transparent bg-destructive text-destructive-foreground',
   };
 
   const priorityLabels = {
@@ -105,10 +105,10 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
   };
 
   const priorityColors = {
-    low: 'bg-green-100 text-green-800',
-    medium: 'bg-yellow-100 text-yellow-800',
-    high: 'bg-red-100 text-red-800',
-    critical: 'bg-purple-100 text-purple-800',
+    low: 'border-transparent bg-secondary text-secondary-foreground',
+    medium: 'border-transparent bg-accent text-accent-foreground',
+    high: 'border-transparent bg-destructive text-destructive-foreground',
+    critical: 'border-transparent bg-destructive text-destructive-foreground animate-pulse-glow',
   };
 
   const getStatusIcon = (status: Task['status']) => {
@@ -171,7 +171,7 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
         {trigger}
       </DialogTrigger>
       <DialogContent 
-        className="w-[94vw] sm:w-auto max-w-[430px] sm:max-w-4xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto"
+        className="w-[95vw] sm:w-auto max-w-[500px] sm:max-w-5xl max-h-[90vh] overflow-y-auto glass-effect"
         data-task-details-dialog
         onPointerDownOutside={(e) => {
           // Разрешаем закрытие только если клик не по toast уведомлениям
@@ -199,10 +199,15 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
         }}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="flex items-center gap-3 text-xl">
             {getStatusIcon(task.status)}
-            <TaskText text={task.title} type="title" sourceLang={task.language} className="text-lg font-semibold" />
+            <TaskText 
+              text={task.title} 
+              type="title" 
+              sourceLang={task.language} 
+              className="font-semibold leading-relaxed text-wrap break-words hyphens-auto" 
+            />
           </DialogTitle>
         </DialogHeader>
 

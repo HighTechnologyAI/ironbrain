@@ -219,11 +219,11 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
           className="flex items-center gap-2"
         >
           <Bot className="h-4 w-4" />
-          Tiger AI
+          AI
         </Button>
       </DialogTrigger>
       <DialogContent 
-        className="w-[92vw] sm:w-auto max-w-[430px] sm:max-w-2xl h-[80vh] sm:h-[600px] flex flex-col"
+        className="w-[95vw] sm:w-auto max-w-[500px] sm:max-w-3xl h-[85vh] sm:h-[700px] flex flex-col glass-effect"
         onMouseDown={(e) => e.stopPropagation()} 
         onClick={(e) => e.stopPropagation()}
         onPointerDownOutside={(e) => e.preventDefault()}
@@ -231,10 +231,10 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 text-lg">
             <Bot className="h-5 w-5 text-primary" />
-            Tiger AI - Помощник по задаче
-            <Badge variant="outline" className="ml-2">
+            AI Помощник
+            <Badge variant="outline" className="ml-2 text-xs truncate max-w-40">
               {task.title}
             </Badge>
           </DialogTitle>
