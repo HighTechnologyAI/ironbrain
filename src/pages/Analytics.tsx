@@ -20,6 +20,7 @@ import {
   LineChart,
   Loader2
 } from "lucide-react";
+import { MiniSparkline, type SparklineData } from "@/components/ui/mini-sparkline";
 import { useNavigate } from "react-router-dom";
 
 const Analytics = () => {
@@ -113,38 +114,53 @@ const Analytics = () => {
     const completedTasks = tasks.filter((t: any) => t.status === 'completed').length;
     const avgHours = tasks.reduce((acc: number, t: any) => acc + (t.actual_hours || 0), 0) / tasks.length || 0;
     
+    // Генерируем тестовые спарклайн данные для каждой метрики
+    const generateSparklineData = (trend: string, count: number = 7): SparklineData[] => {
+      return Array.from({ length: count }, (_, i) => {
+        const base = 50;
+        const variation = trend === 'up' ? i * 2 + Math.random() * 10 : 
+                         trend === 'down' ? -i * 2 + Math.random() * 10 : 
+                         Math.random() * 20 - 10;
+        return { value: Math.max(0, base + variation) };
+      });
+    };
+    
     return [
       {
         title: language === 'ru' ? 'Выполненных задач' : 'Завършени задачи',
         value: completedTasks.toString(),
         change: "+12.5%",
-        trend: "up",
+        trend: "up" as const,
         icon: Target,
-        color: "text-primary"
+        color: "text-primary",
+        sparkline: generateSparklineData('up')
       },
       {
         title: language === 'ru' ? 'Активных сотрудников' : 'Активни служители',
         value: profiles.length.toString(),
         change: "+8.3%", 
-        trend: "up",
+        trend: "up" as const,
         icon: Users,
-        color: "text-primary"
+        color: "text-primary",
+        sparkline: generateSparklineData('up')
       },
       {
         title: language === 'ru' ? 'Среднее время' : 'Средно време',
         value: `${avgHours.toFixed(1)}${language === 'ru' ? ' ч' : ' ч'}`,
         change: "-15.2%",
-        trend: "down",
+        trend: "down" as const,
         icon: Clock,
-        color: "text-green-600"
+        color: "text-green-600",
+        sparkline: generateSparklineData('down')
       },
       {
         title: language === 'ru' ? 'Достижений' : 'Постижения',
         value: achievements.length.toString(),
         change: "+23.1%",
-        trend: "up", 
+        trend: "up" as const, 
         icon: Award,
-        color: "text-accent"
+        color: "text-accent",
+        sparkline: generateSparklineData('up')
       }
     ];
   };
@@ -355,8 +371,18 @@ const Analytics = () => {
                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </CardHeader>
               <CardContent>
-                <div className={`text-2xl font-bold ${stat.color} font-mono mb-1`}>
-                  {stat.value}
+                <div className="flex items-center justify-between mb-2">
+                  <div className={`text-2xl font-bold ${stat.color} font-mono`}>
+                    {stat.value}
+                  </div>
+                  <MiniSparkline 
+                    data={stat.sparkline}
+                    height={32}
+                    width={80}
+                    trend={stat.trend}
+                    variant="line"
+                    strokeWidth={1.5}
+                  />
                 </div>
                 <div className="flex items-center gap-1 text-xs">
                   <TrendIcon className={`h-3 w-3 ${trendColor}`} />
