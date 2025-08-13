@@ -425,8 +425,6 @@ const Tasks = () => {
                 </div>
                 
                 <div className="flex flex-wrap gap-2 justify-between items-center">
-                  <TaskAIAssistant task={task} employeeId={task.assigned_to?.id} />
-
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -539,6 +537,7 @@ const Tasks = () => {
                             Готово
                           </Button>
                         )}
+                        <TaskAIAssistant task={task} employeeId={task.assigned_to?.id} />
                       </div>
                     )}
                   </div>

@@ -200,13 +200,13 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader className="pb-4">
-          <DialogTitle className="flex items-center gap-3 text-xl">
+          <DialogTitle className="flex items-center gap-3">
             {getStatusIcon(task.status)}
             <TaskText 
               text={task.title} 
               type="title" 
               sourceLang={task.language} 
-              className="font-semibold leading-relaxed text-wrap break-words hyphens-auto" 
+              className="text-lg font-semibold leading-snug text-wrap break-words" 
             />
           </DialogTitle>
         </DialogHeader>
