@@ -75,8 +75,12 @@ const AssignParticipantDialog = ({ open, onOpenChange, taskId, onAssigned }: Ass
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
+      <DialogContent
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Назначить участника</DialogTitle>
           <DialogDescription>Выберите сотрудника для добавления к задаче</DialogDescription>

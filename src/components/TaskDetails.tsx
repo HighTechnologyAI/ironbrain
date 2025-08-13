@@ -282,14 +282,18 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
     </Button>
   )}
 
-  <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+  <Dialog open={reportOpen} onOpenChange={setReportOpen} modal={false}>
     <DialogTrigger asChild>
       <Button variant="destructive" size="sm" className="w-full justify-start">
         <AlertCircle className="h-4 w-4 mr-2" />
         {language === 'ru' ? 'Проблема' : 'Проблема'}
       </Button>
     </DialogTrigger>
-    <DialogContent>
+    <DialogContent
+      onPointerDownOutside={(e) => e.preventDefault()}
+      onInteractOutside={(e) => e.preventDefault()}
+      onEscapeKeyDown={(e) => e.preventDefault()}
+    >
       <DialogHeader>
         <DialogTitle>{language === 'ru' ? 'Сообщить о проблеме' : 'Съобщаване за проблем'}</DialogTitle>
         <DialogDescription>
