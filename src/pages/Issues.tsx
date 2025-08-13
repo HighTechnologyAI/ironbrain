@@ -171,7 +171,8 @@ const Issues = () => {
         {/* Action Button */}
         <div className="flex justify-end mb-6">
           <Button 
-            className="cyber-glow"
+            variant="cyber"
+            size="lg"
             onClick={() => setShowCreateForm(true)}
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -179,11 +180,11 @@ const Issues = () => {
           </Button>
         </div>
 
-        {/* Filters */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-          <Card>
+        {/* Enhanced Filters */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <Card className="glass-effect">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-lg flex items-center gap-2 cyber-text">
                 <Search className="h-4 w-4" />
                 Поиск
               </CardTitle>
@@ -193,23 +194,24 @@ const Issues = () => {
                 placeholder="Поиск проблем..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                className="bg-background/50 border-primary/20 focus:border-primary/60"
               />
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-effect">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-lg flex items-center gap-2 cyber-text">
                 <Filter className="h-4 w-4" />
                 Статус
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-background/50 border-primary/20 focus:border-primary/60">
                   <SelectValue placeholder="Выберите статус" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="glass-effect">
                   <SelectItem value="all">Все статусы</SelectItem>
                   <SelectItem value="open">Открытые</SelectItem>
                   <SelectItem value="in-progress">В работе</SelectItem>
@@ -220,19 +222,19 @@ const Issues = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-effect">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-lg flex items-center gap-2 cyber-text">
                 <AlertTriangle className="h-4 w-4" />
                 Приоритет
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-background/50 border-primary/20 focus:border-primary/60">
                   <SelectValue placeholder="Выберите приоритет" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="glass-effect">
                   <SelectItem value="all">Все приоритеты</SelectItem>
                   <SelectItem value="low">Низкий</SelectItem>
                   <SelectItem value="medium">Средний</SelectItem>
@@ -244,36 +246,40 @@ const Issues = () => {
           </Card>
         </div>
 
-        <div className="space-y-4">
-          {filteredIssues.map((issue) => {
+        <div className="space-y-6">
+          {filteredIssues.map((issue, index) => {
             const severityInfo = getSeverityInfo(issue.severity || 'medium');
             const statusInfo = getStatusInfo(issue.status);
             const StatusIcon = statusInfo.icon;
             const createdDate = new Date(issue.created_at);
 
             return (
-              <Card key={issue.id} className="hover:border-primary/50 transition-all duration-300 group">
+              <Card 
+                key={issue.id} 
+                className="cyber-border group hover:scale-[1.01] cursor-pointer animate-fade-in-up"
+                style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant={statusInfo.variant} className="flex items-center gap-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <Badge variant={statusInfo.variant} className="flex items-center gap-1 px-3 py-1">
                           <StatusIcon className="h-3 w-3" />
                           {statusInfo.label}
                         </Badge>
-                        <Badge variant={severityInfo.variant}>
+                        <Badge variant={severityInfo.variant} className="px-3 py-1">
                           {severityInfo.label}
                         </Badge>
                       </div>
-                      <CardTitle className="text-xl group-hover:cyber-text transition-colors">
+                      <CardTitle className="text-xl group-hover:cyber-text transition-all duration-300 mb-2">
                         {issue.title}
                       </CardTitle>
                       {issue.taskTitle && (
-                        <CardDescription className="mt-1">
-                          Задача: {issue.taskTitle}
+                        <CardDescription className="mt-2 p-2 bg-primary/5 rounded border-l-2 border-primary/30">
+                          <span className="font-medium text-primary">Задача:</span> {issue.taskTitle}
                         </CardDescription>
                       )}
-                      <CardDescription className="mt-1">
+                      <CardDescription className="mt-2 leading-relaxed">
                         {issue.description}
                       </CardDescription>
                     </div>

@@ -60,15 +60,22 @@
     --dark-surface: 225 84% 6%;
     --darker-surface: 222 84% 3%;
 
-    /* Gradients */
+    /* Enhanced Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(120 100% 50%), hsl(120 100% 70%));
+    --gradient-cyber: linear-gradient(135deg, hsl(120 100% 50% / 0.1), hsl(180 100% 50% / 0.1));
     --gradient-surface: linear-gradient(180deg, hsl(225 84% 6%), hsl(222 84% 4.5%));
+    --gradient-card: linear-gradient(145deg, hsl(225 84% 7%), hsl(225 84% 5%));
+    --gradient-button: linear-gradient(135deg, hsl(120 100% 50%), hsl(120 80% 60%));
+    --gradient-hover: linear-gradient(135deg, hsl(120 100% 60%), hsl(120 90% 70%));
     --gradient-glow: radial-gradient(circle at center, hsl(120 100% 50% / 0.1), transparent);
 
-    /* Shadows and effects */
-    --shadow-cyber: 0 0 20px hsl(120 100% 50% / 0.3);
-    --shadow-surface: 0 4px 20px hsl(222 84% 2% / 0.5);
-    --glow-cyber: 0 0 10px hsl(120 100% 50% / 0.5);
+    /* Enhanced Shadows and effects */
+    --shadow-cyber: 0 0 30px hsl(120 100% 50% / 0.2), 0 0 60px hsl(120 100% 50% / 0.1);
+    --shadow-surface: 0 8px 32px hsl(222 84% 2% / 0.8);
+    --shadow-card: 0 4px 20px hsl(222 84% 2% / 0.6), inset 0 1px 0 hsl(120 100% 50% / 0.1);
+    --shadow-button: 0 4px 15px hsl(120 100% 50% / 0.3), inset 0 1px 0 hsl(120 100% 70% / 0.2);
+    --glow-cyber: 0 0 15px hsl(120 100% 50% / 0.6), 0 0 30px hsl(120 100% 50% / 0.3);
+    --glow-hover: 0 0 25px hsl(120 100% 50% / 0.8), 0 0 50px hsl(120 100% 50% / 0.4);
 
     /* Animation durations */
     --transition-fast: 0.15s ease-out;
@@ -164,14 +171,41 @@
     }
   }
 
-  /* Cyber glow effects */
+  /* Enhanced Cyber Effects */
   .cyber-glow {
     box-shadow: var(--glow-cyber);
+    transition: box-shadow var(--transition-normal);
+  }
+
+  .cyber-glow:hover {
+    box-shadow: var(--glow-hover);
+    transform: translateY(-1px);
   }
 
   .cyber-text {
     color: hsl(var(--cyber-green));
-    text-shadow: 0 0 10px hsl(var(--cyber-green) / 0.5);
+    text-shadow: 0 0 15px hsl(var(--cyber-green) / 0.6), 0 0 30px hsl(var(--cyber-green) / 0.3);
+  }
+
+  .cyber-border {
+    border: 1px solid hsl(var(--cyber-green) / 0.3);
+    background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--darker-surface)));
+    box-shadow: var(--shadow-card);
+    transition: all var(--transition-normal);
+  }
+
+  .cyber-border:hover {
+    border-color: hsl(var(--cyber-green) / 0.6);
+    box-shadow: var(--shadow-cyber), var(--shadow-card);
+  }
+
+  .glass-effect {
+    background: linear-gradient(145deg, 
+      hsl(var(--card) / 0.8), 
+      hsl(var(--darker-surface) / 0.6)
+    );
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border) / 0.5);
   }
 
   /* Floating animation for background elements */
