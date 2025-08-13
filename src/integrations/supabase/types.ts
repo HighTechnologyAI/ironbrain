@@ -850,6 +850,7 @@ export type Database = {
           file_size: number | null
           file_url: string | null
           id: string
+          language: string | null
           mentioned_users: string[] | null
           task_id: string
           updated_at: string
@@ -862,6 +863,7 @@ export type Database = {
           file_size?: number | null
           file_url?: string | null
           id?: string
+          language?: string | null
           mentioned_users?: string[] | null
           task_id: string
           updated_at?: string
@@ -874,6 +876,7 @@ export type Database = {
           file_size?: number | null
           file_url?: string | null
           id?: string
+          language?: string | null
           mentioned_users?: string[] | null
           task_id?: string
           updated_at?: string
