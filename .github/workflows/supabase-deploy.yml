@@ -30,22 +30,30 @@ jobs:
       - name: "Link project"
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
 
-      - name: "Set secrets for Edge Functions (OPENAI_API_KEY)"
-        run: supabase secrets set OPENAI_API_KEY="$OPENAI_API_KEY" --project-ref "$SUPABASE_PROJECT_REF"
+      - name: "Set secrets for Edge Functions"
+        run: |
+          supabase secrets set OPENAI_API_KEY="$OPENAI_API_KEY" --project-ref "$SUPABASE_PROJECT_REF"
 
-      - name: "Deploy Edge Function: translate"
-        run: supabase functions deploy translate --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
+      - name: "Deploy Edge Function: admin-api"
+        run: supabase functions deploy admin-api --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: "Deploy Edge Function: ai-task-assistant"
+        run: supabase functions deploy ai-task-assistant --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: "Deploy Edge Function: create-demo-users"
+        run: supabase functions deploy create-demo-users --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: "Deploy Edge Function: lang-detect"
+        run: supabase functions deploy lang-detect --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
 
       - name: "Deploy Edge Function: task-ai-assistant"
         run: supabase functions deploy task-ai-assistant --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
 
-      - name: "Deploy Edge Function: lang-detect"
-        run: |
-          if [ -d "supabase/functions/lang-detect" ]; then
-            supabase functions deploy lang-detect --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
-          else
-            echo "No lang-detect function directory yet (ok for first run)"
-          fi
+      - name: "Deploy Edge Function: translate"
+        run: supabase functions deploy translate --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: "Deploy Edge Function: webhook-handler"
+        run: supabase functions deploy webhook-handler --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
 
       - name: "Sync and push database migrations"
         run: |
