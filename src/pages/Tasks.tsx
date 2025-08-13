@@ -328,11 +328,11 @@ const Tasks = () => {
   };
 
   const statusColors = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    in_progress: 'bg-blue-100 text-blue-800',
-    completed: 'bg-green-100 text-green-800',
-    cancelled: 'bg-gray-100 text-gray-800',
-    on_hold: 'bg-orange-100 text-orange-800',
+    pending: 'border-transparent bg-accent text-accent-foreground',
+    in_progress: 'border-transparent bg-primary text-primary-foreground',
+    completed: 'border-transparent bg-secondary text-secondary-foreground',
+    cancelled: 'border-transparent bg-muted text-muted-foreground',
+    on_hold: 'border-transparent bg-destructive text-destructive-foreground',
   };
 
   const priorityLabels = {
@@ -343,17 +343,17 @@ const Tasks = () => {
   };
 
   const priorityColors = {
-    low: 'bg-green-100 text-green-800',
-    medium: 'bg-yellow-100 text-yellow-800',
-    high: 'bg-red-100 text-red-800',
-    critical: 'bg-purple-100 text-purple-800',
+    low: 'border-transparent bg-secondary text-secondary-foreground',
+    medium: 'border-transparent bg-accent text-accent-foreground',
+    high: 'border-transparent bg-destructive text-destructive-foreground',
+    critical: 'border-transparent bg-destructive text-destructive-foreground animate-pulse-glow',
   };
 
   const TaskCard = ({ task }: { task: Task }) => (
     <TaskDetails
       task={task}
       trigger={
-        <Card className="hover:shadow-md transition-shadow cursor-pointer">
+        <Card className="cyber-border group hover:scale-[1.01] cursor-pointer transition-all duration-300">
           <CardHeader className="pb-3">
             <div className="flex justify-between items-start">
               <div className="flex-1">
@@ -361,20 +361,20 @@ const Tasks = () => {
                   text={task.title} 
                   type="title" 
                   sourceLang={task.language}
-                  className="text-lg mb-1 font-semibold" 
+                  className="text-lg mb-2 font-semibold group-hover:cyber-text transition-colors" 
                 />
                 <TaskText 
                   text={task.description || ''} 
                   type="description" 
                   sourceLang={task.language}
-                  className="text-sm text-muted-foreground" 
+                  className="text-sm text-muted-foreground leading-relaxed" 
                 />
               </div>
-              <div className="flex gap-2 ml-4">
-                <Badge className={priorityColors[task.priority]}>
+              <div className="flex flex-col gap-2 ml-4">
+                <Badge className={`${priorityColors[task.priority]} px-3 py-1 text-xs font-medium rounded-full`}>
                   {priorityLabels[task.priority]}
                 </Badge>
-                <Badge className={statusColors[task.status]}>
+                <Badge className={`${statusColors[task.status]} px-3 py-1 text-xs font-medium rounded-full`}>
                   {statusLabels[task.status]}
                 </Badge>
               </div>
@@ -640,9 +640,15 @@ const Tasks = () => {
 
           {isAdmin && (
             <TabsContent value="all" className="mt-6">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {filteredTasks.map((task) => (
-                  <TaskCard key={task.id} task={task} />
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {filteredTasks.map((task, index) => (
+                  <div 
+                    key={task.id} 
+                    className="animate-fade-in-up"
+                    style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
+                  >
+                    <TaskCard task={task} />
+                  </div>
                 ))}
               </div>
               {filteredTasks.length === 0 && (
@@ -658,9 +664,15 @@ const Tasks = () => {
           )}
 
           <TabsContent value="my" className="mt-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {getMyTasks().map((task) => (
-                <TaskCard key={task.id} task={task} />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {getMyTasks().map((task, index) => (
+                <div 
+                  key={task.id} 
+                  className="animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
+                >
+                  <TaskCard task={task} />
+                </div>
               ))}
             </div>
             {getMyTasks().length === 0 && (
@@ -675,9 +687,15 @@ const Tasks = () => {
           </TabsContent>
 
           <TabsContent value="created" className="mt-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {getCreatedTasks().map((task) => (
-                <TaskCard key={task.id} task={task} />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {getCreatedTasks().map((task, index) => (
+                <div 
+                  key={task.id} 
+                  className="animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
+                >
+                  <TaskCard task={task} />
+                </div>
               ))}
             </div>
             {getCreatedTasks().length === 0 && (
@@ -692,9 +710,15 @@ const Tasks = () => {
           </TabsContent>
 
           <TabsContent value="collab" className="mt-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {getCollaboratedTasks().map((task) => (
-                <TaskCard key={task.id} task={task} />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {getCollaboratedTasks().map((task, index) => (
+                <div 
+                  key={task.id} 
+                  className="animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
+                >
+                  <TaskCard task={task} />
+                </div>
               ))}
             </div>
             {getCollaboratedTasks().length === 0 && (
@@ -707,9 +731,15 @@ const Tasks = () => {
           </TabsContent>
 
           <TabsContent value="completed" className="mt-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {getCompletedTasks().map((task) => (
-                <TaskCard key={task.id} task={task} />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {getCompletedTasks().map((task, index) => (
+                <div 
+                  key={task.id} 
+                  className="animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
+                >
+                  <TaskCard task={task} />
+                </div>
               ))}
             </div>
             {getCompletedTasks().length === 0 && (
