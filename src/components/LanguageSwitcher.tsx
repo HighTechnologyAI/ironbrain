@@ -1,3 +1,4 @@
+import React from 'react';
 import { useLanguage } from '@/hooks/use-language';
 import { languages } from '@/lib/i18n';
 import {
@@ -9,13 +10,22 @@ import {
 } from '@/components/ui/select';
 import { Globe } from 'lucide-react';
 
-const LanguageSwitcher = () => {
+const LanguageSwitcher = React.memo(() => {
   const { language, setLanguage } = useLanguage();
 
-  const currentLanguage = languages.find(lang => lang.code === language);
+  const currentLanguage = React.useMemo(() => 
+    languages.find(lang => lang.code === language), 
+    [language]
+  );
+
+  const handleLanguageChange = React.useCallback((newLanguage: string) => {
+    if (newLanguage !== language) {
+      setLanguage(newLanguage);
+    }
+  }, [language, setLanguage]);
 
   return (
-    <Select value={language} onValueChange={setLanguage}>
+    <Select value={language} onValueChange={handleLanguageChange}>
       <SelectTrigger className="w-40">
         <div className="flex items-center gap-2">
           <Globe className="h-4 w-4" />
@@ -41,6 +51,8 @@ const LanguageSwitcher = () => {
       </SelectContent>
     </Select>
   );
-};
+});
+
+LanguageSwitcher.displayName = 'LanguageSwitcher';
 
 export default LanguageSwitcher;

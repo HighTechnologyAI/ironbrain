@@ -18,8 +18,6 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     localStorage.setItem('language', language);
   }, [language]);
-
-  // Мемоизируем функцию setLanguage
   const setLanguage = useCallback((lang: string) => {
     setLanguageState(lang);
   }, []);
