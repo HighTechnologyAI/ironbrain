@@ -333,6 +333,68 @@ export interface Translations {
     last3Months: string;
     lastYear: string;
     overdue: string;
+    
+    // Production & UAV Dashboard
+    production: string;
+    productionKanban: string;
+    uavDashboard: string;
+    missionControl: string;
+    serialNumber: string;
+    model: string;
+    stage: string;
+    progress: string;
+    assignedTo: string;
+    estimatedCompletion: string;
+    priority: string;
+    normal: string;
+    urgent: string;
+    incoming: string;
+    mechanical: string;
+    electronics: string;
+    assembly: string;
+    testing: string;
+    packaging: string;
+    hoursUnit: string;
+    minutes: string;
+    systemHealth: string;
+    operational: string;
+    maintenance: string;
+    documents: string;
+    maintenanceCenter: string;
+    documentCenter: string;
+    integrations: string;
+    systemStats: string;
+    totalUsers: string;
+    totalTasks: string;
+    apiStatus: string;
+    database: string;
+    recentTasks: string;
+    quickActions: string;
+    optimizeDB: string;
+    userManagement: string;
+    exportReports: string;
+    systemSettings: string;
+    adminPanel: string;
+    adminKey: string;
+    enterAdminKey: string;
+    checking: string;
+    loginToAdmin: string;
+    systemAdministration: string;
+    adminModeActive: string;
+    fullAccess: string;
+    mainMenu: string;
+    update: string;
+    backup: string;
+    backupCreated: string;
+    fileDownloaded: string;
+    requestCompleted: string;
+    recordsReceived: string;
+    taskCreatedViaAPI: string;
+    enterTaskName: string;
+    authError: string;
+    invalidAdminKey: string;
+    allTime: string;
+    activeProfiles: string;
   }
 
 export const translations: Record<string, Translations> = {
@@ -658,6 +720,68 @@ export const translations: Record<string, Translations> = {
     last3Months: 'Last 3 months',
     lastYear: 'Last year',
     overdue: 'Overdue',
+    
+    // Production & UAV Dashboard
+    production: 'Production',
+    productionKanban: 'Production Kanban',
+    uavDashboard: 'UAV Dashboard',
+    missionControl: 'Mission Control',
+    serialNumber: 'Serial Number',
+    model: 'Model',
+    stage: 'Stage',
+    progress: 'Progress',
+    assignedTo: 'Assigned To',
+    estimatedCompletion: 'Estimated Completion',
+    priority: 'Priority',
+    normal: 'Normal',
+    urgent: 'Urgent',
+    incoming: 'Incoming',
+    mechanical: 'Mechanical',
+    electronics: 'Electronics',
+    assembly: 'Assembly',
+    testing: 'Testing',
+    packaging: 'Packaging',
+    hoursUnit: 'hours',
+    minutes: 'minutes',
+    systemHealth: 'System Health',
+    operational: 'Operational',
+    maintenance: 'Maintenance',
+    documents: 'Documents',
+    maintenanceCenter: 'Maintenance Center',
+    documentCenter: 'Document Center',
+    integrations: 'Integrations',
+    systemStats: 'System Statistics',
+    totalUsers: 'Total Users',
+    totalTasks: 'Total Tasks',
+    apiStatus: 'API Status',
+    database: 'Database',
+    recentTasks: 'Recent Tasks',
+    quickActions: 'Quick Actions',
+    optimizeDB: 'Optimize Database',
+    userManagement: 'User Management',
+    exportReports: 'Export Reports',
+    systemSettings: 'System Settings',
+    adminPanel: 'Admin Panel',
+    adminKey: 'Admin Key',
+    enterAdminKey: 'Enter admin key',
+    checking: 'Checking...',
+    loginToAdmin: 'Login to admin panel',
+    systemAdministration: 'System administration and monitoring',
+    adminModeActive: 'Administrator mode active',
+    fullAccess: 'Full access to system functions and management',
+    mainMenu: 'Main Menu',
+    update: 'Update',
+    backup: 'Backup',
+    backupCreated: 'Backup created',
+    fileDownloaded: 'File downloaded to your computer',
+    requestCompleted: 'Request completed',
+    recordsReceived: 'records received',
+    taskCreatedViaAPI: 'Task created via API',
+    enterTaskName: 'Enter task name',
+    authError: 'Authentication error',
+    invalidAdminKey: 'Invalid admin key',
+    allTime: 'All time',
+    activeProfiles: 'Active profiles',
   },
   ru: {
     // Common
@@ -981,6 +1105,68 @@ export const translations: Record<string, Translations> = {
     last3Months: 'Последние 3 месяца',
     lastYear: 'Последний год',
     overdue: 'Просрочено',
+    
+    // Production & UAV Dashboard
+    production: 'Производство',
+    productionKanban: 'Производственный Канбан',
+    uavDashboard: 'UAV Панель',
+    missionControl: 'Центр управления',
+    serialNumber: 'Серийный номер',
+    model: 'Модель',
+    stage: 'Этап',
+    progress: 'Прогресс',
+    assignedTo: 'Назначен',
+    estimatedCompletion: 'Оценочное завершение',
+    priority: 'Приоритет',
+    normal: 'Обычный',
+    urgent: 'Срочный',
+    incoming: 'Поступивший',
+    mechanical: 'Механика',
+    electronics: 'Электроника',
+    assembly: 'Сборка',
+    testing: 'Тестирование',
+    packaging: 'Упаковка',
+    hoursUnit: 'часа',
+    minutes: 'минут',
+    systemHealth: 'Состояние системы',
+    operational: 'Операционный',
+    maintenance: 'Техобслуживание',
+    documents: 'Документооборот',
+    maintenanceCenter: 'Центр техобслуживания',
+    documentCenter: 'Центр документооборота',
+    integrations: 'Интеграции',
+    systemStats: 'Статистика системы',
+    totalUsers: 'Всего пользователей',
+    totalTasks: 'Всего задач',
+    apiStatus: 'API статус',
+    database: 'База данных',
+    recentTasks: 'Последние задачи',
+    quickActions: 'Быстрые действия',
+    optimizeDB: 'Оптимизировать БД',
+    userManagement: 'Управление пользователями',
+    exportReports: 'Экспорт отчётов',
+    systemSettings: 'Системные настройки',
+    adminPanel: 'Панель администрирования системы',
+    adminKey: 'Admin ключ',
+    enterAdminKey: 'Введите admin ключ',
+    checking: 'Проверка...',
+    loginToAdmin: 'Войти в админ панель',
+    systemAdministration: 'Системное администрирование и мониторинг',
+    adminModeActive: 'Режим администратора активен',
+    fullAccess: 'Полный доступ к системным функциям и управлению',
+    mainMenu: 'Главное меню',
+    update: 'Обновить',
+    backup: 'Бэкап',
+    backupCreated: 'Бэкап создан',
+    fileDownloaded: 'Файл загружен на ваш компьютер',
+    requestCompleted: 'Запрос выполнен',
+    recordsReceived: 'записей получено',
+    taskCreatedViaAPI: 'Задача создана через API',
+    enterTaskName: 'Введите название задачи',
+    authError: 'Ошибка аутентификации',
+    invalidAdminKey: 'Неверный admin ключ',
+    allTime: 'За всё время',
+    activeProfiles: 'Активных профилей',
   },
   
   bg: {
@@ -1305,5 +1491,67 @@ export const translations: Record<string, Translations> = {
     last3Months: 'Последните 3 месеца',
     lastYear: 'Последната година',
     overdue: 'Просрочени',
+    
+    // Production & UAV Dashboard
+    production: 'Производство',
+    productionKanban: 'Производствен Канбан',
+    uavDashboard: 'UAV Табло',
+    missionControl: 'Център за управление',
+    serialNumber: 'Сериен номер',
+    model: 'Модел',
+    stage: 'Етап',
+    progress: 'Прогрес',
+    assignedTo: 'Назначен на',
+    estimatedCompletion: 'Очаквано завършване',
+    priority: 'Приоритет',
+    normal: 'Нормален',
+    urgent: 'Спешно',
+    incoming: 'Постъпил',
+    mechanical: 'Механика',
+    electronics: 'Електроника',
+    assembly: 'Сглобяване',
+    testing: 'Тестване',
+    packaging: 'Опаковане',
+    hoursUnit: 'часа',
+    minutes: 'минути',
+    systemHealth: 'Състояние на системата',
+    operational: 'Оперативен',
+    maintenance: 'Поддръжка',
+    documents: 'Документооборот',
+    maintenanceCenter: 'Център за поддръжка',
+    documentCenter: 'Център за документооборот',
+    integrations: 'Интеграции',
+    systemStats: 'Статистика на системата',
+    totalUsers: 'Общо потребители',
+    totalTasks: 'Общо задачи',
+    apiStatus: 'API статус',
+    database: 'База данни',
+    recentTasks: 'Последни задачи',
+    quickActions: 'Бързи действия',
+    optimizeDB: 'Оптимизирай БД',
+    userManagement: 'Управление на потребители',
+    exportReports: 'Експорт на отчети',
+    systemSettings: 'Системни настройки',
+    adminPanel: 'Панел за администриране на системата',
+    adminKey: 'Admin ключ',
+    enterAdminKey: 'Въведете admin ключ',
+    checking: 'Проверка...',
+    loginToAdmin: 'Влез в админ панела',
+    systemAdministration: 'Системно администриране и мониторинг',
+    adminModeActive: 'Режим администратор активен',
+    fullAccess: 'Пълен достъп до системни функции и управление',
+    mainMenu: 'Главно меню',
+    update: 'Обнови',
+    backup: 'Резервно копие',
+    backupCreated: 'Резервно копие създадено',
+    fileDownloaded: 'Файлът е изтеглен на вашия компютър',
+    requestCompleted: 'Заявката е изпълнена',
+    recordsReceived: 'записа получени',
+    taskCreatedViaAPI: 'Задачата е създадена чрез API',
+    enterTaskName: 'Въведете име на задачата',
+    authError: 'Грешка при удостоверяване',
+    invalidAdminKey: 'Невалиден admin ключ',
+    allTime: 'За цялото време',
+    activeProfiles: 'Активни профили',
   },
 };

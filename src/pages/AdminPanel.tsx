@@ -93,8 +93,8 @@ const AdminPanel = () => {
   const authenticate = async () => {
     if (!adminKey.trim()) {
       toast({
-        title: 'Ошибка',
-        description: 'Введите admin ключ',
+        title: t.error,
+        description: t.enterAdminKey,
         variant: 'destructive'
       });
       return;
@@ -106,8 +106,8 @@ const AdminPanel = () => {
       setIsAuthenticated(true);
       loadDashboard();
       toast({
-        title: 'Успешно',
-        description: 'Вход в админ панель выполнен',
+        title: t.success,
+        description: t.loginToAdmin,
       });
     } catch (error) {
       toast({
@@ -151,8 +151,8 @@ const AdminPanel = () => {
       });
       setQueryResult(result);
       toast({
-        title: 'Запрос выполнен',
-        description: `Получено ${result.result?.length || 0} записей`,
+        title: t.requestCompleted,
+        description: `${t.recordsReceived} ${result.result?.length || 0} ${t.recordsReceived}`,
       });
     } catch (error) {
       console.error('Query failed:', error);
@@ -180,8 +180,8 @@ const AdminPanel = () => {
       URL.revokeObjectURL(url);
 
       toast({
-        title: 'Бэкап создан',
-        description: 'Файл загружен на ваш компьютер',
+        title: t.backupCreated,
+        description: t.fileDownloaded,
       });
     } catch (error) {
       console.error('Backup failed:', error);
@@ -193,8 +193,8 @@ const AdminPanel = () => {
   const createTask = async () => {
     if (!newTask.title.trim()) {
       toast({
-        title: 'Ошибка',
-        description: 'Введите название задачи',
+        title: t.error,
+        description: t.enterTaskName,
         variant: 'destructive'
       });
       return;
@@ -225,8 +225,8 @@ const AdminPanel = () => {
       loadDashboard();
 
       toast({
-        title: 'Успешно',
-        description: 'Задача создана через API',
+        title: t.success,
+        description: t.taskCreatedViaAPI,
       });
     } catch (error) {
       console.error('Create task failed:', error);
@@ -246,7 +246,7 @@ const AdminPanel = () => {
           className="absolute top-6 left-6 text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Назад
+          {t.dashboard}
         </Button>
         
         <Card className="w-full max-w-md border-primary/30 shadow-2xl">
@@ -269,7 +269,7 @@ const AdminPanel = () => {
               <Input
                 id="admin-key"
                 type="password"
-                placeholder="Введите admin ключ"
+                placeholder={t.enterAdminKey}
                 value={adminKey}
                 onChange={(e) => setAdminKey(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && authenticate()}
@@ -284,12 +284,12 @@ const AdminPanel = () => {
               {loading ? (
                 <div className="flex items-center gap-2">
                   <Activity className="h-4 w-4 animate-spin" />
-                  Проверка...
+                  {t.checking}
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <Shield className="h-4 w-4" />
-                  Войти в админ панель
+                  {t.loginToAdmin}
                 </div>
               )}
             </Button>
@@ -304,7 +304,7 @@ const AdminPanel = () => {
     <div className="min-h-screen bg-background">
       <AppNavigation 
         title="Tiger CRM Admin Panel"
-        subtitle="Системное администрирование и мониторинг"
+        subtitle={t.systemAdministration}
       />
       
       <div className="max-w-7xl mx-auto p-6">
@@ -314,9 +314,9 @@ const AdminPanel = () => {
             <div className="flex items-center gap-3">
               <Shield className="h-6 w-6 text-primary" />
               <div>
-                <h3 className="font-semibold text-primary">Режим администратора активен</h3>
+                <h3 className="font-semibold text-primary">{t.adminModeActive}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Полный доступ к системным функциям и управлению
+                  {t.fullAccess}
                 </p>
               </div>
               <div className="ml-auto flex items-center gap-2">
@@ -327,15 +327,15 @@ const AdminPanel = () => {
                   className="bg-background hover:bg-muted"
                 >
                   <Home className="h-4 w-4 mr-2" />
-                  Главное меню
+                  {t.mainMenu}
                 </Button>
                 <Button variant="outline" onClick={loadDashboard} disabled={loading} size="sm">
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  Обновить
+                  {t.update}
                 </Button>
                 <Button variant="outline" onClick={downloadBackup} disabled={loading} size="sm">
                   <Download className="h-4 w-4 mr-2" />
-                  Бэкап
+                  {t.backup}
                 </Button>
               </div>
             </div>
@@ -346,15 +346,15 @@ const AdminPanel = () => {
           <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="dashboard">
               <Activity className="h-4 w-4 mr-2" />
-              Дашборд
+              {t.dashboard}
             </TabsTrigger>
             <TabsTrigger value="tasks">
               <Settings className="h-4 w-4 mr-2" />
-              Задачи
+              {t.tasks}
             </TabsTrigger>
             <TabsTrigger value="database">
               <Database className="h-4 w-4 mr-2" />
-              База данных
+              {t.database}
             </TabsTrigger>
             <TabsTrigger value="users">
               <Users className="h-4 w-4 mr-2" />
@@ -378,7 +378,7 @@ const AdminPanel = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Статус системы</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.systemHealth}</CardTitle>
                   <Activity className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -393,7 +393,7 @@ const AdminPanel = () => {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Всего пользователей</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.totalUsers}</CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -401,14 +401,14 @@ const AdminPanel = () => {
                     {systemStatus?.stats?.total_users || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Активных профилей: {systemStatus?.stats?.total_profiles || 0}
+                    {t.activeProfiles}: {systemStatus?.stats?.total_profiles || 0}
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Всего задач</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.totalTasks}</CardTitle>
                   <BarChart3 className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -416,14 +416,14 @@ const AdminPanel = () => {
                     {systemStatus?.stats?.total_tasks || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    За всё время
+                    {t.allTime}
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">API статус</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.apiStatus}</CardTitle>
                   <Database className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -431,7 +431,7 @@ const AdminPanel = () => {
                     {systemStatus?.health?.api || 'Unknown'}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    БД: {systemStatus?.health?.database || 'Unknown'}
+                    {t.database}: {systemStatus?.health?.database || 'Unknown'}
                   </p>
                 </CardContent>
               </Card>
@@ -440,7 +440,7 @@ const AdminPanel = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Последние задачи</CardTitle>
+                  <CardTitle>{t.recentTasks}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -463,24 +463,24 @@ const AdminPanel = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Быстрые действия</CardTitle>
+                  <CardTitle>{t.quickActions}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button className="w-full justify-start" variant="outline">
                     <Database className="h-4 w-4 mr-2" />
-                    Оптимизировать БД
+                    {t.optimizeDB}
                   </Button>
                   <Button className="w-full justify-start" variant="outline">
                     <Users className="h-4 w-4 mr-2" />
-                    Управление пользователями
+                    {t.userManagement}
                   </Button>
                   <Button className="w-full justify-start" variant="outline">
                     <Download className="h-4 w-4 mr-2" />
-                    Экспорт отчётов
+                    {t.exportReports}
                   </Button>
                   <Button className="w-full justify-start" variant="outline">
                     <Settings className="h-4 w-4 mr-2" />
-                    Системные настройки
+                    {t.systemSettings}
                   </Button>
                 </CardContent>
               </Card>

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusChip } from '@/components/ui/status-chip';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import AppNavigation from '@/components/AppNavigation';
+import { useLanguage } from '@/hooks/use-language';
 import { 
   Factory, 
   Package, 
@@ -32,6 +33,7 @@ interface ProductionUnit {
 }
 
 const ProductionKanban = () => {
+  const { t } = useLanguage();
   const [units] = useState<ProductionUnit[]>([
     {
       id: '1',
@@ -68,42 +70,42 @@ const ProductionKanban = () => {
   const stages = [
     { 
       id: 'incoming', 
-      name: 'Приёмка', 
+      name: t.incoming, 
       icon: Package, 
       color: 'text-muted-foreground',
       bgColor: 'bg-surface-2'
     },
     { 
       id: 'mechanical', 
-      name: 'Механо/3D', 
+      name: t.mechanical, 
       icon: Wrench, 
       color: 'text-info',
       bgColor: 'bg-info/10'
     },
     { 
       id: 'electronics', 
-      name: 'Электроника', 
+      name: t.electronics, 
       icon: Target, 
       color: 'text-warning',
       bgColor: 'bg-warning/10'
     },
     { 
       id: 'assembly', 
-      name: 'Сборка', 
+      name: t.assembly, 
       icon: Factory, 
       color: 'text-primary',
       bgColor: 'bg-primary/10'
     },
     { 
       id: 'testing', 
-      name: 'Испытания', 
+      name: t.testing, 
       icon: ClipboardCheck, 
       color: 'text-warning',
       bgColor: 'bg-warning/10'
     },
     { 
       id: 'packaging', 
-      name: 'Упаковка', 
+      name: t.packaging, 
       icon: CheckCircle, 
       color: 'text-success',
       bgColor: 'bg-success/10'
@@ -124,9 +126,9 @@ const ProductionKanban = () => {
 
   const getPriorityText = (priority: string) => {
     switch (priority) {
-      case 'urgent': return 'СРОЧНО';
-      case 'high': return 'ВЫСОКИЙ';
-      default: return 'ОБЫЧНЫЙ';
+      case 'urgent': return t.urgent.toUpperCase();
+      case 'high': return t.high.toUpperCase();
+      default: return t.normal.toUpperCase();
     }
   };
 
@@ -136,7 +138,7 @@ const ProductionKanban = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <AppNavigation title="Производственный конвейер" subtitle="Kanban-система управления производством UAV" />
+      <AppNavigation title={t.productionKanban} subtitle="Kanban-система управления производством UAV" />
       
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* Production KPIs */}
@@ -144,7 +146,7 @@ const ProductionKanban = () => {
           <Card className="bg-surface-1 border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
-                Цель месяца
+                {t.strategicTarget}
               </CardTitle>
               <Target className="h-4 w-4 text-primary" />
             </CardHeader>
@@ -157,7 +159,7 @@ const ProductionKanban = () => {
           <Card className="bg-surface-1 border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
-                Произведено
+                {t.production}
               </CardTitle>
               <Factory className="h-4 w-4 text-success" />
             </CardHeader>
@@ -173,7 +175,7 @@ const ProductionKanban = () => {
           <Card className="bg-surface-1 border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
-                Выполнение плана
+                {t.performance}
               </CardTitle>
               <BarChart3 className="h-4 w-4 text-primary" />
             </CardHeader>
@@ -186,7 +188,7 @@ const ProductionKanban = () => {
           <Card className="bg-surface-1 border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
-                В работе
+                {t.inProgress}
               </CardTitle>
               <Clock className="h-4 w-4 text-warning" />
             </CardHeader>
@@ -237,7 +239,7 @@ const ProductionKanban = () => {
                       <CardContent className="pt-0 space-y-3">
                         <div>
                           <div className="flex justify-between text-xs mb-1">
-                            <span className="text-muted-foreground">Прогресс:</span>
+                            <span className="text-muted-foreground">{t.progress}:</span>
                             <span className="font-mono font-semibold">{unit.progress}%</span>
                           </div>
                           <Progress value={unit.progress} className="h-2" />
@@ -245,11 +247,11 @@ const ProductionKanban = () => {
                         
                         <div className="space-y-1 text-xs">
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Исполнитель:</span>
+                            <span className="text-muted-foreground">{t.assignedTo}:</span>
                             <span className="font-semibold">{unit.assignedTo}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">До завершения:</span>
+                            <span className="text-muted-foreground">{t.estimatedCompletion}:</span>
                             <span className="font-mono font-semibold text-primary">{unit.estimatedCompletion}</span>
                           </div>
                         </div>
