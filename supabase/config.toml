@@ -1,7 +1,22 @@
 project_id = "zqnjgwrvvrqaenzmlvfx"
 
 [functions.admin-api]
+verify_jwt = true
+
+[functions.ai-task-assistant]
+verify_jwt = false
+
+[functions.create-demo-users]
+verify_jwt = true
+
+[functions.lang-detect]
+verify_jwt = false
+
+[functions.task-ai-assistant]
 verify_jwt = false
 
 [functions.translate]
-verify_jwt = true
+verify_jwt = false
+
+[functions.webhook-handler]
+verify_jwt = false
