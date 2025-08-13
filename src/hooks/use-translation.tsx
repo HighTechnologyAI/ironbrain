@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { translateText, detectLanguage } from '@/lib/translation';
 import { useLanguage } from '@/hooks/use-language';
 
@@ -14,8 +14,12 @@ const translationCache = new Map<string, TranslationState>();
 
 export function useTranslation(text: string, sourceLang?: string | null) {
   const { language } = useLanguage();
-  const cacheKey = `${text}-${language}`;
-  const isMountedRef = useRef(true);
+  const processedRef = useRef(new Set<string>());
+  
+  // Create stable cache key
+  const cacheKey = useMemo(() => {
+    return `${text.trim()}-${sourceLang || 'auto'}-${language}`;
+  }, [text, sourceLang, language]);
   
   // Initialize state from cache if available
   const [state, setState] = useState<TranslationState>(() => {
@@ -33,13 +37,11 @@ export function useTranslation(text: string, sourceLang?: string | null) {
   });
 
   useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+    // Prevent duplicate processing
+    if (processedRef.current.has(cacheKey)) {
+      return;
+    }
 
-  useEffect(() => {
     const handleTranslation = async () => {
       if (!text || text.trim() === '') {
         const emptyState = {
@@ -55,15 +57,22 @@ export function useTranslation(text: string, sourceLang?: string | null) {
 
       // Check cache first
       const cached = translationCache.get(cacheKey);
-      if (cached && !cached.isTranslating) {
+      if (cached) {
         setState(cached);
         return;
       }
 
+      // Mark as being processed
+      processedRef.current.add(cacheKey);
+
       // Detect language if not provided
       let currentDetectedLang = sourceLang;
       if (!currentDetectedLang) {
-        currentDetectedLang = await detectLanguage(text);
+        try {
+          currentDetectedLang = await detectLanguage(text);
+        } catch {
+          currentDetectedLang = 'unknown';
+        }
       }
 
       // Check if translation is needed
@@ -78,9 +87,7 @@ export function useTranslation(text: string, sourceLang?: string | null) {
           detectedLang: currentDetectedLang,
           needsTranslation: false
         };
-        if (isMountedRef.current) {
-          setState(noTranslationState);
-        }
+        setState(noTranslationState);
         translationCache.set(cacheKey, noTranslationState);
         return;
       }
@@ -92,9 +99,7 @@ export function useTranslation(text: string, sourceLang?: string | null) {
         detectedLang: currentDetectedLang,
         needsTranslation: true
       };
-      if (isMountedRef.current) {
-        setState(translatingState);
-      }
+      setState(translatingState);
       translationCache.set(cacheKey, translatingState);
 
       try {
@@ -108,9 +113,7 @@ export function useTranslation(text: string, sourceLang?: string | null) {
           needsTranslation: true
         };
         
-        if (isMountedRef.current) {
-          setState(finalState);
-        }
+        setState(finalState);
         translationCache.set(cacheKey, finalState);
       } catch (error) {
         console.error('Translation error:', error);
@@ -121,15 +124,18 @@ export function useTranslation(text: string, sourceLang?: string | null) {
           needsTranslation: true
         };
         
-        if (isMountedRef.current) {
-          setState(errorState);
-        }
+        setState(errorState);
         translationCache.set(cacheKey, errorState);
       }
     };
 
     handleTranslation();
-  }, [text, language, sourceLang]); // Removed cacheKey from dependencies
+
+    // Cleanup when component unmounts
+    return () => {
+      processedRef.current.delete(cacheKey);
+    };
+  }, [cacheKey, text, language, sourceLang]);
 
   return state;
 }
