@@ -37,8 +37,11 @@ export function useTranslation(text: string, sourceLang?: string | null) {
   });
 
   useEffect(() => {
+    console.log('useTranslation effect triggered for:', cacheKey, 'processed:', processedRef.current.has(cacheKey));
+    
     // Prevent duplicate processing
     if (processedRef.current.has(cacheKey)) {
+      console.log('Already processed, skipping:', cacheKey);
       return;
     }
 
@@ -57,12 +60,15 @@ export function useTranslation(text: string, sourceLang?: string | null) {
 
       // Check cache first
       const cached = translationCache.get(cacheKey);
+      console.log('Cache check for:', cacheKey, 'cached:', cached);
       if (cached) {
+        console.log('Using cached translation:', cached);
         setState(cached);
         return;
       }
 
       // Mark as being processed
+      console.log('Starting translation process for:', cacheKey);
       processedRef.current.add(cacheKey);
 
       // Detect language if not provided
