@@ -19,9 +19,60 @@ export async function translateText(text: string, target: string): Promise<strin
     // For very long texts, split into chunks
     if (text.length > 1000) {
       console.log('Text too long, splitting into chunks');
-      // For now, just return original text for very long content
-      // TODO: Implement proper chunking logic
-      return text;
+      // Split into sentences and translate in chunks
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+      const chunks = [];
+      let currentChunk = '';
+      
+      for (const sentence of sentences) {
+        if ((currentChunk + sentence).length > 800) {
+          if (currentChunk) chunks.push(currentChunk.trim());
+          currentChunk = sentence;
+        } else {
+          currentChunk += (currentChunk ? '. ' : '') + sentence;
+        }
+      }
+      if (currentChunk) chunks.push(currentChunk.trim());
+      
+      // Translate each chunk
+      const translatedChunks = await Promise.all(
+        chunks.map(async (chunk) => {
+          // Check cache for each chunk
+          const { data: cached } = await supabase
+            .from('translations_cache')
+            .select('translated_text')
+            .eq('source_text', chunk)
+            .eq('target_lang', target)
+            .maybeSingle();
+          
+          if (cached) return cached.translated_text;
+          
+          // Translate chunk
+          const { data, error } = await supabase.functions.invoke('translate', {
+            body: { text: chunk, target }
+          });
+          
+          if (error) return chunk;
+          const translated = (data?.translated as string) || chunk;
+          
+          // Cache chunk translation
+          if (translated !== chunk) {
+            const sourceLang = await detectLanguage(chunk);
+            supabase
+              .from('translations_cache')
+              .insert({
+                source_text: chunk,
+                source_lang: sourceLang,
+                target_lang: target,
+                translated_text: translated
+              });
+          }
+          
+          return translated;
+        })
+      );
+      
+      return translatedChunks.join('. ');
     }
     
     // Check cache first
