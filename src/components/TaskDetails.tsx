@@ -167,8 +167,31 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
       </DialogTrigger>
       <DialogContent 
         className="w-[94vw] sm:w-auto max-w-[430px] sm:max-w-4xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto"
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onInteractOutside={(e) => e.preventDefault()}
+        data-task-details-dialog
+        onPointerDownOutside={(e) => {
+          // Разрешаем закрытие только если клик не по toast уведомлениям
+          const target = e.target as Element;
+          const isToastClick = target.closest('[data-sonner-toast]') || 
+                              target.closest('[data-radix-toast-viewport]') ||
+                              target.closest('.sonner-toast') ||
+                              target.closest('[role="status"]') ||
+                              target.closest('[role="alert"]');
+          if (!isToastClick) {
+            e.preventDefault();
+          }
+        }}
+        onInteractOutside={(e) => {
+          // Разрешаем взаимодействие с toast уведомлениями
+          const target = e.target as Element;
+          const isToastInteraction = target.closest('[data-sonner-toast]') || 
+                                   target.closest('[data-radix-toast-viewport]') ||
+                                   target.closest('.sonner-toast') ||
+                                   target.closest('[role="status"]') ||
+                                   target.closest('[role="alert"]');
+          if (!isToastInteraction) {
+            e.preventDefault();
+          }
+        }}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader>
@@ -282,7 +305,7 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
     </Button>
   )}
 
-  <Dialog open={reportOpen} onOpenChange={setReportOpen} modal={false}>
+  <Dialog open={reportOpen} onOpenChange={setReportOpen}>
     <DialogTrigger asChild>
       <Button variant="destructive" size="sm" className="w-full justify-start">
         <AlertCircle className="h-4 w-4 mr-2" />
@@ -290,9 +313,15 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
       </Button>
     </DialogTrigger>
     <DialogContent
-      onPointerDownOutside={(e) => e.preventDefault()}
-      onInteractOutside={(e) => e.preventDefault()}
-      onEscapeKeyDown={(e) => e.preventDefault()}
+      className="sm:max-w-md"
+      onPointerDownOutside={(e) => {
+        // Разрешаем закрытие вложенного диалога, но не основного
+        const target = e.target as Element;
+        const isMainDialog = target.closest('[data-task-details-dialog]');
+        if (isMainDialog) {
+          e.preventDefault();
+        }
+      }}
     >
       <DialogHeader>
         <DialogTitle>{language === 'ru' ? 'Сообщить о проблеме' : 'Съобщаване за проблем'}</DialogTitle>
