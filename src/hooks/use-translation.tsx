@@ -11,10 +11,11 @@ interface TranslationState {
 
 // Global cache to share translations across components
 const translationCache = new Map<string, TranslationState>();
+// Global processing tracker to prevent duplicate requests
+const processingTracker = new Set<string>();
 
 export function useTranslation(text: string, sourceLang?: string | null) {
   const { language } = useLanguage();
-  const processedRef = useRef(new Set<string>());
   
   // Create stable cache key
   const cacheKey = useMemo(() => {
@@ -37,14 +38,6 @@ export function useTranslation(text: string, sourceLang?: string | null) {
   });
 
   useEffect(() => {
-    console.log('useTranslation effect triggered for:', cacheKey, 'processed:', processedRef.current.has(cacheKey));
-    
-    // Prevent duplicate processing
-    if (processedRef.current.has(cacheKey)) {
-      console.log('Already processed, skipping:', cacheKey);
-      return;
-    }
-
     const handleTranslation = async () => {
       if (!text || text.trim() === '') {
         const emptyState = {
@@ -60,16 +53,18 @@ export function useTranslation(text: string, sourceLang?: string | null) {
 
       // Check cache first
       const cached = translationCache.get(cacheKey);
-      console.log('Cache check for:', cacheKey, 'cached:', cached);
       if (cached) {
-        console.log('Using cached translation:', cached);
         setState(cached);
         return;
       }
 
+      // Prevent duplicate processing using global tracker
+      if (processingTracker.has(cacheKey)) {
+        return;
+      }
+
       // Mark as being processed
-      console.log('Starting translation process for:', cacheKey);
-      processedRef.current.add(cacheKey);
+      processingTracker.add(cacheKey);
 
       // Detect language if not provided
       let currentDetectedLang = sourceLang;
@@ -95,6 +90,7 @@ export function useTranslation(text: string, sourceLang?: string | null) {
         };
         setState(noTranslationState);
         translationCache.set(cacheKey, noTranslationState);
+        processingTracker.delete(cacheKey);
         return;
       }
 
@@ -132,15 +128,13 @@ export function useTranslation(text: string, sourceLang?: string | null) {
         
         setState(errorState);
         translationCache.set(cacheKey, errorState);
+      } finally {
+        // Always remove from processing tracker when done
+        processingTracker.delete(cacheKey);
       }
     };
 
     handleTranslation();
-
-    // Cleanup when component unmounts
-    return () => {
-      processedRef.current.delete(cacheKey);
-    };
   }, [cacheKey, text, language, sourceLang]);
 
   return state;
