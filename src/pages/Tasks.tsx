@@ -74,7 +74,7 @@ const Tasks = () => {
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
   const { toast } = useToast();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { teamMembers } = useTeamData();
 
@@ -101,6 +101,7 @@ const Tasks = () => {
     };
     loadProfileId();
   }, [user]);
+
   useEffect(() => {
     loadTasks();
   }, []);
