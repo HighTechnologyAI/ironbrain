@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
@@ -97,7 +97,7 @@ const Tasks = () => {
     setCommentCounts(map);
   };
 
-  const loadTasks = async () => {
+  const loadTasks = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('tasks')
@@ -130,9 +130,9 @@ const Tasks = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t.error, t.tasksLoadError, toast]);
 
-  const loadCollaboratedTasks = async () => {
+  const loadCollaboratedTasks = useCallback(async () => {
     try {
       if (!currentProfileId) { setCollaboratedTasks([]); return; }
       const { data: links, error: linksError } = await supabase
@@ -169,7 +169,7 @@ const Tasks = () => {
     } catch (e) {
       console.error('Unexpected error loading collaborated tasks:', e);
     }
-  };
+  }, [currentProfileId]);
 
   useEffect(() => {
     const loadProfileId = async () => {
