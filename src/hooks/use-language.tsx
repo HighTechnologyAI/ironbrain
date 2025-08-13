@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { translations, type Translations } from '@/lib/i18n';
 
 interface LanguageContextType {
@@ -18,10 +18,20 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('language', language);
   }, [language]);
 
-  const t = translations[language] || translations.en;
+  // Мемоизируем объект переводов для предотвращения лишних ререндеров
+  const t = useMemo(() => {
+    return translations[language] || translations.en;
+  }, [language]);
+
+  // Мемоизируем контекст значения
+  const contextValue = useMemo(() => ({
+    language,
+    setLanguage,
+    t
+  }), [language, t, setLanguage]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   );

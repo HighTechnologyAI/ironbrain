@@ -74,7 +74,7 @@ const Tasks = () => {
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const { teamMembers } = useTeamData();
 
@@ -103,11 +103,11 @@ const Tasks = () => {
   }, [user]);
   useEffect(() => {
     loadTasks();
-  }, [t]); // Перезагружаем задачи при смене языка
+  }, []);
 
   useEffect(() => {
     loadCollaboratedTasks();
-  }, [currentProfileId, t]); // Перезагружаем коллаборативные задачи при смене языка
+  }, [currentProfileId]);
 
   const loadCommentCounts = async (taskIds: string[]) => {
     if (!taskIds || taskIds.length === 0) { setCommentCounts({}); return; }
