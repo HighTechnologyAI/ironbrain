@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import CreateTaskForm from '@/components/CreateTaskForm';
 import TaskAIAssistant from '@/components/TaskAIAssistant';
 import TaskDetails from '@/components/TaskDetails';
+import TaskText from '@/components/TaskText';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import NotificationCenter from '@/components/NotificationCenter';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -54,6 +55,7 @@ interface Task {
   estimated_hours: number;
   actual_hours: number;
   tags: string[];
+  language?: string | null;
   assigned_to: {
     id: string;
     full_name: string;
@@ -112,6 +114,7 @@ const Tasks = () => {
           estimated_hours,
           actual_hours,
           tags,
+          language,
           assigned_to:profiles!tasks_assigned_to_fkey(id, full_name, position),
           created_by:profiles!tasks_created_by_fkey(id, full_name)
         `)
@@ -157,6 +160,7 @@ const Tasks = () => {
           estimated_hours,
           actual_hours,
           tags,
+          language,
           assigned_to:profiles!tasks_assigned_to_fkey(id, full_name, position),
           created_by:profiles!tasks_created_by_fkey(id, full_name)
         `)
@@ -353,10 +357,18 @@ const Tasks = () => {
           <CardHeader className="pb-3">
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <CardTitle className="text-lg mb-1">{task.title}</CardTitle>
-                <CardDescription className="text-sm">
-                  {task.description}
-                </CardDescription>
+                <TaskText 
+                  text={task.title} 
+                  type="title" 
+                  sourceLang={task.language}
+                  className="text-lg mb-1 font-semibold" 
+                />
+                <TaskText 
+                  text={task.description || ''} 
+                  type="description" 
+                  sourceLang={task.language}
+                  className="text-sm text-muted-foreground" 
+                />
               </div>
               <div className="flex gap-2 ml-4">
                 <Badge className={priorityColors[task.priority]}>

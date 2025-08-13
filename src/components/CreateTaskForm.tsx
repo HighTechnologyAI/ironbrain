@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/use-language';
+import { detectLanguage } from '@/lib/translation';
 import {
   Dialog,
   DialogContent,
@@ -140,6 +141,9 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
         console.warn('Translation failed, fallback to original:', e);
       }
 
+      // Определяем язык исходного текста
+      const detectedLanguage = await detectLanguage(originalTitle + ' ' + originalDescription);
+
       // Подготавливаем данные задачи
       const taskData = {
         title: translatedTitle,
@@ -150,6 +154,7 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
         due_date: data.due_date?.toISOString(),
         estimated_hours: typeof data.estimated_hours === 'number' ? Math.round(data.estimated_hours) : null,
         tags: data.tags ? data.tags.split(',').map(tag => tag.trim()) : null,
+        language: detectedLanguage !== 'unknown' ? detectedLanguage : null,
       };
 
       const { error } = await supabase

@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import TaskChat from '@/components/TaskChat';
+import TaskText from '@/components/TaskText';
 import {
   Eye,
   Calendar,
@@ -41,6 +42,7 @@ interface Task {
   estimated_hours: number;
   actual_hours: number;
   tags: string[];
+  language?: string | null;
   assigned_to: {
     id: string;
     full_name: string;
@@ -200,7 +202,7 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {getStatusIcon(task.status)}
-            {task.title}
+            <TaskText text={task.title} type="title" sourceLang={task.language} className="text-lg font-semibold" />
           </DialogTitle>
         </DialogHeader>
 
@@ -209,9 +211,12 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
           <div className="lg:col-span-2 space-y-4">
             <div>
               <h3 className="text-sm font-medium mb-2">{language === 'ru' ? 'Описание' : 'Описание'}</h3>
-              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {task.description || (language === 'ru' ? 'Описание не указано' : 'Няма описание')}
-              </p>
+              <TaskText 
+                text={task.description || (language === 'ru' ? 'Описание не указано' : 'Няма описание')} 
+                type="description"
+                sourceLang={task.language}
+                className="text-sm text-muted-foreground whitespace-pre-wrap" 
+              />
             </div>
 
             <Separator />

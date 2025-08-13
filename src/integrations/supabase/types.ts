@@ -1088,6 +1088,7 @@ export type Database = {
           due_date: string | null
           estimated_hours: number | null
           id: string
+          language: string | null
           priority: Database["public"]["Enums"]["task_priority"] | null
           status: Database["public"]["Enums"]["task_status"] | null
           tags: string[] | null
@@ -1105,6 +1106,7 @@ export type Database = {
           due_date?: string | null
           estimated_hours?: number | null
           id?: string
+          language?: string | null
           priority?: Database["public"]["Enums"]["task_priority"] | null
           status?: Database["public"]["Enums"]["task_status"] | null
           tags?: string[] | null
@@ -1122,6 +1124,7 @@ export type Database = {
           due_date?: string | null
           estimated_hours?: number | null
           id?: string
+          language?: string | null
           priority?: Database["public"]["Enums"]["task_priority"] | null
           status?: Database["public"]["Enums"]["task_status"] | null
           tags?: string[] | null
