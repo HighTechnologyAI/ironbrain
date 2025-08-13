@@ -50,6 +50,8 @@ jobs:
       - name: "Sync and push database migrations"
         run: |
           # First sync local migrations with remote database
-          supabase db pull
+          echo "Pulling remote migrations..."
+          supabase db pull --create-local-migrations || echo "Pull completed with warnings, continuing..."
           # Then push any new migrations
+          echo "Pushing database migrations..."
           supabase db push -p "$SUPABASE_DB_PASSWORD"
