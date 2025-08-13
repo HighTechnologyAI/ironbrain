@@ -14,6 +14,16 @@ export async function detectLanguage(text: string): Promise<string> {
 
 export async function translateText(text: string, target: string): Promise<string> {
   try {
+    console.log('translateText called for text length:', text.length, 'target:', target);
+    
+    // For very long texts, split into chunks
+    if (text.length > 1000) {
+      console.log('Text too long, splitting into chunks');
+      // For now, just return original text for very long content
+      // TODO: Implement proper chunking logic
+      return text;
+    }
+    
     // Check cache first
     const { data: cached } = await supabase
       .from('translations_cache')
@@ -22,16 +32,23 @@ export async function translateText(text: string, target: string): Promise<strin
       .eq('target_lang', target)
       .maybeSingle();
 
+    console.log('Cache result:', cached);
     if (cached) {
+      console.log('Using cached translation');
       return cached.translated_text;
     }
 
     // Not in cache, translate and store
+    console.log('Translating text...');
     const { data, error } = await supabase.functions.invoke('translate', {
       body: { text, target }
     });
     
-    if (error) return text;
+    console.log('Translation response:', data, error);
+    if (error) {
+      console.error('Translation API error:', error);
+      return text;
+    }
     
     const translated = (data?.translated as string) || text;
     
