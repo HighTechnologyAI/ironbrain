@@ -298,6 +298,41 @@ export interface Translations {
     noActiveUsers: string;
     moreUsersOnlinePrefix: string;
     moreUsersOnlineSuffix: string;
+
+    // Smart AI Sidebar
+    smartAISidebar: string;
+    taskSummary: string;
+    riskAnalysis: string;
+    recommendedActions: string;
+    taskIntelligence: string;
+    complexity: string;
+    timeEstimation: string;
+    smartAITags: string;
+    aiActions: string;
+    generateSummary: string;
+    suggestSubtasks: string;
+    findExperts: string;
+    riskLevel: string;
+    riskHigh: string;
+    riskMedium: string;
+    riskLow: string;
+    noTaskSelected: string;
+    selectTaskToSeeInsights: string;
+    riskCritical: string;
+    // Analytics and Reports
+    exportReport: string;
+    period: string;
+    analyticsDepartment: string;
+    allDepartments: string;
+    weekPerformance: string;
+    departmentPerformance: string;
+    topPerformers: string;
+    efficiency: string;
+    lastDays: string;
+    lastMonth: string;
+    last3Months: string;
+    lastYear: string;
+    overdue: string;
   }
 
 export const translations: Record<string, Translations> = {
@@ -361,7 +396,7 @@ export const translations: Record<string, Translations> = {
     aiDescription: 'Description:',
     aiPriority: 'Priority',
     aiTime: 'Time',
-    aiTags: 'Tags:',
+    smartAITags: 'Tags:',
     aiRecommendations: 'Recommendations:',
     aiWorkloadStatus: 'Workload status:',
     aiAnalysis: 'Analysis:',
@@ -588,6 +623,41 @@ export const translations: Record<string, Translations> = {
     noActiveUsers: 'No active users',
     moreUsersOnlinePrefix: '+',
     moreUsersOnlineSuffix: ' more users online',
+
+    // Smart AI Sidebar
+    smartAISidebar: 'Smart AI Sidebar',
+    taskSummary: 'Task Summary',
+    riskAnalysis: 'Risk Analysis',
+    recommendedActions: 'Recommended Actions',
+    taskIntelligence: 'Task Intelligence',
+    complexity: 'Complexity',
+    timeEstimation: 'Time Estimation',
+    aiTags: 'Tags',
+    aiActions: 'AI Actions',
+    generateSummary: 'Generate Summary',
+    suggestSubtasks: 'Suggest Subtasks',
+    findExperts: 'Find Experts',
+    riskLevel: 'Risk Level',
+    riskHigh: 'High',
+    riskMedium: 'Medium',
+    riskLow: 'Low',
+    riskCritical: 'Critical',
+    noTaskSelected: 'No task selected',
+    selectTaskToSeeInsights: 'Select a task to see AI insights',
+    // Analytics and Reports
+    exportReport: 'Export Report',
+    period: 'Period',
+    analyticsDepartment: 'Department',
+    allDepartments: 'All Departments',
+    weekPerformance: 'Weekly Performance',
+    departmentPerformance: 'Department Performance',
+    topPerformers: 'Top Performers',
+    efficiency: 'Efficiency',
+    lastDays: 'Last 7 days',
+    lastMonth: 'Last 30 days',
+    last3Months: 'Last 3 months',
+    lastYear: 'Last year',
+    overdue: 'Overdue',
   },
   ru: {
     // Common
@@ -649,7 +719,7 @@ export const translations: Record<string, Translations> = {
     aiDescription: 'Описание:',
     aiPriority: 'Приоритет',
     aiTime: 'Время',
-    aiTags: 'Теги:',
+    smartAITags: 'Теги:',
     aiRecommendations: 'Рекомендации:',
     aiWorkloadStatus: 'Статус нагрузки:',
     aiAnalysis: 'Анализ:',
@@ -876,6 +946,41 @@ export const translations: Record<string, Translations> = {
     noActiveUsers: 'Нет активных пользователей',
     moreUsersOnlinePrefix: '+',
     moreUsersOnlineSuffix: ' больше пользователей онлайн',
+
+    // Smart AI Sidebar
+    smartAISidebar: 'Умный AI Сайдбар',
+    taskSummary: 'Краткое описание задачи',
+    riskAnalysis: 'Анализ рисков',
+    recommendedActions: 'Рекомендуемые действия',
+    taskIntelligence: 'Интеллект задачи',
+    complexity: 'Сложность',
+    timeEstimation: 'Оценка времени',
+    aiTags: 'Теги',
+    aiActions: 'AI Действия',
+    generateSummary: 'Создать резюме',
+    suggestSubtasks: 'Предложить подзадачи',
+    findExperts: 'Найти экспертов',
+    riskLevel: 'Уровень риска',
+    riskHigh: 'Высокий',
+    riskMedium: 'Средний',
+    riskLow: 'Низкий',
+    riskCritical: 'Критический',
+    noTaskSelected: 'Задача не выбрана',
+    selectTaskToSeeInsights: 'Выберите задачу для получения AI аналитики',
+    // Analytics and Reports
+    exportReport: 'Экспорт отчета',
+    period: 'Период',
+    analyticsDepartment: 'Отдел',
+    allDepartments: 'Все отделы',
+    weekPerformance: 'Производительность по неделям',
+    departmentPerformance: 'Производительность отделов',
+    topPerformers: 'Лучшие исполнители',
+    efficiency: 'Эффективность',
+    lastDays: 'Последние 7 дней',
+    lastMonth: 'Последние 30 дней',
+    last3Months: 'Последние 3 месяца',
+    lastYear: 'Последний год',
+    overdue: 'Просрочено',
   },
   
   bg: {
@@ -938,7 +1043,7 @@ export const translations: Record<string, Translations> = {
     aiDescription: 'Описание:',
     aiPriority: 'Приоритет',
     aiTime: 'Време',
-    aiTags: 'Етикети:',
+    smartAITags: 'Етикети:',
     aiRecommendations: 'Препоръки:',
     aiWorkloadStatus: 'Състояние на натоварването:',
     aiAnalysis: 'Анализ:',
@@ -1165,5 +1270,40 @@ export const translations: Record<string, Translations> = {
     noActiveUsers: 'Няма активни потребители',
     moreUsersOnlinePrefix: '+',
     moreUsersOnlineSuffix: ' още потребители онлайн',
+
+    // Smart AI Sidebar
+    smartAISidebar: 'Умен AI Странична лента',
+    taskSummary: 'Резюме на задачата',
+    riskAnalysis: 'Анализ на риска',
+    recommendedActions: 'Препоръчани действия',
+    taskIntelligence: 'Интелигентност на задачата',
+    complexity: 'Сложност',
+    timeEstimation: 'Оценка на времето',
+    aiTags: 'Етикети',
+    aiActions: 'AI Действия',
+    generateSummary: 'Генерирай резюме',
+    suggestSubtasks: 'Предложи подзадачи',
+    findExperts: 'Намери експерти',
+    riskLevel: 'Ниво на риска',
+    riskHigh: 'Високо',
+    riskMedium: 'Средно',
+    riskLow: 'Ниско',
+    riskCritical: 'Критично',
+    noTaskSelected: 'Няма избрана задача',
+    selectTaskToSeeInsights: 'Изберете задача за AI анализ',
+    // Analytics and Reports
+    exportReport: 'Експорт на отчет',
+    period: 'Период',
+    analyticsDepartment: 'Отдел',
+    allDepartments: 'Всички отдели',
+    weekPerformance: 'Седмична производителност',
+    departmentPerformance: 'Производителност по отдели',
+    topPerformers: 'Най-добри изпълнители',
+    efficiency: 'Ефективност',
+    lastDays: 'Последните 7 дни',
+    lastMonth: 'Последните 30 дни',
+    last3Months: 'Последните 3 месеца',
+    lastYear: 'Последната година',
+    overdue: 'Просрочени',
   },
 };

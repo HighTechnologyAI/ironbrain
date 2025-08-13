@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { StatusChip } from '@/components/ui/status-chip';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useLanguage } from '@/hooks/use-language';
 import { 
   Brain, 
   Target, 
@@ -52,6 +53,7 @@ interface SmartAISidebarProps {
 
 export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISidebarProps) => {
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const { t } = useLanguage();
 
   // Анализ рисков для выбранной задачи
   const analyzeTaskRisks = (task: Task) => {
@@ -61,17 +63,33 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
     const daysUntilDue = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
     if (daysUntilDue < 1 && task.status !== 'completed') {
-      risks.push({ type: 'critical', message: 'Задача просрочена', icon: AlertTriangle });
+      risks.push({ 
+        type: 'critical', 
+        message: 'Задача просрочена', 
+        icon: AlertTriangle 
+      });
     } else if (daysUntilDue <= 2 && task.status !== 'completed') {
-      risks.push({ type: 'warning', message: 'Приближается дедлайн', icon: Clock });
+      risks.push({ 
+        type: 'warning', 
+        message: 'Приближается дедлайн', 
+        icon: Clock 
+      });
     }
 
     if (task.priority === 'critical' && task.status === 'pending') {
-      risks.push({ type: 'critical', message: 'Критическая задача не начата', icon: Target });
+      risks.push({ 
+        type: 'critical', 
+        message: 'Критическая задача не начата', 
+        icon: Target 
+      });
     }
 
     if (task.estimated_hours > 0 && task.actual_hours > task.estimated_hours * 1.5) {
-      risks.push({ type: 'warning', message: 'Превышение оценки времени', icon: Timer });
+      risks.push({ 
+        type: 'warning', 
+        message: 'Превышение оценки времени', 
+        icon: Timer 
+      });
     }
 
     return risks;
@@ -161,10 +179,10 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
       <div className="p-4 border-b border-border">
         <div className="flex items-center gap-2 mb-2">
           <Brain className="h-5 w-5 text-primary" />
-          <h3 className="font-semibold font-ui">Smart Assistant</h3>
+          <h3 className="font-semibold font-ui">{t.smartAISidebar}</h3>
         </div>
         <p className="text-xs text-muted-foreground">
-          Интеллектуальные подсказки и анализ
+          {t.selectTaskToSeeInsights}
         </p>
       </div>
 
@@ -174,19 +192,19 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
           <div>
             <h4 className="font-medium font-ui mb-3 flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-primary" />
-              Сводка
+              {t.taskSummary}
             </h4>
             <div className="grid grid-cols-2 gap-3">
               <Card className="p-3 bg-surface-2 border-border">
                 <div className="text-center">
                   <div className="text-lg font-bold font-mono text-success">{summary.completedTasks}</div>
-                  <div className="text-xs text-muted-foreground">Завершено</div>
+                  <div className="text-xs text-muted-foreground">{t.completed}</div>
                 </div>
               </Card>
               <Card className="p-3 bg-surface-2 border-border">
                 <div className="text-center">
                   <div className="text-lg font-bold font-mono text-primary">{summary.inProgressTasks}</div>
-                  <div className="text-xs text-muted-foreground">В работе</div>
+                  <div className="text-xs text-muted-foreground">{t.inProgress}</div>
                 </div>
               </Card>
               <Card className="p-3 bg-surface-2 border-border">
@@ -198,7 +216,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
               <Card className="p-3 bg-surface-2 border-border">
                 <div className="text-center">
                   <div className="text-lg font-bold font-mono text-warning">{summary.highPriorityTasks}</div>
-                  <div className="text-xs text-muted-foreground">Высокий приоритет</div>
+                  <div className="text-xs text-muted-foreground">{t.high}</div>
                 </div>
               </Card>
             </div>
@@ -213,7 +231,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
                 <div>
                   <h4 className="font-medium font-ui mb-3 flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-warning" />
-                    Риски и предупреждения
+                    {t.riskAnalysis}
                   </h4>
                   <div className="space-y-2">
                     {risks.map((risk, index) => (
@@ -227,7 +245,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
                             variant={risk.type === 'critical' ? 'critical' : 'warning'}
                             className="mt-1 text-xs"
                           >
-                            {risk.type === 'critical' ? 'КРИТИЧНО' : 'ВНИМАНИЕ'}
+                            {risk.type === 'critical' ? t.riskCritical : 'ВНИМАНИЕ'}
                           </StatusChip>
                         </div>
                       </div>
@@ -241,7 +259,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
                 <div>
                   <h4 className="font-medium font-ui mb-3 flex items-center gap-2">
                     <Target className="h-4 w-4 text-primary" />
-                    Рекомендуемые действия
+                    {t.recommendedActions}
                   </h4>
                   <div className="space-y-2">
                     {nextActions.map((action, index) => (
@@ -278,18 +296,18 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
               <div>
                 <h4 className="font-medium font-ui mb-3 flex items-center gap-2">
                   <Lightbulb className="h-4 w-4 text-primary" />
-                  Анализ задачи
+                  {t.taskIntelligence}
                 </h4>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Сложность:</span>
+                    <span className="text-muted-foreground">{t.complexity}:</span>
                     <StatusChip variant={selectedTask.priority === 'critical' ? 'critical' : 'info'}>
                       {selectedTask.priority === 'critical' ? 'ВЫСОКАЯ' : 'СРЕДНЯЯ'}
                     </StatusChip>
                   </div>
                   
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Оценка времени:</span>
+                    <span className="text-muted-foreground">{t.timeEstimation}:</span>
                     <span className="font-mono font-semibold">
                       {selectedTask.estimated_hours}ч
                     </span>
@@ -297,7 +315,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
                   
                   {selectedTask.tags && selectedTask.tags.length > 0 && (
                     <div>
-                      <span className="text-muted-foreground text-sm">Теги:</span>
+                      <span className="text-muted-foreground text-sm">{t.aiTags}:</span>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {selectedTask.tags.map((tag, index) => (
                           <Badge key={index} variant="outline" className="text-xs">
@@ -316,8 +334,8 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
             <div className="text-center py-8">
               <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-sm text-muted-foreground">
-                Выберите задачу для получения<br />
-                персональных рекомендаций
+                {t.noTaskSelected}<br />
+                {t.selectTaskToSeeInsights}
               </p>
             </div>
           )}
@@ -326,7 +344,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
           <div>
             <h4 className="font-medium font-ui mb-3 flex items-center gap-2">
               <Zap className="h-4 w-4 text-primary" />
-              AI Действия
+              {t.aiActions}
             </h4>
             <div className="space-y-2">
               <Button 
@@ -337,7 +355,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
                 disabled={isGeneratingSummary}
               >
                 <Brain className="h-4 w-4 mr-2" />
-                {isGeneratingSummary ? 'Генерация...' : 'Создать саммари'}
+                {isGeneratingSummary ? 'Генерация...' : t.generateSummary}
               </Button>
               
               <Button 
@@ -346,7 +364,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
                 className="w-full justify-start"
               >
                 <Target className="h-4 w-4 mr-2" />
-                Предложить подзадачи
+                {t.suggestSubtasks}
               </Button>
               
               <Button 
@@ -355,7 +373,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
                 className="w-full justify-start"
               >
                 <Users className="h-4 w-4 mr-2" />
-                Найти эксперта
+                {t.findExperts}
               </Button>
             </div>
           </div>
