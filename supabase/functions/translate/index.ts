@@ -1,6 +1,6 @@
 // Edge Function: translate
 // Translates arbitrary text to a target language using OpenAI
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

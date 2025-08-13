@@ -1,7 +1,7 @@
 // Edge Function: lang-detect
 // Returns ISO code ('ru','bg','uk','en', etc.) guessed from text.
 // Uses OpenAI for robust detection on mixed content. Cheap for short inputs.
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
