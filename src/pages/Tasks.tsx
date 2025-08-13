@@ -21,6 +21,7 @@ import TaskDetails from '@/components/TaskDetails';
 import TaskText from '@/components/TaskText';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import NotificationCenter from '@/components/NotificationCenter';
+import { SmartAISidebar } from '@/components/SmartAISidebar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAdmin } from '@/hooks/use-admin';
 import AssignParticipantDialog from '@/components/AssignParticipantDialog';
@@ -39,6 +40,8 @@ import {
   Trash2,
   UserPlus,
   MessageSquare,
+  SidebarClose,
+  SidebarOpen
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -86,6 +89,8 @@ const Tasks = () => {
   const [assigneeFilter, setAssigneeFilter] = useState<string>('self');
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
   const [collaboratedTasks, setCollaboratedTasks] = useState<Task[]>([]);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [showAISidebar, setShowAISidebar] = useState(true);
 
   const loadCommentCounts = async (taskIds: string[]) => {
     if (!taskIds || taskIds.length === 0) { setCommentCounts({}); return; }
@@ -562,204 +567,244 @@ const Tasks = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/')}
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold">{t.tasksTitle}</h1>
-              <p className="text-muted-foreground">
-                {t.tasksDescription}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <NotificationCenter />
-            <LanguageSwitcher />
-            {/* Создание задач только через админ панель */}
-          </div>
-        </div>
+    <div className="min-h-screen bg-background">
+      <div className="flex">
+        {/* Main Content */}
+        <div className={`flex-1 transition-all duration-300 ${showAISidebar ? 'mr-80' : ''}`}>
+          <div className="p-6">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate('/')}
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                  <div>
+                    <h1 className="text-3xl font-bold">{t.tasksTitle}</h1>
+                    <p className="text-muted-foreground">
+                      {t.tasksDescription}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAISidebar(!showAISidebar)}
+                  >
+                    {showAISidebar ? <SidebarClose className="h-4 w-4" /> : <SidebarOpen className="h-4 w-4" />}
+                    {showAISidebar ? 'Скрыть AI' : 'AI Помощник'}
+                  </Button>
+                  <NotificationCenter />
+                  <LanguageSwitcher />
+                </div>
+              </div>
 
-        <div className="flex gap-4 mb-6">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={t.searchTasks}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+              <div className="flex gap-4 mb-6">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder={t.searchTasks}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue placeholder={t.taskStatus} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.allStatuses}</SelectItem>
+                    <SelectItem value="pending">{t.pending}</SelectItem>
+                    <SelectItem value="in_progress">{t.inProgress}</SelectItem>
+                    <SelectItem value="completed">{t.completed}</SelectItem>
+                    <SelectItem value="cancelled">{t.cancelled}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue placeholder={t.taskPriority} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.allPriorities}</SelectItem>
+                    <SelectItem value="low">{t.low}</SelectItem>
+                    <SelectItem value="medium">{t.medium}</SelectItem>
+                    <SelectItem value="high">{t.high}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Tabs defaultValue="my" className="w-full">
+                <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
+                  {isAdmin && (
+                    <TabsTrigger value="all">{t.allTasks} ({filteredTasks.length})</TabsTrigger>
+                  )}
+                  <TabsTrigger value="my">{t.myTasks} ({getMyTasks().length})</TabsTrigger>
+                  <TabsTrigger value="created">{t.createdByMe} ({getCreatedTasks().length})</TabsTrigger>
+                  <TabsTrigger value="collab">Совместно ({getCollaboratedTasks().length})</TabsTrigger>
+                  <TabsTrigger value="completed">{t.completed} ({getCompletedTasks().length})</TabsTrigger>
+                </TabsList>
+
+                {isAdmin && (
+                  <TabsContent value="all" className="mt-6">
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                      {filteredTasks.map((task, index) => (
+                        <div 
+                          key={task.id} 
+                          className="animate-fade-in-up cursor-pointer"
+                          style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
+                          onClick={() => setSelectedTask(task)}
+                        >
+                          <TaskCard task={task} />
+                        </div>
+                      ))}
+                    </div>
+                    {filteredTasks.length === 0 && (
+                      <div className="text-center py-12">
+                        <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">{t.noTasksFound}</h3>
+                        <p className="text-muted-foreground">
+                          {t.noTasksFoundDesc}
+                        </p>
+                      </div>
+                    )}
+                  </TabsContent>
+                )}
+
+                <TabsContent value="my" className="mt-6">
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {getMyTasks().map((task, index) => (
+                      <div 
+                        key={task.id} 
+                        className="animate-fade-in-up cursor-pointer"
+                        style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
+                        onClick={() => setSelectedTask(task)}
+                      >
+                        <TaskCard task={task} />
+                      </div>
+                    ))}
+                  </div>
+                  {getMyTasks().length === 0 && (
+                    <div className="text-center py-12">
+                      <Timer className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">{t.noActiveTasks}</h3>
+                      <p className="text-muted-foreground">
+                        {t.noActiveTasksDesc}
+                      </p>
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="created" className="mt-6">
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {getCreatedTasks().map((task, index) => (
+                      <div 
+                        key={task.id} 
+                        className="animate-fade-in-up cursor-pointer"
+                        style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
+                        onClick={() => setSelectedTask(task)}
+                      >
+                        <TaskCard task={task} />
+                      </div>
+                    ))}
+                  </div>
+                  {getCreatedTasks().length === 0 && (
+                    <div className="text-center py-12">
+                      <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">{t.noCreatedTasks}</h3>
+                      <p className="text-muted-foreground">
+                        {t.noCreatedTasksDesc}
+                      </p>
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="collab" className="mt-6">
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {getCollaboratedTasks().map((task, index) => (
+                      <div 
+                        key={task.id} 
+                        className="animate-fade-in-up cursor-pointer"
+                        style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
+                        onClick={() => setSelectedTask(task)}
+                      >
+                        <TaskCard task={task} />
+                      </div>
+                    ))}
+                  </div>
+                  {getCollaboratedTasks().length === 0 && (
+                    <div className="text-center py-12">
+                      <Timer className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">Совместных задач нет</h3>
+                      <p className="text-muted-foreground">Вас еще не приглашали в задачи.</p>
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="completed" className="mt-6">
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {getCompletedTasks().map((task, index) => (
+                      <div 
+                        key={task.id} 
+                        className="animate-fade-in-up cursor-pointer"
+                        style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
+                        onClick={() => setSelectedTask(task)}
+                      >
+                        <TaskCard task={task} />
+                      </div>
+                    ))}
+                  </div>
+                  {getCompletedTasks().length === 0 && (
+                    <div className="text-center py-12">
+                      <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">Завершённых задач нет</h3>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+
+              <AssignParticipantDialog
+                open={assignOpen}
+                onOpenChange={setAssignOpen}
+                taskId={assignTaskId}
+                onAssigned={() => {
+                  setAssignOpen(false);
+                  toast({ title: 'Участник добавлен', description: 'Сотрудник добавлен к задаче' });
+                  loadTasks();
+                  loadCollaboratedTasks();
+                }}
               />
             </div>
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder={t.taskStatus} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t.allStatuses}</SelectItem>
-              <SelectItem value="pending">{t.pending}</SelectItem>
-              <SelectItem value="in_progress">{t.inProgress}</SelectItem>
-              <SelectItem value="completed">{t.completed}</SelectItem>
-              <SelectItem value="cancelled">{t.cancelled}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder={t.taskPriority} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t.allPriorities}</SelectItem>
-              <SelectItem value="low">{t.low}</SelectItem>
-              <SelectItem value="medium">{t.medium}</SelectItem>
-              <SelectItem value="high">{t.high}</SelectItem>
-            </SelectContent>
-          </Select>
-          {/* Индивидуальный режим: фильтр по исполнителю скрыт, показываем только задачи текущего пользователя */}
         </div>
 
-        <Tabs defaultValue="my" className="w-full">
-          <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
-            {isAdmin && (
-              <TabsTrigger value="all">{t.allTasks} ({filteredTasks.length})</TabsTrigger>
-            )}
-            <TabsTrigger value="my">{t.myTasks} ({getMyTasks().length})</TabsTrigger>
-            <TabsTrigger value="created">{t.createdByMe} ({getCreatedTasks().length})</TabsTrigger>
-            <TabsTrigger value="collab">Совместно ({getCollaboratedTasks().length})</TabsTrigger>
-            <TabsTrigger value="completed">{t.completed} ({getCompletedTasks().length})</TabsTrigger>
-          </TabsList>
-
-          {isAdmin && (
-            <TabsContent value="all" className="mt-6">
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {filteredTasks.map((task, index) => (
-                  <div 
-                    key={task.id} 
-                    className="animate-fade-in-up"
-                    style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
-                  >
-                    <TaskCard task={task} />
-                  </div>
-                ))}
-              </div>
-              {filteredTasks.length === 0 && (
-                <div className="text-center py-12">
-                  <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">{t.noTasksFound}</h3>
-                  <p className="text-muted-foreground">
-                    {t.noTasksFoundDesc}
-                  </p>
-                </div>
-              )}
-            </TabsContent>
-          )}
-
-          <TabsContent value="my" className="mt-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {getMyTasks().map((task, index) => (
-                <div 
-                  key={task.id} 
-                  className="animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
-                >
-                  <TaskCard task={task} />
-                </div>
-              ))}
-            </div>
-            {getMyTasks().length === 0 && (
-              <div className="text-center py-12">
-                <Timer className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">{t.noActiveTasks}</h3>
-                <p className="text-muted-foreground">
-                  {t.noActiveTasksDesc}
-                </p>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="created" className="mt-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {getCreatedTasks().map((task, index) => (
-                <div 
-                  key={task.id} 
-                  className="animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
-                >
-                  <TaskCard task={task} />
-                </div>
-              ))}
-            </div>
-            {getCreatedTasks().length === 0 && (
-              <div className="text-center py-12">
-                <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">{t.noCreatedTasks}</h3>
-                <p className="text-muted-foreground">
-                  {t.noCreatedTasksDesc}
-                </p>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="collab" className="mt-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {getCollaboratedTasks().map((task, index) => (
-                <div 
-                  key={task.id} 
-                  className="animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
-                >
-                  <TaskCard task={task} />
-                </div>
-              ))}
-            </div>
-            {getCollaboratedTasks().length === 0 && (
-              <div className="text-center py-12">
-                <Timer className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Совместных задач нет</h3>
-                <p className="text-muted-foreground">Вас еще не приглашали в задачи.</p>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="completed" className="mt-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {getCompletedTasks().map((task, index) => (
-                <div 
-                  key={task.id} 
-                  className="animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'both' }}
-                >
-                  <TaskCard task={task} />
-                </div>
-              ))}
-            </div>
-            {getCompletedTasks().length === 0 && (
-              <div className="text-center py-12">
-                <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Завершённых задач нет</h3>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-
-        <AssignParticipantDialog
-          open={assignOpen}
-          onOpenChange={setAssignOpen}
-          taskId={assignTaskId}
-          onAssigned={() => {
-            setAssignOpen(false);
-            toast({ title: 'Участник добавлен', description: 'Сотрудник добавлен к задаче' });
-            loadTasks();
-            loadCollaboratedTasks();
-          }}
-        />
+        {/* Smart AI Sidebar */}
+        {showAISidebar && (
+          <div className="fixed right-0 top-0 h-full z-40">
+            <SmartAISidebar 
+              selectedTask={selectedTask}
+              tasks={tasks}
+              onTaskAction={(action, taskId) => {
+                switch (action) {
+                  case 'start_task':
+                    updateTaskStatus(taskId, 'in_progress');
+                    break;
+                  case 'complete_task':
+                    updateTaskStatus(taskId, 'completed');
+                    break;
+                  default:
+                    console.log(`AI Action: ${action} for task ${taskId}`);
+                }
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
