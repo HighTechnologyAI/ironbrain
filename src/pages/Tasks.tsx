@@ -355,26 +355,20 @@ const Tasks = () => {
       trigger={
         <Card className="cyber-border group hover:scale-[1.01] cursor-pointer transition-all duration-300">
           <CardHeader className="pb-3">
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
+            <div className="flex justify-between items-start gap-4">
+              <div className="flex-1 min-w-0">
                 <TaskText 
                   text={task.title} 
                   type="title" 
                   sourceLang={task.language}
-                  className="text-lg mb-2 font-semibold group-hover:cyber-text transition-colors" 
-                />
-                <TaskText 
-                  text={task.description || ''} 
-                  type="description" 
-                  sourceLang={task.language}
-                  className="text-sm text-muted-foreground leading-relaxed" 
+                  className="text-lg font-semibold group-hover:cyber-text transition-colors truncate block" 
                 />
               </div>
-              <div className="flex flex-col gap-2 ml-4">
-                <Badge className={`${priorityColors[task.priority]} px-3 py-1 text-xs font-medium rounded-full`}>
+              <div className="flex flex-col gap-2 flex-shrink-0">
+                <Badge className={`${priorityColors[task.priority]} px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap`}>
                   {priorityLabels[task.priority]}
                 </Badge>
-                <Badge className={`${statusColors[task.status]} px-3 py-1 text-xs font-medium rounded-full`}>
+                <Badge className={`${statusColors[task.status]} px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap`}>
                   {statusLabels[task.status]}
                 </Badge>
               </div>
@@ -382,18 +376,18 @@ const Tasks = () => {
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-3">
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <User className="h-4 w-4" />
-                  <span>{t.assignee}: {task.assigned_to?.full_name}</span>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                <div className="flex items-center gap-1 min-w-0">
+                  <User className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">{task.assigned_to?.full_name || 'Не назначено'}</span>
                 </div>
                 {task.due_date && (
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 flex-shrink-0">
                     <Calendar className="h-4 w-4" />
-                    <span>{t.dueDate}: {format(new Date(task.due_date), 'dd MMMM yyyy', { locale: ru })}</span>
+                    <span className="whitespace-nowrap">{format(new Date(task.due_date), 'dd.MM.yyyy', { locale: ru })}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 flex-shrink-0">
                   <MessageSquare className="h-4 w-4" />
                   <span>{commentCounts[task.id] ?? 0}</span>
                 </div>
@@ -401,34 +395,39 @@ const Tasks = () => {
 
               {task.estimated_hours && (
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>{t.estimated}: {task.estimated_hours}{t.hours}</span>
+                  <Clock className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">{task.estimated_hours}ч</span>
                   {task.actual_hours && (
-                    <span>• {t.actual}: {task.actual_hours}{t.hours}</span>
+                    <span className="whitespace-nowrap">• {task.actual_hours}ч</span>
                   )}
                 </div>
               )}
 
               {task.tags && task.tags.length > 0 && (
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Tag className="h-4 w-4 text-muted-foreground" />
-                  {task.tags.map((tag, index) => (
-                    <Badge key={index} variant="outline" className="text-xs">
+                  <Tag className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  {task.tags.slice(0, 2).map((tag, index) => (
+                    <Badge key={index} variant="outline" className="text-xs truncate max-w-20">
                       {tag}
                     </Badge>
                   ))}
+                  {task.tags.length > 2 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{task.tags.length - 2}
+                    </Badge>
+                  )}
                 </div>
               )}
 
               <div className="flex flex-col gap-2 pt-2">
-                <div className="text-xs text-muted-foreground">
-                  {t.created}: {format(new Date(task.created_at), 'dd.MM.yyyy HH:mm', { locale: ru })}
+                <div className="text-xs text-muted-foreground truncate">
+                  {format(new Date(task.created_at), 'dd.MM.yyyy HH:mm', { locale: ru })}
                 </div>
                 
                 <div className="flex flex-wrap gap-2 justify-between items-center">
                   <TaskAIAssistant task={task} employeeId={task.assigned_to?.id} />
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
@@ -522,9 +521,9 @@ const Tasks = () => {
                               e.stopPropagation();
                               updateTaskStatus(task.id, 'in_progress');
                             }}
-                            className="text-xs"
+                            className="text-xs whitespace-nowrap"
                           >
-                            {t.startWork}
+                            Начать
                           </Button>
                         )}
                         {task.status === 'in_progress' && (
@@ -534,10 +533,10 @@ const Tasks = () => {
                               e.stopPropagation();
                               updateTaskStatus(task.id, 'completed');
                             }}
-                            className="text-xs"
+                            className="text-xs whitespace-nowrap"
                           >
                             <CheckCircle className="h-4 w-4 mr-1" />
-                            {t.complete}
+                            Готово
                           </Button>
                         )}
                       </div>
