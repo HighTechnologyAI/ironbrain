@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
-import { translateText } from '@/lib/translation';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { useLanguage } from '@/hooks/use-language';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface MessageTextProps {
   id: string;
@@ -10,22 +9,8 @@ interface MessageTextProps {
 }
 
 export default function MessageText({ id, text, sourceLang }: MessageTextProps) {
-  const { language } = useLanguage();
   const [showOriginal, setShowOriginal] = useState(false);
-  const [translated, setTranslated] = useState<string | null>(null);
-  const needsTranslation = sourceLang && language && sourceLang !== 'unknown' && sourceLang !== language;
-
-  useEffect(() => {
-    let cancelled = false;
-    if (needsTranslation) {
-      translateText(text, language).then((t) => {
-        if (!cancelled) setTranslated(t);
-      });
-    } else {
-      setTranslated(null);
-    }
-    return () => { cancelled = true; };
-  }, [id, text, language, needsTranslation]);
+  const { translated, needsTranslation } = useTranslation(text, sourceLang);
 
   if (!needsTranslation) {
     return <p className="text-sm text-muted-foreground">{text}</p>;

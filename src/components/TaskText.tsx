@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '@/hooks/use-language';
-import { translateText, detectLanguage } from '@/lib/translation';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface TaskTextProps {
   text: string;
@@ -16,49 +16,8 @@ const TaskText: React.FC<TaskTextProps> = ({
   className = '' 
 }) => {
   const { language } = useLanguage();
-  const [translatedText, setTranslatedText] = useState<string>('');
-  const [isTranslating, setIsTranslating] = useState(false);
-  const [detectedLang, setDetectedLang] = useState<string | null>(sourceLang);
   const [showOriginal, setShowOriginal] = useState(false);
-
-  useEffect(() => {
-    const handleTranslation = async () => {
-      if (!text || text.trim() === '') {
-        setTranslatedText('');
-        return;
-      }
-
-      // Если язык не определен, определяем его
-      if (!detectedLang) {
-        const detected = await detectLanguage(text);
-        setDetectedLang(detected);
-      }
-
-      const currentDetectedLang = detectedLang || await detectLanguage(text);
-
-      // Если язык совпадает с текущим языком системы, показываем оригинал
-      if (currentDetectedLang === language || currentDetectedLang === 'unknown') {
-        setTranslatedText(text);
-        return;
-      }
-
-      // Переводим текст
-      setIsTranslating(true);
-      try {
-        const translated = await translateText(text, language);
-        setTranslatedText(translated);
-      } catch (error) {
-        console.error('Translation error:', error);
-        setTranslatedText(text); // Показываем оригинал при ошибке
-      } finally {
-        setIsTranslating(false);
-      }
-    };
-
-    handleTranslation();
-  }, [text, language, detectedLang]);
-
-  const needsTranslation = detectedLang && detectedLang !== language && detectedLang !== 'unknown';
+  const { translated, isTranslating, detectedLang, needsTranslation } = useTranslation(text, sourceLang);
 
   if (isTranslating) {
     return (
@@ -73,7 +32,7 @@ const TaskText: React.FC<TaskTextProps> = ({
     );
   }
 
-  const displayText = showOriginal ? text : (translatedText || text);
+  const displayText = showOriginal ? text : translated;
 
   return (
     <div className={className}>
