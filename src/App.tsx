@@ -23,6 +23,11 @@ import Awards from "./pages/Awards";
 import CreateDemoUsers from "./pages/CreateDemoUsers";
 import Integrations from "./pages/Integrations";
 import NotFound from "./pages/NotFound";
+// UAV-specific pages
+import MissionControl from "./pages/MissionControl";
+import ProductionKanban from "./pages/ProductionKanban";
+import MaintenanceCenter from "./pages/MaintenanceCenter";
+import DocumentCenter from "./pages/DocumentCenter";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -68,6 +73,11 @@ const AppShell = () => {
             <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
             <Route path="/awards" element={<ProtectedRoute><Awards /></ProtectedRoute>} />
             <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
+            {/* UAV-specific routes */}
+            <Route path="/missions" element={<ProtectedRoute><MissionControl /></ProtectedRoute>} />
+            <Route path="/production" element={<ProtectedRoute><ProductionKanban /></ProtectedRoute>} />
+            <Route path="/maintenance" element={<ProtectedRoute><MaintenanceCenter /></ProtectedRoute>} />
+            <Route path="/documents" element={<ProtectedRoute><DocumentCenter /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/create-demo-users" element={<CreateDemoUsers />} />
