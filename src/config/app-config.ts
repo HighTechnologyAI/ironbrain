@@ -22,7 +22,7 @@ export const APP_CONFIG = {
     projectId: SUPABASE_PROJECT_ID,
   },
   files: {
-    maxFileSize: 10 * 1024 * 1024, // 10MB
+    maxFileSize: 100 * 1024 * 1024, // 100MB
     allowedTypes: [
       'image/jpeg',
       'image/png',
