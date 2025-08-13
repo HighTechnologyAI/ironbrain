@@ -129,7 +129,7 @@ export function useTranslation(text: string, sourceLang?: string | null) {
     };
 
     handleTranslation();
-  }, [text, language, sourceLang, cacheKey]);
+  }, [text, language, sourceLang]); // Removed cacheKey from dependencies
 
   return state;
 }
