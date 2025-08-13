@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/hooks/use-language';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusChip } from '@/components/ui/status-chip';
@@ -43,6 +44,7 @@ interface DroneStatus {
 }
 
 const MissionControl = () => {
+  const { t } = useLanguage();
   const [activeMissions] = useState<Mission[]>([
     {
       id: 'M001',
@@ -125,7 +127,7 @@ const MissionControl = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <AppNavigation title="Mission Control" subtitle="Центр управления UAV миссиями" />
+      <AppNavigation title={t.missionControlTitle} subtitle={t.missionControlCenter} />
       
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* Quick Action Header */}

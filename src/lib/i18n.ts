@@ -395,6 +395,149 @@ export interface Translations {
     invalidAdminKey: string;
     allTime: string;
     activeProfiles: string;
+
+    // UAV Dashboard
+    operationalCenter: string;
+    uavSystem: string;
+    welcomeUser: string;
+    systems: string;
+    ready: string;
+    launchMission: string;
+    strategicGoal: string;
+    increaseCapacity: string;
+    onTrack: string;
+    completion: string;
+    monthlyGrowth: string;
+    productionUnit: string;
+    qualityLabel: string;
+    deadlineLabel: string;
+    activeMissionsLabel: string;
+    productionConveyor: string;
+    technicalStatus: string;
+    teamOnline: string;
+    unitsInFlight: string;
+    unitsInProduction: string;
+    systemHealthStatus: string;
+    operatorsOnline: string;
+    systemStatusLabel: string;
+    databaseLabel: string;
+    temperatureLabel: string;
+    batteryLabel: string;
+    communicationLabel: string;
+    lastUpdateLabel: string;
+    quickActionsLabel: string;
+    tasksLabel: string;
+    analyticsLabel: string;
+    problemsLabel: string;
+    
+    // Mission Control
+    missionControlTitle: string;
+    missionControlCenter: string;
+    weatherConditions: string;
+    windLabel: string;
+    visibilityLabel: string;
+    gpsSignalLabel: string;
+    excellentLabel: string;
+    activeMissionsTitle: string;
+    waypointsLabel: string;
+    altitudeLabel: string;
+    flightTimeLabel: string;
+    progressLabel: string;
+    mapLabel: string;
+    detailsLabel: string;
+    fleetStatusLabel: string;
+    tacticalMapLabel: string;
+    mapboxIntegrationLabel: string;
+    armedStatus: string;
+    inFlightStatus: string;
+    planningStatus: string;
+    completedStatus: string;
+    abortedStatus: string;
+    warningStatus: string;
+    criticalStatus: string;
+    lowStatus: string;
+    highStatus: string;
+    
+    // Analytics
+    analyticsTitle: string;
+    performanceAnalysisDesc: string;
+    exportReportLabel: string;
+    periodLabel: string;
+    departmentLabel: string;
+    allDepartmentsLabel: string;
+    last7DaysLabel: string;
+    last30DaysLabel: string;
+    last3MonthsLabel: string;
+    lastYearLabel: string;
+    completedTasksLabel: string;
+    activeEmployeesLabel: string;
+    averageTimeLabel: string;
+    achievementsLabel: string;
+    forPeriodLabel: string;
+    weeklyPerformanceLabel: string;
+    plannedVsCompletedLabel: string;
+    departmentPerformanceLabel: string;
+    tasksAndEfficiencyLabel: string;
+    topPerformersLabel: string;
+    tasksCompletedLabel: string;
+    efficiencyLabel: string;
+    
+    // Issues
+    issuesTitle: string;
+    issueTrackingDesc: string;
+    createIssueLabel: string;
+    searchIssuesPlaceholder: string;
+    statusLabel: string;
+    priorityLabel: string;
+    allStatusesLabel: string;
+    openStatus: string;
+    inProgressStatus: string;
+    resolvedStatus: string;
+    closedStatus: string;
+    allPrioritiesLabel: string;
+    taskLabel: string;
+    createdByLabel: string;
+    assignedToLabel: string;
+    createdDateLabel: string;
+    noIssuesFoundLabel: string;
+    noIssuesYetLabel: string;
+    
+    // Awards
+    awardsTitle: string;
+    motivationSystemDesc: string;
+    createAwardLabel: string;
+    totalAchievementsLabel: string;
+    awardsTodayLabel: string;
+    overallRatingLabel: string;
+    activeParticipantsLabel: string;
+    availableAchievementsLabel: string;
+    searchAchievementsPlaceholder: string;
+    categoryLabel: string;
+    allCategoriesLabel: string;
+    starterCategory: string;
+    productivityCategory: string;
+    teamworkCategory: string;
+    milestoneCategory: string;
+    noAchievementsCreatedLabel: string;
+    createFirstAchievementLabel: string;
+    recentAwardsLabel: string;
+    noAwardsYetLabel: string;
+    awardsWillAppearLabel: string;
+    leaderboardLabel: string;
+    pointsLabel: string;
+    
+    // Team
+    teamManagementDesc: string;
+    addEmployeeLabel: string;
+    loadingTeamLabel: string;
+    dataLoadErrorLabel: string;
+    tryAgainLabel: string;
+    noTeamMembersLabel: string;
+    sinceLabel: string;
+    editLabel: string;
+    roleLabel: string;
+    cancelLabel: string;
+    saveLabel: string;
   }
 
 export const translations: Record<string, Translations> = {
@@ -782,6 +925,149 @@ export const translations: Record<string, Translations> = {
     invalidAdminKey: 'Invalid admin key',
     allTime: 'All time',
     activeProfiles: 'Active profiles',
+
+    // UAV Dashboard
+    operationalCenter: 'Operational Control Center',
+    uavSystem: 'UAV Mission and Production Management System',
+    welcomeUser: 'Welcome',
+    systems: 'Systems',
+    ready: 'READY',
+    launchMission: 'Launch Mission',
+    strategicGoal: 'Strategic Goal',
+    increaseCapacity: 'Increase production capacity to 100 units/month',
+    onTrack: 'ON TRACK',
+    completion: 'completion',
+    monthlyGrowth: '+12% per month',
+    productionUnit: 'Production',
+    qualityLabel: 'Quality',
+    deadlineLabel: 'Deadline',
+    activeMissionsLabel: 'Active Missions',
+    productionConveyor: 'Production Conveyor',
+    technicalStatus: 'Technical Status',
+    teamOnline: 'Team Online',
+    unitsInFlight: 'Drones in flight',
+    unitsInProduction: 'Units in production',
+    systemHealthStatus: 'System health',
+    operatorsOnline: 'Operators online',
+    systemStatusLabel: 'System Status',
+    databaseLabel: 'DB',
+    temperatureLabel: 'Temp',
+    batteryLabel: 'Battery',
+    communicationLabel: 'Comm',
+    lastUpdateLabel: 'Last update',
+    quickActionsLabel: 'Quick Actions',
+    tasksLabel: 'Tasks',
+    analyticsLabel: 'Analytics',
+    problemsLabel: 'Problems',
+    
+    // Mission Control
+    missionControlTitle: 'Mission Control',
+    missionControlCenter: 'UAV Mission Control Center',
+    weatherConditions: 'Weather Conditions',
+    windLabel: 'Wind',
+    visibilityLabel: 'Visibility',
+    gpsSignalLabel: 'GPS Signal',
+    excellentLabel: 'Excellent',
+    activeMissionsTitle: 'Active Missions',
+    waypointsLabel: 'Waypoints',
+    altitudeLabel: 'Altitude',
+    flightTimeLabel: 'Flight time',
+    progressLabel: 'Progress',
+    mapLabel: 'Map',
+    detailsLabel: 'Details',
+    fleetStatusLabel: 'Fleet Status',
+    tacticalMapLabel: 'Tactical Map',
+    mapboxIntegrationLabel: 'Mapbox GL JS integration pending',
+    armedStatus: 'ARMED',
+    inFlightStatus: 'IN FLIGHT',
+    planningStatus: 'PLANNING',
+    completedStatus: 'COMPLETED',
+    abortedStatus: 'ABORTED',
+    warningStatus: 'WARNING',
+    criticalStatus: 'CRITICAL',
+    lowStatus: 'LOW',
+    highStatus: 'HIGH',
+    
+    // Analytics
+    analyticsTitle: 'Analytics',
+    performanceAnalysisDesc: 'Performance analysis and team metrics',
+    exportReportLabel: 'Export Report',
+    periodLabel: 'Period',
+    departmentLabel: 'Department',
+    allDepartmentsLabel: 'All departments',
+    last7DaysLabel: 'Last 7 days',
+    last30DaysLabel: 'Last 30 days',
+    last3MonthsLabel: 'Last 3 months',
+    lastYearLabel: 'Last year',
+    completedTasksLabel: 'Completed tasks',
+    activeEmployeesLabel: 'Active employees',
+    averageTimeLabel: 'Average time',
+    achievementsLabel: 'Achievements',
+    forPeriodLabel: 'for period',
+    weeklyPerformanceLabel: 'Weekly Performance',
+    plannedVsCompletedLabel: 'Planned vs completed tasks',
+    departmentPerformanceLabel: 'Department Performance',
+    tasksAndEfficiencyLabel: 'Tasks and efficiency by departments',
+    topPerformersLabel: 'Top Performers',
+    tasksCompletedLabel: 'tasks completed',
+    efficiencyLabel: 'efficiency',
+    
+    // Issues
+    issuesTitle: 'Issues',
+    issueTrackingDesc: 'Issue and bug tracking system',
+    createIssueLabel: 'Create Issue',
+    searchIssuesPlaceholder: 'Search issues...',
+    statusLabel: 'Status',
+    priorityLabel: 'Priority',
+    allStatusesLabel: 'All statuses',
+    openStatus: 'Open',
+    inProgressStatus: 'In Progress',
+    resolvedStatus: 'Resolved',
+    closedStatus: 'Closed',
+    allPrioritiesLabel: 'All priorities',
+    taskLabel: 'Task',
+    createdByLabel: 'Created by',
+    assignedToLabel: 'Assigned to',
+    createdDateLabel: 'Created',
+    noIssuesFoundLabel: 'No issues found with specified criteria',
+    noIssuesYetLabel: 'No open issues. Create the first issue for tracking.',
+    
+    // Awards
+    awardsTitle: 'Awards and Achievements',
+    motivationSystemDesc: 'Motivation and recognition system',
+    createAwardLabel: 'Create Award',
+    totalAchievementsLabel: 'Total achievements',
+    awardsTodayLabel: 'Awards today',
+    overallRatingLabel: 'Overall rating',
+    activeParticipantsLabel: 'Active participants',
+    availableAchievementsLabel: 'Available achievements',
+    searchAchievementsPlaceholder: 'Search achievements...',
+    categoryLabel: 'Category',
+    allCategoriesLabel: 'All categories',
+    starterCategory: 'Starter',
+    productivityCategory: 'Productivity',
+    teamworkCategory: 'Teamwork',
+    milestoneCategory: 'Milestone',
+    noAchievementsCreatedLabel: 'No achievements created yet',
+    createFirstAchievementLabel: 'Create first achievement to motivate team!',
+    recentAwardsLabel: 'Recent Awards',
+    noAwardsYetLabel: 'No awards yet',
+    awardsWillAppearLabel: 'Awards will appear here after creation',
+    leaderboardLabel: 'Leaderboard',
+    pointsLabel: 'points',
+    
+    // Team
+    teamManagementDesc: 'Team member management',
+    addEmployeeLabel: 'Add Employee',
+    loadingTeamLabel: 'Loading team...',
+    dataLoadErrorLabel: 'Data loading error',
+    tryAgainLabel: 'Try again',
+    noTeamMembersLabel: 'No team members. Add the first employee.',
+    sinceLabel: 'Since',
+    editLabel: 'Edit',
+    roleLabel: 'Role',
+    cancelLabel: 'Cancel',
+    saveLabel: 'Save',
   },
   ru: {
     // Common
@@ -1167,6 +1453,149 @@ export const translations: Record<string, Translations> = {
     invalidAdminKey: 'Неверный admin ключ',
     allTime: 'За всё время',
     activeProfiles: 'Активных профилей',
+
+    // UAV Dashboard
+    operationalCenter: 'Операционный центр управления',
+    uavSystem: 'Система управления UAV миссиями и производством',
+    welcomeUser: 'Добро пожаловать',
+    systems: 'Системы',
+    ready: 'ГОТОВ',
+    launchMission: 'Запустить миссию',
+    strategicGoal: 'Стратегическая цель',
+    increaseCapacity: 'Увеличение производственной мощности до 100 единиц/месяц',
+    onTrack: 'НА ПУТИ',
+    completion: 'выполнения',
+    monthlyGrowth: '+12% за месяц',
+    productionUnit: 'Производство',
+    qualityLabel: 'Качество',
+    deadlineLabel: 'Дедлайн',
+    activeMissionsLabel: 'Активные миссии',
+    productionConveyor: 'Производственный конвейер',
+    technicalStatus: 'Техническое состояние',
+    teamOnline: 'Команда онлайн',
+    unitsInFlight: 'Беспилотники в полете',
+    unitsInProduction: 'Единиц в производстве',
+    systemHealthStatus: 'Исправность системы',
+    operatorsOnline: 'Операторов в сети',
+    systemStatusLabel: 'Системный статус',
+    databaseLabel: 'БД',
+    temperatureLabel: 'Темп',
+    batteryLabel: 'Батарея',
+    communicationLabel: 'Связь',
+    lastUpdateLabel: 'Последнее обновление',
+    quickActionsLabel: 'Быстрые действия',
+    tasksLabel: 'Задачи',
+    analyticsLabel: 'Аналитика',
+    problemsLabel: 'Проблемы',
+    
+    // Mission Control
+    missionControlTitle: 'Центр управления миссиями',
+    missionControlCenter: 'Центр управления UAV миссиями',
+    weatherConditions: 'Погодные условия',
+    windLabel: 'Ветер',
+    visibilityLabel: 'Видимость',
+    gpsSignalLabel: 'GPS сигнал',
+    excellentLabel: 'Отличный',
+    activeMissionsTitle: 'Активные миссии',
+    waypointsLabel: 'Точки маршрута',
+    altitudeLabel: 'Высота',
+    flightTimeLabel: 'Время в полете',
+    progressLabel: 'Прогресс',
+    mapLabel: 'Карта',
+    detailsLabel: 'Детали',
+    fleetStatusLabel: 'Состояние флота',
+    tacticalMapLabel: 'Тактическая карта',
+    mapboxIntegrationLabel: 'Интеграция с картографическим сервисом',
+    armedStatus: 'ВООРУЖЕН',
+    inFlightStatus: 'В ПОЛЕТЕ',
+    planningStatus: 'ПЛАНИРОВАНИЕ',
+    completedStatus: 'ЗАВЕРШЕН',
+    abortedStatus: 'ПРЕРВАН',
+    warningStatus: 'ПРЕДУПРЕЖДЕНИЕ',
+    criticalStatus: 'КРИТИЧНО',
+    lowStatus: 'НИЗКО',
+    highStatus: 'ВЫСОКАЯ',
+    
+    // Analytics
+    analyticsTitle: 'Аналитика',
+    performanceAnalysisDesc: 'Анализ производительности и метрики команды',
+    exportReportLabel: 'Экспорт отчета',
+    periodLabel: 'Период',
+    departmentLabel: 'Отдел',
+    allDepartmentsLabel: 'Все отделы',
+    last7DaysLabel: 'Последние 7 дней',
+    last30DaysLabel: 'Последние 30 дней',
+    last3MonthsLabel: 'Последние 3 месяца',
+    lastYearLabel: 'Последний год',
+    completedTasksLabel: 'Выполненных задач',
+    activeEmployeesLabel: 'Активных сотрудников',
+    averageTimeLabel: 'Среднее время',
+    achievementsLabel: 'Достижений',
+    forPeriodLabel: 'за период',
+    weeklyPerformanceLabel: 'Производительность по неделям',
+    plannedVsCompletedLabel: 'Сравнение запланированных и выполненных задач',
+    departmentPerformanceLabel: 'Производительность отделов',
+    tasksAndEfficiencyLabel: 'Задачи и эффективность по отделам',
+    topPerformersLabel: 'Лучшие исполнители',
+    tasksCompletedLabel: 'задач выполнено',
+    efficiencyLabel: 'эффективность',
+    
+    // Issues
+    issuesTitle: 'Проблемы',
+    issueTrackingDesc: 'Система отслеживания проблем и ошибок',
+    createIssueLabel: 'Создать проблему',
+    searchIssuesPlaceholder: 'Поиск проблем...',
+    statusLabel: 'Статус',
+    priorityLabel: 'Приоритет',
+    allStatusesLabel: 'Все статусы',
+    openStatus: 'Открыта',
+    inProgressStatus: 'В работе',
+    resolvedStatus: 'Решена',
+    closedStatus: 'Закрыта',
+    allPrioritiesLabel: 'Все приоритеты',
+    taskLabel: 'Задача',
+    createdByLabel: 'Создал',
+    assignedToLabel: 'Назначено',
+    createdDateLabel: 'Создано',
+    noIssuesFoundLabel: 'Проблемы не найдены по заданным критериям',
+    noIssuesYetLabel: 'Нет открытых проблем. Создайте первую проблему для отслеживания.',
+    
+    // Awards
+    awardsTitle: 'Награды и достижения',
+    motivationSystemDesc: 'Система мотивации и признания заслуг',
+    createAwardLabel: 'Создать награду',
+    totalAchievementsLabel: 'Всего достижений',
+    awardsTodayLabel: 'Награждений сегодня',
+    overallRatingLabel: 'Общий рейтинг',
+    activeParticipantsLabel: 'Активных участников',
+    availableAchievementsLabel: 'Доступные достижения',
+    searchAchievementsPlaceholder: 'Поиск достижений...',
+    categoryLabel: 'Категория',
+    allCategoriesLabel: 'Все категории',
+    starterCategory: 'Начинающий',
+    productivityCategory: 'Продуктивность',
+    teamworkCategory: 'Командная работа',
+    milestoneCategory: 'Веха',
+    noAchievementsCreatedLabel: 'Достижения пока не созданы',
+    createFirstAchievementLabel: 'Создайте первое достижение для мотивации команды!',
+    recentAwardsLabel: 'Последние награждения',
+    noAwardsYetLabel: 'Пока нет награждений',
+    awardsWillAppearLabel: 'Награждения будут отображаться здесь после их создания',
+    leaderboardLabel: 'Таблица лидеров',
+    pointsLabel: 'очков',
+    
+    // Team
+    teamManagementDesc: 'Управление участниками команды',
+    addEmployeeLabel: 'Добавить сотрудника',
+    loadingTeamLabel: 'Загрузка команды...',
+    dataLoadErrorLabel: 'Ошибка загрузки данных',
+    tryAgainLabel: 'Попробовать снова',
+    noTeamMembersLabel: 'Нет участников команды. Добавьте первого сотрудника.',
+    sinceLabel: 'С',
+    editLabel: 'Изм.',
+    roleLabel: 'Роль',
+    cancelLabel: 'Отмена',
+    saveLabel: 'Сохранить',
   },
   
   bg: {
@@ -1553,5 +1982,148 @@ export const translations: Record<string, Translations> = {
     invalidAdminKey: 'Невалиден admin ключ',
     allTime: 'За цялото време',
     activeProfiles: 'Активни профили',
+
+    // UAV Dashboard
+    operationalCenter: 'Операционен център за управление',
+    uavSystem: 'Система за управление на UAV мисии и производство',
+    welcomeUser: 'Добре дошли',
+    systems: 'Системи',
+    ready: 'ГОТОВ',
+    launchMission: 'Стартирай мисия',
+    strategicGoal: 'Стратегическа цел',
+    increaseCapacity: 'Увеличаване на производствения капацитет до 100 единици/месец',
+    onTrack: 'НА ПЪТЯ',
+    completion: 'завършеност',
+    monthlyGrowth: '+12% за месец',
+    productionUnit: 'Производство',
+    qualityLabel: 'Качество',
+    deadlineLabel: 'Краен срок',
+    activeMissionsLabel: 'Активни мисии',
+    productionConveyor: 'Производствена лента',
+    technicalStatus: 'Техническо състояние',
+    teamOnline: 'Екип онлайн',
+    unitsInFlight: 'Дронове в полет',
+    unitsInProduction: 'Единици в производство',
+    systemHealthStatus: 'Здраве на системата',
+    operatorsOnline: 'Оператори онлайн',
+    systemStatusLabel: 'Системен статус',
+    databaseLabel: 'БД',
+    temperatureLabel: 'Темп',
+    batteryLabel: 'Батерия',
+    communicationLabel: 'Връзка',
+    lastUpdateLabel: 'Последна актуализация',
+    quickActionsLabel: 'Бързи действия',
+    tasksLabel: 'Задачи',
+    analyticsLabel: 'Аналитика',
+    problemsLabel: 'Проблеми',
+    
+    // Mission Control
+    missionControlTitle: 'Център за управление на мисии',
+    missionControlCenter: 'Център за управление на UAV мисии',
+    weatherConditions: 'Метеорологични условия',
+    windLabel: 'Вятър',
+    visibilityLabel: 'Видимост',
+    gpsSignalLabel: 'GPS сигнал',
+    excellentLabel: 'Отличен',
+    activeMissionsTitle: 'Активни мисии',
+    waypointsLabel: 'Точки от маршрута',
+    altitudeLabel: 'Височина',
+    flightTimeLabel: 'Време в полет',
+    progressLabel: 'Прогрес',
+    mapLabel: 'Карта',
+    detailsLabel: 'Детайли',
+    fleetStatusLabel: 'Състояние на флота',
+    tacticalMapLabel: 'Тактическа карта',
+    mapboxIntegrationLabel: 'Интеграция с картографска услуга',
+    armedStatus: 'ВЪОРЪЖЕН',
+    inFlightStatus: 'В ПОЛЕТ',
+    planningStatus: 'ПЛАНИРАНЕ',
+    completedStatus: 'ЗАВЪРШЕН',
+    abortedStatus: 'ПРЕКРАТЕН',
+    warningStatus: 'ПРЕДУПРЕЖДЕНИЕ',
+    criticalStatus: 'КРИТИЧНО',
+    lowStatus: 'НИСКО',
+    highStatus: 'ВИСОКО',
+    
+    // Analytics
+    analyticsTitle: 'Аналитика',
+    performanceAnalysisDesc: 'Анализ на производителността и метрики на екипа',
+    exportReportLabel: 'Експорт на отчет',
+    periodLabel: 'Период',
+    departmentLabel: 'Отдел',
+    allDepartmentsLabel: 'Всички отдели',
+    last7DaysLabel: 'Последните 7 дни',
+    last30DaysLabel: 'Последните 30 дни',
+    last3MonthsLabel: 'Последните 3 месеца',
+    lastYearLabel: 'Последната година',
+    completedTasksLabel: 'Завършени задачи',
+    activeEmployeesLabel: 'Активни служители',
+    averageTimeLabel: 'Средно време',
+    achievementsLabel: 'Постижения',
+    forPeriodLabel: 'за период',
+    weeklyPerformanceLabel: 'Седмична производителност',
+    plannedVsCompletedLabel: 'Планирани срещу завършени задачи',
+    departmentPerformanceLabel: 'Производителност на отделите',
+    tasksAndEfficiencyLabel: 'Задачи и ефективност по отдели',
+    topPerformersLabel: 'Най-добри изпълнители',
+    tasksCompletedLabel: 'задачи завършени',
+    efficiencyLabel: 'ефективност',
+    
+    // Issues
+    issuesTitle: 'Проблеми',
+    issueTrackingDesc: 'Система за проследяване на проблеми и грешки',
+    createIssueLabel: 'Създай проблем',
+    searchIssuesPlaceholder: 'Търсене на проблеми...',
+    statusLabel: 'Статус',
+    priorityLabel: 'Приоритет',
+    allStatusesLabel: 'Всички статуси',
+    openStatus: 'Отворен',
+    inProgressStatus: 'В работа',
+    resolvedStatus: 'Решен',
+    closedStatus: 'Затворен',
+    allPrioritiesLabel: 'Всички приоритети',
+    taskLabel: 'Задача',
+    createdByLabel: 'Създаден от',
+    assignedToLabel: 'Възложен на',
+    createdDateLabel: 'Създаден',
+    noIssuesFoundLabel: 'Не са намерени проблеми по зададените критерии',
+    noIssuesYetLabel: 'Няма отворени проблеми. Създайте първия проблем за проследяване.',
+    
+    // Awards
+    awardsTitle: 'Награди и постижения',
+    motivationSystemDesc: 'Система за мотивация и признаване на заслуги',
+    createAwardLabel: 'Създай награда',
+    totalAchievementsLabel: 'Общо постижения',
+    awardsTodayLabel: 'Награди днес',
+    overallRatingLabel: 'Общ рейтинг',
+    activeParticipantsLabel: 'Активни участници',
+    availableAchievementsLabel: 'Налични постижения',
+    searchAchievementsPlaceholder: 'Търсене на постижения...',
+    categoryLabel: 'Категория',
+    allCategoriesLabel: 'Всички категории',
+    starterCategory: 'Начинаещ',
+    productivityCategory: 'Продуктивност',
+    teamworkCategory: 'Екипна работа',
+    milestoneCategory: 'Етап',
+    noAchievementsCreatedLabel: 'Все още не са създадени постижения',
+    createFirstAchievementLabel: 'Създайте първото постижение за мотивация на екипа!',
+    recentAwardsLabel: 'Последни награди',
+    noAwardsYetLabel: 'Все още няма награди',
+    awardsWillAppearLabel: 'Наградите ще се появят тук след създаването им',
+    leaderboardLabel: 'Класация',
+    pointsLabel: 'точки',
+    
+    // Team
+    teamManagementDesc: 'Управление на членовете на екипа',
+    addEmployeeLabel: 'Добави служител',
+    loadingTeamLabel: 'Зареждане на екипа...',
+    dataLoadErrorLabel: 'Грешка при зареждане на данни',
+    tryAgainLabel: 'Опитай отново',
+    noTeamMembersLabel: 'Няма членове на екипа. Добавете първия служител.',
+    sinceLabel: 'От',
+    editLabel: 'Ред.',
+    roleLabel: 'Роля',
+    cancelLabel: 'Отказ',
+    saveLabel: 'Запази',
   },
 };

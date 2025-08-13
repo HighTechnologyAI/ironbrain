@@ -96,8 +96,8 @@ const UAVDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <AppNavigation 
-        title="Операционный центр управления" 
-        subtitle="Система управления UAV миссиями и производством"
+        title={t.operationalCenter} 
+        subtitle={t.uavSystem}
       />
       
       <div className="max-w-7xl mx-auto p-6 space-y-8">
@@ -110,13 +110,13 @@ const UAVDashboard = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold font-ui tracking-tight">
-                Добро пожаловать, {user?.email?.split('@')[0]}
+                {t.welcomeUser}, {user?.email?.split('@')[0]}
               </h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground font-mono">
                 <div className="flex items-center gap-2">
                   <Wifi className="h-4 w-4 text-success" />
-                  <span>Системы:</span>
-                  <StatusChip variant="ready">ГОТОВ</StatusChip>
+                  <span>{t.systems}:</span>
+                  <StatusChip variant="ready">{t.ready}</StatusChip>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
@@ -127,7 +127,7 @@ const UAVDashboard = () => {
           </div>
           <Button variant="mission" size="lg" onClick={() => navigate('/missions')}>
             <Plane className="h-4 w-4 mr-2" />
-            Запустить миссию
+            {t.launchMission}
           </Button>
         </div>
 
