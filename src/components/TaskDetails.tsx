@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/hooks/use-language';
@@ -70,11 +70,14 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
   
   const dateLocale = language === 'bg' ? bg : ru;
 
+  // Стабилизируем ID задачи для предотвращения ненужных перерендеров
+  const stableTaskId = task.id;
+
   useEffect(() => {
     if (user && task.created_by) {
       setIsTaskCreator(user.id === task.created_by.id);
     }
-  }, [user, task.created_by]);
+  }, [user?.id, task.created_by?.id]); // Более специфичные зависимости
 
   const statusLabels = {
     pending: t.pending,
@@ -214,7 +217,7 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
             <Separator />
 
             {/* Чат и файлы */}
-            <TaskChat taskId={task.id} isTaskCreator={isTaskCreator} />
+            <TaskChat key={stableTaskId} taskId={stableTaskId} isTaskCreator={isTaskCreator} />
           </div>
 
           {/* Боковая панель с деталями */}
@@ -361,4 +364,13 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
   );
 };
 
-export default TaskDetails;
+export default React.memo(TaskDetails, (prevProps, nextProps) => {
+  // Предотвращаем ре-рендер если основные данные задачи не изменились
+  return (
+    prevProps.task.id === nextProps.task.id &&
+    prevProps.task.status === nextProps.task.status &&
+    prevProps.task.title === nextProps.task.title &&
+    prevProps.task.assigned_to?.id === nextProps.task.assigned_to?.id &&
+    prevProps.task.created_by?.id === nextProps.task.created_by?.id
+  );
+});
