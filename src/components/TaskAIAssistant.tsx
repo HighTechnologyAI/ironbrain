@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/use-language';
-import { Bot, Send, MessageCircle, X } from 'lucide-react';
+import { ToneSelector, type AITone } from '@/components/ui/tone-selector';
+import { Bot, Send, MessageCircle, X, Settings } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -46,6 +47,8 @@ const TaskAIAssistant = ({ task, employeeId }: TaskAIAssistantProps) => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
+  const [aiTone, setAiTone] = useState<AITone>('professional');
+  const [showSettings, setShowSettings] = useState(false);
   const { toast } = useToast();
   const { language } = useLanguage();
   const locale = language === 'ru' ? 'ru-RU' : language === 'bg' ? 'bg-BG' : 'en-US';
@@ -99,9 +102,23 @@ const TaskAIAssistant = ({ task, employeeId }: TaskAIAssistantProps) => {
 
   const addWelcomeMessage = () => {
     if (messages.length === 0) {
-      const welcomeMessage: Message = {
-        id: 'welcome',
-        content: `Привет! Я Tiger AI - твой персональный помощник по задаче "${task.title}". 
+      const welcomeTexts = {
+        en: `Hello! I'm Tiger AI - your personal assistant for the task "${task.title}".
+
+I know all the details of this task:
+• Priority: ${getPriorityLabel(task.priority)}
+• Status: ${getStatusLabel(task.status)}
+• Assignee: ${task.assigned_to?.full_name || 'Not assigned'}
+${task.estimated_hours ? `• Estimated time: ${task.estimated_hours}h` : ''}
+${task.tags?.length ? `• Tags: ${task.tags.join(', ')}` : ''}
+
+How can I help? I can:
+✓ Break down the task into subtasks
+✓ Give implementation recommendations
+✓ Help with time planning
+✓ Answer questions about context
+✓ Suggest optimal approach`,
+        ru: `Привет! Я Tiger AI - твой персональный помощник по задаче "${task.title}". 
 
 Я знаю все детали этой задачи:
 • Приоритет: ${getPriorityLabel(task.priority)}
@@ -116,6 +133,26 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
 ✓ Помочь с планированием времени
 ✓ Ответить на вопросы по контексту
 ✓ Предложить оптимальный подход`,
+        bg: `Здравей! Аз съм Tiger AI - твоят личен асистент за задачата "${task.title}".
+
+Знам всички детайли на тази задача:
+• Приоритет: ${getPriorityLabel(task.priority)}
+• Статус: ${getStatusLabel(task.status)}
+• Изпълнител: ${task.assigned_to?.full_name || 'Не е назначен'}
+${task.estimated_hours ? `• Планирано време: ${task.estimated_hours}ч` : ''}
+${task.tags?.length ? `• Тагове: ${task.tags.join(', ')}` : ''}
+
+Как мога да помогна? Мога да:
+✓ Разделя задачата на подзадачи
+✓ Дам препоръки за изпълнение
+✓ Помогна с планирането на времето
+✓ Отговоря на въпроси за контекста
+✓ Предложа оптимален подход`
+      };
+
+      const welcomeMessage: Message = {
+        id: 'welcome',
+        content: welcomeTexts[language as keyof typeof welcomeTexts] || welcomeTexts.en,
         isBot: true,
         timestamp: new Date(),
       };
@@ -154,6 +191,7 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
           },
           employeeId,
           language,
+          tone: aiTone,
         },
       });
 
@@ -233,17 +271,40 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Bot className="h-5 w-5 text-primary" />
-            AI Помощник
+            {language === 'ru' ? 'AI Помощник' : language === 'bg' ? 'AI Асистент' : 'AI Assistant'}
             <Badge variant="outline" className="ml-2 text-xs truncate max-w-40">
               {task.title}
             </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSettings(!showSettings)}
+              className="ml-auto"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Персональный ассистент по этой задаче. История сообщений сохраняется.
+            {language === 'ru' 
+              ? 'Персональный ассистент по этой задаче. История сообщений сохраняется.'
+              : language === 'bg'
+              ? 'Личен асистент за тази задача. Историята на съобщенията се запазва.'
+              : 'Personal assistant for this task. Message history is saved.'
+            }
           </DialogDescription>
         </DialogHeader>
         
         <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+          {showSettings && (
+            <div className="p-4 bg-muted/20 rounded-lg">
+              <ToneSelector
+                selectedTone={aiTone}
+                onToneChange={setAiTone}
+                size="sm"
+              />
+            </div>
+          )}
+          
           <div className="flex-1 overflow-y-auto space-y-4 p-4 bg-muted/20 rounded-lg">
             {messages.map((message) => (
               <div
@@ -293,7 +354,13 @@ ${task.tags?.length ? `• Теги: ${task.tags.join(', ')}` : ''}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Спросите AI о задаче, попросите совет или помощь..."
+              placeholder={
+                language === 'ru' 
+                  ? 'Спросите AI о задаче, попросите совет или помощь...'
+                  : language === 'bg'
+                  ? 'Попитайте AI за задачата, поискайте съвет или помощ...'
+                  : 'Ask AI about the task, request advice or help...'
+              }
               className="flex-1 min-h-[60px] max-h-[120px]"
               disabled={loading}
             />

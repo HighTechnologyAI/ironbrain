@@ -20,6 +20,7 @@ import {
   Settings,
   Send
 } from 'lucide-react';
+import { ToneSelector, type AITone } from '@/components/ui/tone-selector';
 
 interface AITaskAssistantProps {
   employees?: Array<{
@@ -51,6 +52,7 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
+  const [aiTone, setAiTone] = useState<AITone>('professional');
 
   // Load own profile and a simple tasks list
   useEffect(() => {
@@ -145,6 +147,7 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
           taskContext: selectedTaskCtx,
           employeeId: selectedTaskCtx?.assigned_to?.id || null,
           language,
+          tone: aiTone,
         },
       });
       if (error) throw error;
@@ -193,6 +196,7 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
           message: message.trim(),
           taskContext: "Mode: " + mode,
           language,
+          tone: aiTone,
         }
       });
 
@@ -312,6 +316,13 @@ const AITaskAssistant: React.FC<AITaskAssistantProps> = ({
       </CardHeader>
       
       <CardContent className="space-y-6">
+        {/* Настройки тональности */}
+        <ToneSelector
+          selectedTone={aiTone}
+          onToneChange={setAiTone}
+          size="sm"
+        />
+        
         {/* Режим работы */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">{t.aiModeLabel}</label>
