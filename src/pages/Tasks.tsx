@@ -682,12 +682,37 @@ const Tasks = () => {
               <Tabs defaultValue="my" className="w-full">
                 <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'} cyber-border bg-surface-1/30 backdrop-blur-sm p-1 gap-1 h-auto`}>
                   {isAdmin && (
-                    <TabsTrigger value="all">{t.allTasks} ({filteredTasks.length})</TabsTrigger>
+                    <TabsTrigger 
+                      value="all" 
+                      className="data-[state=active]:bg-primary/20 data-[state=active]:border-primary data-[state=active]:border-2 data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
+                    >
+                      {t.allTasks} ({filteredTasks.length})
+                    </TabsTrigger>
                   )}
-                  <TabsTrigger value="my">{t.myTasks} ({getMyTasks().length})</TabsTrigger>
-                  <TabsTrigger value="created">{t.createdByMe} ({getCreatedTasks().length})</TabsTrigger>
-                  <TabsTrigger value="collab">Совместно ({getCollaboratedTasks().length})</TabsTrigger>
-                  <TabsTrigger value="completed">{t.completed} ({getCompletedTasks().length})</TabsTrigger>
+                  <TabsTrigger 
+                    value="my"
+                    className="data-[state=active]:bg-primary/20 data-[state=active]:border-primary data-[state=active]:border-2 data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
+                  >
+                    {t.myTasks} ({getMyTasks().length})
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="created"
+                    className="data-[state=active]:bg-primary/20 data-[state=active]:border-primary data-[state=active]:border-2 data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
+                  >
+                    {t.createdByMe} ({getCreatedTasks().length})
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="collab"
+                    className="data-[state=active]:bg-primary/20 data-[state=active]:border-primary data-[state=active]:border-2 data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
+                  >
+                    Совместно ({getCollaboratedTasks().length})
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="completed"
+                    className="data-[state=active]:bg-primary/20 data-[state=active]:border-primary data-[state=active]:border-2 data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
+                  >
+                    {t.completed} ({getCompletedTasks().length})
+                  </TabsTrigger>
                 </TabsList>
 
                 {isAdmin && (
