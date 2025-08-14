@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Zap, Shield, Lock, Mail, User, Eye, EyeOff, Building, Briefcase, Phone, MessageCircle } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import CyberBackground from "@/components/AnimatedStarfield";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -78,22 +79,22 @@ const Auth = () => {
 
       if (data.user) {
         toast({
-          title: "Успешный вход",
-          description: "Добро пожаловать в Tiger CRM!",
+          title: t.successLogin,
+          description: t.welcomeToTiger,
         });
         navigate('/');
       }
     } catch (error: any) {
-      let errorMessage = "Произошла ошибка при входе";
+      let errorMessage = t.loginErrorGeneric;
       
       if (error.message.includes("Invalid login credentials")) {
-        errorMessage = "Неверный email или пароль";
+        errorMessage = t.invalidCredentials;
       } else if (error.message.includes("Email not confirmed")) {
-        errorMessage = "Подтвердите email перед входом";
+        errorMessage = t.emailNotConfirmed;
       }
 
       toast({
-        title: "Ошибка входа",
+        title: t.loginError,
         description: errorMessage,
         variant: "destructive",
       });
@@ -130,21 +131,21 @@ const Auth = () => {
 
       if (data.user) {
         toast({
-          title: "Регистрация успешна!",
-          description: "Проверьте email для подтверждения аккаунта (или войдите сразу если отключено подтверждение)",
+          title: t.registrationSuccess,
+          description: t.checkEmail,
         });
       }
     } catch (error: any) {
-      let errorMessage = "Произошла ошибка при регистрации";
+      let errorMessage = t.registrationErrorGeneric;
       
       if (error.message.includes("User already registered")) {
-        errorMessage = "Пользователь с таким email уже существует";
+        errorMessage = t.userExists;
       } else if (error.message.includes("Password should be")) {
-        errorMessage = "Пароль слишком слабый. Минимум 6 символов";
+        errorMessage = t.weakPassword;
       }
 
       toast({
-        title: "Ошибка регистрации",
+        title: t.registrationError,
         description: errorMessage,
         variant: "destructive",
       });
@@ -159,16 +160,21 @@ const Auth = () => {
       <CyberBackground />
       <div className="w-full max-w-md relative z-10">
         {/* Header */}
+        {/* Language Switcher */}
+        <div className="absolute top-6 right-6 z-20">
+          <LanguageSwitcher />
+        </div>
+
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="relative">
               <Zap className="text-primary h-12 w-12 cyber-glow animate-pulse" />
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-full blur-xl"></div>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-yellow-400 bg-clip-text text-transparent">TIGER CRM</h1>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-yellow-400 bg-clip-text text-transparent">{t.title}</h1>
           </div>
           <p className="text-foreground/80 font-mono text-sm tracking-wider">
-            Система достижения результатов компании
+            {t.systemDesc}
           </p>
         </div>
 
@@ -176,10 +182,10 @@ const Auth = () => {
           <CardHeader>
             <CardTitle className="text-center flex items-center justify-center gap-2 text-foreground">
               <Shield className="h-5 w-5 text-primary" />
-              Авторизация
+              {t.auth}
             </CardTitle>
             <CardDescription className="text-center text-foreground/70">
-              Войдите в систему или создайте новый аккаунт
+              {t.enterSystem}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -189,13 +195,13 @@ const Auth = () => {
                   value="signin"
                   className="text-foreground/70 data-[state=active]:bg-primary data-[state=active]:text-black data-[state=active]:font-semibold transition-all"
                 >
-                  Вход
+                  {t.signIn}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="signup"
                   className="text-foreground/70 data-[state=active]:bg-primary data-[state=active]:text-black data-[state=active]:font-semibold transition-all"
                 >
-                  Регистрация
+                  {t.signUp}
                 </TabsTrigger>
               </TabsList>
               
@@ -204,7 +210,7 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="signin-email" className="flex items-center gap-2">
                       <Mail className="h-4 w-4" />
-                      Email
+                      {t.email}
                     </Label>
                     <Input
                       id="signin-email"
@@ -220,7 +226,7 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="signin-password" className="flex items-center gap-2">
                       <Lock className="h-4 w-4" />
-                      Пароль
+                      {t.password}
                     </Label>
                     <div className="relative">
                       <Input
@@ -249,7 +255,7 @@ const Auth = () => {
                     className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold transition-all duration-200"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Вход..." : "Войти"}
+                    {isLoading ? t.signingIn : t.signIn}
                   </Button>
                 </form>
               </TabsContent>
@@ -259,7 +265,7 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="signup-fullname" className="flex items-center gap-2">
                       <User className="h-4 w-4" />
-                      Полное имя
+                      {t.fullName}
                     </Label>
                     <Input
                       id="signup-fullname"
@@ -275,7 +281,7 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="signup-position" className="flex items-center gap-2">
                       <Briefcase className="h-4 w-4" />
-                      Должность
+                      {t.position}
                     </Label>
                     <Input
                       id="signup-position"
@@ -291,11 +297,11 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="signup-department" className="flex items-center gap-2">
                       <Building className="h-4 w-4" />
-                      Подразделение
+                      {t.department}
                     </Label>
                     <Select onValueChange={(value) => handleSelectChange('department', value)} disabled={isLoading}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Выберите подразделение" />
+                        <SelectValue placeholder={t.selectDepartment} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Управление">Управление</SelectItem>
@@ -311,7 +317,7 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="signup-phone" className="flex items-center gap-2">
                       <Phone className="h-4 w-4" />
-                      Телефон
+                      {t.phone}
                     </Label>
                     <Input
                       id="signup-phone"
@@ -327,7 +333,7 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="signup-telegram" className="flex items-center gap-2">
                       <MessageCircle className="h-4 w-4" />
-                      Telegram
+                      {t.telegram}
                     </Label>
                     <Input
                       id="signup-telegram"
@@ -343,7 +349,7 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="signup-email" className="flex items-center gap-2">
                       <Mail className="h-4 w-4" />
-                      Email
+                      {t.email}
                     </Label>
                     <Input
                       id="signup-email"
@@ -359,14 +365,14 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="signup-password" className="flex items-center gap-2">
                       <Lock className="h-4 w-4" />
-                      Пароль
+                      {t.password}
                     </Label>
                     <div className="relative">
                       <Input
                         id="signup-password"
                         name="password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="Минимум 6 символов"
+                        placeholder={t.minPassword}
                         value={formData.password}
                         onChange={handleInputChange}
                         required
@@ -389,7 +395,7 @@ const Auth = () => {
                     className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold transition-all duration-200"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Регистрация..." : "Зарегистрироваться"}
+                    {isLoading ? t.registering : t.signUp}
                   </Button>
                 </form>
               </TabsContent>

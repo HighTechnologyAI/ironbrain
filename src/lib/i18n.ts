@@ -90,6 +90,37 @@ export interface Translations {
   operatorsOnline: string;
   lastUpdateTime: string;
   
+  // Auth & Forms
+  auth: string;
+  signIn: string;
+  signUp: string;
+  registration: string;
+  email: string;
+  password: string;
+  fullName: string;
+  position: string;
+  department: string;
+  phone: string;
+  telegram: string;
+  signingIn: string;
+  registering: string;
+  enterSystem: string;
+  successLogin: string;
+  welcomeToTiger: string;
+  loginError: string;
+  registrationSuccess: string;
+  checkEmail: string;
+  registrationError: string;
+  invalidCredentials: string;
+  emailNotConfirmed: string;
+  userExists: string;
+  weakPassword: string;
+  loginErrorGeneric: string;
+  registrationErrorGeneric: string;
+  selectDepartment: string;
+  minPassword: string;
+  systemDesc: string;
+  
   // All missing keys with fallback to prevent build errors
   notifications: string;
   noNotifications: string;
@@ -99,23 +130,14 @@ export interface Translations {
   logout: string;
   signup: string;
   signupPrompt: string;
-  email: string;
-  password: string;
   forgotPassword: string;
   resetPassword: string;
   confirmPassword: string;
-  fullName: string;
-  position: string;
-  department: string;
-  loginError: string;
   signupError: string;
   resetPasswordError: string;
   resetPasswordSuccess: string;
   authRedirect: string;
-  invalidCredentials: string;
   passwordMismatch: string;
-  weakPassword: string;
-  userExists: string;
   allTasks: string;
   myTasks: string;
   searchTasks: string;
@@ -506,6 +528,36 @@ const baseTranslations: Translations = {
   lastUpdateTime: 'Last update',
   
   // Auth & Forms
+  auth: 'Authorization',
+  signIn: 'Sign In',
+  signUp: 'Sign Up',
+  registration: 'Registration',
+  email: 'Email',
+  password: 'Password',
+  fullName: 'Full Name',
+  position: 'Position',
+  department: 'Department',
+  phone: 'Phone',
+  telegram: 'Telegram',
+  signingIn: 'Signing in...',
+  registering: 'Registering...',
+  enterSystem: 'Enter the system or create a new account',
+  successLogin: 'Successful login',
+  welcomeToTiger: 'Welcome to Tiger CRM!',
+  loginError: 'Login error',
+  registrationSuccess: 'Registration successful!',
+  checkEmail: 'Check your email to confirm your account (or login immediately if confirmation is disabled)',
+  registrationError: 'Registration error',
+  invalidCredentials: 'Invalid email or password',
+  emailNotConfirmed: 'Confirm your email before logging in',
+  userExists: 'User with this email already exists',
+  weakPassword: 'Password is too weak. Minimum 6 characters',
+  loginErrorGeneric: 'An error occurred during login',
+  registrationErrorGeneric: 'An error occurred during registration',
+  selectDepartment: 'Select department',
+  minPassword: 'Minimum 6 characters',
+  systemDesc: 'Company Results Achievement System',
+  
   notifications: 'Notifications',
   noNotifications: 'No notifications',
   markAsRead: 'Mark as read',
@@ -514,23 +566,14 @@ const baseTranslations: Translations = {
   logout: 'Logout',
   signup: 'Sign Up',
   signupPrompt: 'Don\'t have an account? Sign up',
-  email: 'Email',
-  password: 'Password',
   forgotPassword: 'Forgot password?',
   resetPassword: 'Reset Password',
   confirmPassword: 'Confirm Password',
-  fullName: 'Full Name',
-  position: 'Position',
-  department: 'Department',
-  loginError: 'Login failed',
   signupError: 'Registration failed',
   resetPasswordError: 'Password reset failed',
   resetPasswordSuccess: 'Password reset email sent',
   authRedirect: 'Redirecting...',
-  invalidCredentials: 'Invalid email or password',
   passwordMismatch: 'Passwords do not match',
-  weakPassword: 'Password too weak',
-  userExists: 'User already exists',
   
   // Tasks
   allTasks: 'All Tasks',
@@ -894,6 +937,37 @@ export const translations: Record<string, Translations> = {
     deadline: 'Дедлайн',
     lastUpdateTime: 'Последнее обновление',
     technicalStatus: 'Техническое состояние',
+    
+    // Auth & Forms Russian
+    auth: 'Авторизация',
+    signIn: 'Вход',
+    signUp: 'Регистрация',
+    registration: 'Регистрация',
+    email: 'Email',
+    password: 'Пароль',
+    fullName: 'Полное имя',
+    position: 'Должность',
+    department: 'Подразделение',
+    phone: 'Телефон',
+    telegram: 'Telegram',
+    signingIn: 'Вход...',
+    registering: 'Регистрация...',
+    enterSystem: 'Войдите в систему или создайте новый аккаунт',
+    successLogin: 'Успешный вход',
+    welcomeToTiger: 'Добро пожаловать в Tiger CRM!',
+    loginError: 'Ошибка входа',
+    registrationSuccess: 'Регистрация успешна!',
+    checkEmail: 'Проверьте email для подтверждения аккаунта (или войдите сразу если отключено подтверждение)',
+    registrationError: 'Ошибка регистрации',
+    invalidCredentials: 'Неверный email или пароль',
+    emailNotConfirmed: 'Подтвердите email перед входом',
+    userExists: 'Пользователь с таким email уже существует',
+    weakPassword: 'Пароль слишком слабый. Минимум 6 символов',
+    loginErrorGeneric: 'Произошла ошибка при входе',
+    registrationErrorGeneric: 'Произошла ошибка при регистрации',
+    selectDepartment: 'Выберите подразделение',
+    minPassword: 'Минимум 6 символов',
+    systemDesc: 'Система достижения результатов компании',
   },
   
   bg: {
@@ -936,5 +1010,36 @@ export const translations: Record<string, Translations> = {
     deadline: 'Краен срок',
     lastUpdateTime: 'Последна актуализация',
     technicalStatus: 'Техническо състояние',
+    
+    // Auth & Forms Bulgarian
+    auth: 'Оторизация',
+    signIn: 'Влизане',
+    signUp: 'Регистрация',
+    registration: 'Регистрация',
+    email: 'Email',
+    password: 'Парола',
+    fullName: 'Пълно име',
+    position: 'Длъжност',
+    department: 'Отдел',
+    phone: 'Телефон',
+    telegram: 'Telegram',
+    signingIn: 'Влизане...',
+    registering: 'Регистрация...',
+    enterSystem: 'Влезте в системата или създайте нов акаунт',
+    successLogin: 'Успешно влизане',
+    welcomeToTiger: 'Добре дошли в Tiger CRM!',
+    loginError: 'Грешка при влизане',
+    registrationSuccess: 'Регистрацията е успешна!',
+    checkEmail: 'Проверете email-а си за потвърждение на акаунта (или влезте веднага ако потвърждението е изключено)',
+    registrationError: 'Грешка при регистрация',
+    invalidCredentials: 'Неправилен email или парола',
+    emailNotConfirmed: 'Потвърдете email-а си преди влизане',
+    userExists: 'Потребител с този email вече съществува',
+    weakPassword: 'Паролата е твърде слаба. Минимум 6 символа',
+    loginErrorGeneric: 'Възникна грешка при влизане',
+    registrationErrorGeneric: 'Възникна грешка при регистрация',
+    selectDepartment: 'Изберете отдел',
+    minPassword: 'Минимум 6 символа',
+    systemDesc: 'Система за постигане на резултати от компанията',
   }
 };
