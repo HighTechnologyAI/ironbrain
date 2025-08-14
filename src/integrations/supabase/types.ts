@@ -1641,6 +1641,20 @@ export type Database = {
           model: string | null
           status: string | null
         }
+        Insert: {
+          battery_level?: number | null
+          drone_name?: string | null
+          latest_data?: never
+          model?: string | null
+          status?: string | null
+        }
+        Update: {
+          battery_level?: number | null
+          drone_name?: string | null
+          latest_data?: never
+          model?: string | null
+          status?: string | null
+        }
         Relationships: []
       }
       uav_analytics_summary: {
