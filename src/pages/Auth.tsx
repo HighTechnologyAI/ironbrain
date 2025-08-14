@@ -13,10 +13,12 @@ import { Zap, Shield, Lock, Mail, User, Eye, EyeOff, Building, Briefcase, Phone,
 import { useLanguage } from "@/hooks/use-language";
 import CyberBackground from "@/components/AnimatedStarfield";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import TransitionPortal from "@/components/TransitionPortal";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -40,13 +42,14 @@ const Auth = () => {
 
     // Слушаем изменения авторизации
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        navigate('/');
+      if (event === 'SIGNED_IN' && session && !isTransitioning) {
+        // Only auto-navigate if not already transitioning
+        setIsTransitioning(true);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, isTransitioning]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -82,7 +85,9 @@ const Auth = () => {
           title: t.successLogin,
           description: t.welcomeToTiger,
         });
-        navigate('/');
+        
+        // Start transition animation instead of direct navigation
+        setIsTransitioning(true);
       }
     } catch (error: any) {
       let errorMessage = t.loginErrorGeneric;
@@ -155,10 +160,19 @@ const Auth = () => {
   };
 
 
+  const handleTransitionComplete = () => {
+    setIsTransitioning(false);
+  };
+
   return (
-    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-6">
+    <>
+      <TransitionPortal 
+        isActive={isTransitioning} 
+        onComplete={handleTransitionComplete}
+      />
+      <div className={`min-h-screen relative overflow-hidden flex items-center justify-center p-6 transition-all duration-1000 ${isTransitioning ? 'scale-95 opacity-90' : ''}`}>
       <CyberBackground />
-      <div className="w-full max-w-md relative z-10">
+      <div className={`w-full max-w-md relative z-10 transition-all duration-1000 ${isTransitioning ? 'transform translate-x-8 scale-95' : ''}`}>
         {/* Header */}
         {/* Language Switcher */}
         <div className="fixed top-4 right-4 z-50">
@@ -406,6 +420,7 @@ const Auth = () => {
 
       </div>
     </div>
+    </>
   );
 };
 
