@@ -34,38 +34,8 @@ interface ProductionUnit {
 
 const ProductionKanban = () => {
   const { t } = useLanguage();
-  const [units] = useState<ProductionUnit[]>([
-    {
-      id: '1',
-      serialNumber: 'UAV-2024-001',
-      model: 'Tiger-X Pro',
-      stage: 'mechanical',
-      progress: 75,
-      assignedTo: 'Иван П.',
-      estimatedCompletion: '2 часа',
-      priority: 'normal'
-    },
-    {
-      id: '2',
-      serialNumber: 'UAV-2024-002',
-      model: 'Tiger-X Standard',
-      stage: 'electronics',
-      progress: 45,
-      assignedTo: 'Мария К.',
-      estimatedCompletion: '4 часа',
-      priority: 'high'
-    },
-    {
-      id: '3',
-      serialNumber: 'UAV-2024-003',
-      model: 'Tiger-X Pro',
-      stage: 'testing',
-      progress: 90,
-      assignedTo: 'Алексей М.',
-      estimatedCompletion: '30 мин',
-      priority: 'urgent'
-    }
-  ]);
+  // Пока нет активного производства - готовимся к демо-шоу
+  const [units] = useState<ProductionUnit[]>([]);
 
   const stages = [
     { 
@@ -132,171 +102,176 @@ const ProductionKanban = () => {
     }
   };
 
-  const monthlyTarget = 100;
-  const currentProduction = 78;
-  const completionRate = (currentProduction / monthlyTarget) * 100;
+  // Данные для демо-шоу 10 сентября
+  const demoDate = new Date('2024-09-10');
+  const today = new Date();
+  const daysUntilDemo = Math.ceil((demoDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  const demoPreparationProgress = Math.max(0, Math.min(100, ((30 - daysUntilDemo) / 30) * 100)); // 30 дней подготовки
 
   return (
     <div className="min-h-screen bg-background">
-      <AppNavigation title={t.productionKanban} subtitle="Kanban-система управления производством UAV" />
+      <AppNavigation title="Подготовка к демо-шоу" subtitle="Демонстрация дронов - 10 сентября 2024" />
       
       <div className="max-w-7xl mx-auto p-6 space-y-8">
-        {/* Production KPIs */}
+        {/* Demo Preparation Status */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="bg-surface-1 border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
-                {t.strategicTarget}
+                Дата демо-шоу
               </CardTitle>
               <Target className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-mono">{monthlyTarget}</div>
-              <p className="text-xs text-muted-foreground">единиц/месяц</p>
+              <div className="text-xl font-bold font-mono">10 сентября</div>
+              <p className="text-xs text-muted-foreground">2024 год</p>
             </CardContent>
           </Card>
 
           <Card className="bg-surface-1 border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
-                {t.production}
-              </CardTitle>
-              <Factory className="h-4 w-4 text-success" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold font-mono text-success">{currentProduction}</div>
-              <div className="flex items-center gap-1 text-xs">
-                <TrendingUp className="h-3 w-3 text-success" />
-                <span className="text-success">+12 за неделю</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-surface-1 border-border">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
-                {t.performance}
-              </CardTitle>
-              <BarChart3 className="h-4 w-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold font-mono">{completionRate.toFixed(1)}%</div>
-              <Progress value={completionRate} className="h-2 mt-2" />
-            </CardContent>
-          </Card>
-
-          <Card className="bg-surface-1 border-border">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
-                {t.inProgress}
+                Дней осталось
               </CardTitle>
               <Clock className="h-4 w-4 text-warning" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-mono text-warning">{units.length}</div>
-              <p className="text-xs text-muted-foreground">активных единиц</p>
+              <div className="text-2xl font-bold font-mono text-warning">{Math.max(0, daysUntilDemo)}</div>
+              <div className="flex items-center gap-1 text-xs">
+                <AlertTriangle className="h-3 w-3 text-warning" />
+                <span className="text-warning">до демонстрации</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-surface-1 border-border">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
+                Готовность
+              </CardTitle>
+              <BarChart3 className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold font-mono">{demoPreparationProgress.toFixed(0)}%</div>
+              <Progress value={demoPreparationProgress} className="h-2 mt-2" />
+            </CardContent>
+          </Card>
+
+          <Card className="bg-surface-1 border-border">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
+                Будущее производство
+              </CardTitle>
+              <Factory className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl font-bold font-mono text-muted-foreground">TBD</div>
+              <p className="text-xs text-muted-foreground">после демонстрации</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Kanban Board */}
-        <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
-          {stages.map((stage) => {
-            const stageUnits = getUnitsInStage(stage.id);
-            return (
-              <div key={stage.id} className="space-y-4">
-                {/* Stage Header */}
-                <div className={`p-4 rounded-lg ${stage.bgColor} border border-border`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <stage.icon className={`h-5 w-5 ${stage.color}`} />
-                      <h3 className="font-semibold font-ui">{stage.name}</h3>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {stageUnits.length}
-                    </Badge>
-                  </div>
-                </div>
-
-                {/* Units in Stage */}
-                <div className="space-y-3">
-                  {stageUnits.map((unit) => (
-                    <Card key={unit.id} className="bg-surface-1 border-border hover:shadow-medium transition-all duration-300">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-sm font-ui">{unit.serialNumber}</CardTitle>
-                          <StatusChip 
-                            priority={getPriorityVariant(unit.priority) as any}
-                            className="text-xs"
-                          >
-                            {getPriorityText(unit.priority)}
-                          </StatusChip>
-                        </div>
-                        <CardDescription className="text-xs font-mono">
-                          {unit.model}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="pt-0 space-y-3">
-                        <div>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="text-muted-foreground">{t.progress}:</span>
-                            <span className="font-mono font-semibold">{unit.progress}%</span>
-                          </div>
-                          <Progress value={unit.progress} className="h-2" />
-                        </div>
-                        
-                        <div className="space-y-1 text-xs">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">{t.assignedTo}:</span>
-                            <span className="font-semibold">{unit.assignedTo}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">{t.estimatedCompletion}:</span>
-                            <span className="font-mono font-semibold text-primary">{unit.estimatedCompletion}</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-
-                {/* Add Unit Button */}
-                <Button 
-                  variant="outline" 
-                  className="w-full h-16 border-dashed border-2 hover:bg-surface-2"
-                >
-                  <Package className="h-4 w-4 mr-2" />
-                  Добавить единицу
-                </Button>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Quality Control Section */}
+        {/* Demo Preparation Status */}
         <Card className="bg-surface-1 border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-ui">
-              <ClipboardCheck className="h-5 w-5 text-primary" />
-              Контроль качества
+              <Target className="h-5 w-5 text-primary" />
+              Подготовка к демонстрации дронов
             </CardTitle>
+            <CardDescription>
+              Текущее состояние подготовки к показательному полету 10 сентября 2024
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold font-mono text-success mb-2">99.2%</div>
-                <p className="text-sm text-muted-foreground">Процент годных</p>
-                <StatusChip variant="ready" className="mt-2">ОТЛИЧНО</StatusChip>
+              <div className="text-center p-6 rounded-lg bg-primary/10 border border-primary/20">
+                <Target className="h-12 w-12 text-primary mx-auto mb-4" />
+                <div className="text-xl font-bold font-mono text-primary mb-2">ЦЕЛЬ</div>
+                <p className="text-sm text-muted-foreground mb-4">Демонстрация возможностей дронов Tiger-X</p>
+                <StatusChip variant="info" className="text-xs">10 СЕНТЯБРЯ</StatusChip>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold font-mono text-warning mb-2">2</div>
-                <p className="text-sm text-muted-foreground">Единиц на доработке</p>
-                <StatusChip variant="warning" className="mt-2">КОНТРОЛЬ</StatusChip>
+              
+              <div className="text-center p-6 rounded-lg bg-warning/10 border border-warning/20">
+                <Factory className="h-12 w-12 text-warning mx-auto mb-4" />
+                <div className="text-xl font-bold font-mono text-warning mb-2">СТАТУС</div>
+                <p className="text-sm text-muted-foreground mb-4">Производство будет запущено после демо</p>
+                <StatusChip variant="warning" className="text-xs">ОЖИДАНИЕ</StatusChip>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold font-mono text-primary mb-2">4.2</div>
-                <p className="text-sm text-muted-foreground">Среднее время сборки (ч)</p>
-                <StatusChip variant="info" className="mt-2">В НОРМЕ</StatusChip>
+              
+              <div className="text-center p-6 rounded-lg bg-success/10 border border-success/20">
+                <CheckCircle className="h-12 w-12 text-success mx-auto mb-4" />
+                <div className="text-xl font-bold font-mono text-success mb-2">ЗАДАЧА</div>
+                <p className="text-sm text-muted-foreground mb-4">Определить объемы производства</p>
+                <StatusChip variant="ready" className="text-xs">ПОСЛЕ ДЕМО</StatusChip>
+              </div>
+            </div>
+            
+            <div className="mt-8 p-6 rounded-lg bg-info/10 border border-info/20">
+              <div className="flex items-center gap-3 mb-4">
+                <BarChart3 className="h-6 w-6 text-info" />
+                <h3 className="text-lg font-semibold">Следующие шаги</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    <span>Подготовка демонстрационных дронов</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-warning" />
+                    <span>Планирование презентации</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-info" />
+                    <span>Подготовка команды</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-warning" />
+                    <span>Проверка безопасности полетов</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Truck className="h-4 w-4 text-info" />
+                    <span>Логистика мероприятия</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Package className="h-4 w-4 text-muted-foreground" />
+                    <span>Анализ результатов и планирование производства</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Future Production Planning */}
+        <Card className="bg-surface-1 border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 font-ui">
+              <Factory className="h-5 w-5 text-primary" />
+              Планирование производства
+            </CardTitle>
+            <CardDescription>
+              После успешной демонстрации будут определены объемы и сроки производства
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center p-4 rounded-lg bg-muted/30">
+                <div className="text-2xl font-bold font-mono text-muted-foreground mb-2">?</div>
+                <p className="text-sm text-muted-foreground">Целевой объем</p>
+                <p className="text-xs text-muted-foreground mt-1">определится после демо</p>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-muted/30">
+                <div className="text-2xl font-bold font-mono text-muted-foreground mb-2">?</div>
+                <p className="text-sm text-muted-foreground">Сроки производства</p>
+                <p className="text-xs text-muted-foreground mt-1">зависят от спроса</p>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-muted/30">
+                <div className="text-2xl font-bold font-mono text-muted-foreground mb-2">?</div>
+                <p className="text-sm text-muted-foreground">Модификации</p>
+                <p className="text-xs text-muted-foreground mt-1">по итогам демонстрации</p>
               </div>
             </div>
           </CardContent>
