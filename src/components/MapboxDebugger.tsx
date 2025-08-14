@@ -56,10 +56,11 @@ const MapboxDebugger: React.FC = () => {
       setResult({
         token_received: true,
         token_length: data.token.length,
-        token_preview: data.token.substring(0, 10) + '...',
+        token_preview: data.token.substring(0, 15) + '...',
         edge_function_duration: duration,
         mapbox_api_test: 'success',
-        geocoding_results: geocodingResult.features?.length || 0
+        geocoding_results: geocodingResult.features?.length || 0,
+        status: 'ALL_SYSTEMS_OPERATIONAL'
       });
       
     } catch (err) {
