@@ -97,7 +97,9 @@ export type Database = {
           id: string
           input_data: Json | null
           model_used: string | null
+          priority: number | null
           provider: string
+          queue_status: string | null
           result_data: string | null
           success: boolean
           tokens_used: number | null
@@ -111,7 +113,9 @@ export type Database = {
           id?: string
           input_data?: Json | null
           model_used?: string | null
+          priority?: number | null
           provider: string
+          queue_status?: string | null
           result_data?: string | null
           success?: boolean
           tokens_used?: number | null
@@ -125,7 +129,9 @@ export type Database = {
           id?: string
           input_data?: Json | null
           model_used?: string | null
+          priority?: number | null
           provider?: string
+          queue_status?: string | null
           result_data?: string | null
           success?: boolean
           tokens_used?: number | null
