@@ -24,50 +24,47 @@ export const SimpleVoiceButton: React.FC = () => {
 
   const speak = async (text: string) => {
     try {
-      console.log('Speaking with OpenAI TTS:', text);
+      console.log('🎤 Начинаю озвучивание:', text);
       
-      // Используем OpenAI TTS для живого голоса
-      const response = await fetch(`https://zqnjgwrvvrqaenzmlvfx.supabase.co/functions/v1/ai-text-to-speech`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpxbmpnd3J2dnJxYWVuem1sdmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyNDYwNDcsImV4cCI6MjA2OTgyMjA0N30.uv41CLbWP5ZMnQLymCIE9uB9m4wC9xyKNSOU3btqcR8'}`
-        },
-        body: JSON.stringify({ 
+      // Используем Supabase client для вызова edge функции
+      const { data, error } = await supabase.functions.invoke('ai-text-to-speech', {
+        body: { 
           text, 
-          voice: 'alloy' // Можно изменить на: echo, fable, onyx, nova, shimmer
-        })
+          voice: 'alloy'
+        }
       });
 
-      if (!response.ok) {
-        console.error('TTS Error:', response.status, response.statusText);
-        // Fallback к браузерному TTS
+      if (error) {
+        console.error('❌ TTS Edge Function Error:', error);
         fallbackSpeak(text);
         return;
       }
 
-      // Воспроизводим живой голос
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
+      console.log('✅ TTS Response received, size:', data?.size || 'unknown');
+
+      // Создаем Audio объект напрямую из ответа
+      const audio = new Audio();
+      audio.src = URL.createObjectURL(new Blob([data], { type: 'audio/mpeg' }));
       
+      audio.onloadstart = () => console.log('🎵 Audio loading started');
+      audio.oncanplay = () => console.log('🎵 Audio can play');
+      audio.onplay = () => console.log('🎵 Audio started playing');
       audio.onended = () => {
-        URL.revokeObjectURL(audioUrl);
+        console.log('🎵 Audio finished playing');
+        URL.revokeObjectURL(audio.src);
       };
       
       audio.onerror = (e) => {
-        console.error('Audio playback error:', e);
-        URL.revokeObjectURL(audioUrl);
-        // Fallback к браузерному TTS
+        console.error('❌ Audio playback error:', e);
+        URL.revokeObjectURL(audio.src);
         fallbackSpeak(text);
       };
       
       await audio.play();
-      console.log('Playing live voice audio');
+      console.log('🎵 Live voice audio playing...');
       
     } catch (error) {
-      console.error('Speech error:', error);
-      // Fallback к браузерному TTS
+      console.error('❌ Speech error:', error);
       fallbackSpeak(text);
     }
   };
