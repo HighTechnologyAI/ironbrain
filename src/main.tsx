@@ -4,6 +4,7 @@ import App from './App.tsx'
 import './index.css'
 import './theme/tokens.css'
 import { initializeNeonTheme } from './theme'
+import './i18n'
 
 // Initialize Tiger Neon UI v2 theme system
 initializeNeonTheme();

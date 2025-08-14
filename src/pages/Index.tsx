@@ -1,1 +1,1 @@
-export { default } from './UAVDashboard';
+export { default } from './Dashboard';

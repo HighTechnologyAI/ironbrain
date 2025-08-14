@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LucideIcon, Home, Bot, CheckSquare, Users, Target, BarChart3, Shield, Award, ExternalLink, Settings, Plane, Factory, Wrench, FileText } from 'lucide-react';
+import { LucideIcon, Home, Bot, CheckSquare, Users, Target, BarChart3, Shield, Award, ExternalLink, Settings, Plane, Factory, Wrench, FileText, Activity, Map, Radio } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -33,7 +33,19 @@ export function AppSidebar() {
   // UAV-focused navigation groups
   const operationsItems: Item[] = [
     { title: t.dashboard || 'Операционный центр', url: '/', icon: Home },
-    { title: 'Mission Control', url: '/missions', icon: Plane, badge: 'LIVE', variant: 'mission' },
+    // Operations Center pages - conditional on feature flags
+    ...(import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' ? [
+      { title: 'Operations Center', url: '/ops-center', icon: Activity, badge: 'OPS' }
+    ] : []),
+    ...(import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' ? [
+      { title: 'Mission Control', url: '/mission-control', icon: Map, badge: 'LIVE', variant: 'mission' as const }
+    ] : []),
+    ...(import.meta.env.VITE_FEATURE_FLEET === 'true' ? [
+      { title: 'Fleet Management', url: '/fleet', icon: Plane }
+    ] : []),
+    ...(import.meta.env.VITE_FEATURE_COMMAND_CENTER === 'true' ? [
+      { title: 'Command Center', url: '/command-center', icon: Shield, badge: 'CTRL', variant: 'warning' as const }
+    ] : []),
     { title: t.tasks || 'Задачи', url: '/tasks', icon: CheckSquare },
     { title: t.team || 'Команда', url: '/team', icon: Users }
   ];
@@ -53,6 +65,10 @@ export function AppSidebar() {
 
   const adminItems: Item[] = [
     { title: t.documents || 'Документооборот', url: '/documents', icon: FileText },
+    // System Logs - conditional on feature flag
+    ...(import.meta.env.VITE_FEATURE_LOGS === 'true' ? [
+      { title: 'System Logs', url: '/logs', icon: Radio, badge: 'LOG' }
+    ] : []),
     { title: t.integrations || 'Интеграции', url: '/integrations', icon: ExternalLink },
     ...(isAdmin ? [{ title: t.admin || 'Админ', url: '/admin', icon: Settings, badge: 'SYS' } as Item] : [])
   ];
