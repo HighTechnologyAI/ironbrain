@@ -9,6 +9,7 @@ import { toast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/use-language';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
+import { useTaskStatistics } from '@/hooks/use-task-statistics';
 import { 
   Brain, 
   Target, 
@@ -66,6 +67,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
   } | null>(null);
   const { t } = useLanguage();
   const { user } = useAuth();
+  const { statistics: taskStatistics, isLoading: isLoadingStats } = useTaskStatistics();
 
   // Анализ рисков для выбранной задачи
   const analyzeTaskRisks = (task: Task) => {
@@ -159,27 +161,6 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
     return actions;
   };
 
-  // Автосаммари на основе истории задач
-  const generateTaskSummary = () => {
-    const completedTasks = tasks.filter(t => t.status === 'completed').length;
-    const inProgressTasks = tasks.filter(t => t.status === 'in_progress').length;
-    const overdueTasks = tasks.filter(t => {
-      const dueDate = new Date(t.due_date);
-      return dueDate < new Date() && t.status !== 'completed';
-    }).length;
-
-    const highPriorityTasks = tasks.filter(t => 
-      (t.priority === 'high' || t.priority === 'critical') && t.status !== 'completed'
-    ).length;
-
-    return {
-      completedTasks,
-      inProgressTasks,
-      overdueTasks,
-      highPriorityTasks,
-      totalTasks: tasks.length
-    };
-  };
 
   // Действия с задачами через AI
   const handleGenerateSummary = async () => {
@@ -443,7 +424,6 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
     }
   };
 
-  const summary = generateTaskSummary();
   const risks = selectedTask ? analyzeTaskRisks(selectedTask) : [];
   const nextActions = selectedTask ? generateNextActions(selectedTask) : [];
 
@@ -471,25 +451,33 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
             <div className="grid grid-cols-2 gap-3">
               <Card className="p-3 bg-surface-2 border-border">
                 <div className="text-center">
-                  <div className="text-lg font-bold font-mono text-success">{summary.completedTasks}</div>
+                  <div className="text-lg font-bold font-mono text-success">
+                    {isLoadingStats ? '...' : taskStatistics.completedTasks}
+                  </div>
                   <div className="text-xs text-muted-foreground">{t.completed}</div>
                 </div>
               </Card>
               <Card className="p-3 bg-surface-2 border-border">
                 <div className="text-center">
-                  <div className="text-lg font-bold font-mono text-primary">{summary.inProgressTasks}</div>
+                  <div className="text-lg font-bold font-mono text-primary">
+                    {isLoadingStats ? '...' : taskStatistics.inProgressTasks}
+                  </div>
                   <div className="text-xs text-muted-foreground">{t.inProgress}</div>
                 </div>
               </Card>
               <Card className="p-3 bg-surface-2 border-border">
                 <div className="text-center">
-                  <div className="text-lg font-bold font-mono text-destructive">{summary.overdueTasks}</div>
+                  <div className="text-lg font-bold font-mono text-destructive">
+                    {isLoadingStats ? '...' : taskStatistics.overdueTasks}
+                  </div>
                   <div className="text-xs text-muted-foreground">Просрочено</div>
                 </div>
               </Card>
               <Card className="p-3 bg-surface-2 border-border">
                 <div className="text-center">
-                  <div className="text-lg font-bold font-mono text-warning">{summary.highPriorityTasks}</div>
+                  <div className="text-lg font-bold font-mono text-warning">
+                    {isLoadingStats ? '...' : taskStatistics.highPriorityTasks}
+                  </div>
                   <div className="text-xs text-muted-foreground">{t.high}</div>
                 </div>
               </Card>
