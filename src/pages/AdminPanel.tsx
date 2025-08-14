@@ -32,10 +32,16 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import TerminalInterface from '@/components/TerminalInterface';
 import TeamManagement from '@/components/TeamManagement';
+import { validateSqlQuery, validateAdminKey, RateLimiter } from '@/utils/security';
+
+// Rate limiter для защиты от brute force
+const rateLimiter = new RateLimiter(5, 15 * 60 * 1000); // 5 попыток за 15 минут
 
 const AdminPanel = () => {
   const [adminKey, setAdminKey] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authAttempts, setAuthAttempts] = useState(0);
+  const [lockoutTime, setLockoutTime] = useState<number | null>(null);
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [sqlQuery, setSqlQuery] = useState('');
@@ -65,21 +71,23 @@ const AdminPanel = () => {
 
   const adminApiCall = async (action: string, method = 'GET', body?: any) => {
     try {
-      const response = await fetch(`https://zqnjgwrvvrqaenzmlvfx.supabase.co/functions/v1/admin-api?action=${action}`, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-key': adminKey,
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpxbmpnd3J2dnJxYWVuem1sdmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyNDYwNDcsImV4cCI6MjA2OTgyMjA0N30.uv41CLbWP5ZMnQLymCIE9uB9m4wC9xyKNSOU3btqcR8`
+      // Используем supabase client для безопасных вызовов
+      const { data, error } = await supabase.functions.invoke('admin-api', {
+        body: {
+          action,
+          method,
+          data: body
         },
-        body: body ? JSON.stringify(body) : undefined
+        headers: {
+          'x-admin-key': adminKey
+        }
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+      if (error) {
+        throw new Error(error.message || 'API Error');
       }
 
-      return await response.json();
+      return data;
     } catch (error: any) {
       toast({
         title: 'API Error',
@@ -91,10 +99,25 @@ const AdminPanel = () => {
   };
 
   const authenticate = async () => {
-    if (!adminKey.trim()) {
+    // Rate limiting проверка
+    const clientId = 'admin-auth';
+    if (!rateLimiter.isAllowed(clientId)) {
+      const remainingMs = rateLimiter.getRemainingTime(clientId);
+      const remainingMinutes = Math.ceil(remainingMs / 60000);
       toast({
-        title: t.error,
-        description: t.enterAdminKey,
+        title: 'Слишком много попыток',
+        description: `Попробуйте через ${remainingMinutes} мин.`,
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Валидация admin ключа
+    const keyValidation = validateAdminKey(adminKey);
+    if (!keyValidation.isValid) {
+      toast({
+        title: 'Неверный формат ключа',
+        description: keyValidation.error,
         variant: 'destructive'
       });
       return;
@@ -104,17 +127,33 @@ const AdminPanel = () => {
     try {
       await adminApiCall('system_status');
       setIsAuthenticated(true);
+      setAuthAttempts(0); // Сброс счетчика при успешной аутентификации
+      setLockoutTime(null);
       loadDashboard();
       toast({
         title: t.success,
         description: t.loginToAdmin,
       });
     } catch (error) {
-      toast({
-        title: 'Ошибка аутентификации',
-        description: 'Неверный admin ключ',
-        variant: 'destructive'
-      });
+      const newAttempts = authAttempts + 1;
+      setAuthAttempts(newAttempts);
+      
+      // Блокировка после 5 неудачных попыток на 15 минут
+      if (newAttempts >= 5) {
+        const lockoutEnd = Date.now() + (15 * 60 * 1000); // 15 минут
+        setLockoutTime(lockoutEnd);
+        toast({
+          title: 'Доступ заблокирован',
+          description: 'Слишком много неудачных попыток. Доступ заблокирован на 15 минут.',
+          variant: 'destructive'
+        });
+      } else {
+        toast({
+          title: 'Ошибка аутентификации',
+          description: `Неверный admin ключ (попытка ${newAttempts}/5)`,
+          variant: 'destructive'
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -143,6 +182,17 @@ const AdminPanel = () => {
 
   const executeQuery = async () => {
     if (!sqlQuery.trim()) return;
+
+    // Валидация SQL запроса
+    const queryValidation = validateSqlQuery(sqlQuery);
+    if (!queryValidation.isValid) {
+      toast({
+        title: 'Неверный SQL запрос',
+        description: queryValidation.error,
+        variant: 'destructive'
+      });
+      return;
+    }
 
     setLoading(true);
     try {

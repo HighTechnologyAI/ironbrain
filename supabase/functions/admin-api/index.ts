@@ -8,8 +8,13 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS'
 };
 
-// Admin authentication key
-const ADMIN_KEY = Deno.env.get('ADMIN_API_KEY') || 'tiger-admin-2025';
+// Admin authentication key - должен быть установлен через переменные окружения
+const ADMIN_KEY = Deno.env.get('ADMIN_API_KEY');
+
+if (!ADMIN_KEY) {
+  console.error('КРИТИЧЕСКАЯ ОШИБКА: ADMIN_API_KEY не установлен в переменных окружения');
+  // В production должна быть ошибка, в development - предупреждение
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -20,9 +25,22 @@ serve(async (req) => {
   try {
     // Check admin authentication
     const adminKey = req.headers.get('x-admin-key');
-    if (adminKey !== ADMIN_KEY) {
+    
+    // Если ключ не установлен в переменных окружения, отклоняем все запросы
+    if (!ADMIN_KEY) {
+      console.error('Admin API вызван, но ADMIN_API_KEY не настроен');
       return new Response(JSON.stringify({ 
-        error: 'Unauthorized - Invalid admin key' 
+        error: 'Service configuration error - Admin API unavailable' 
+      }), {
+        status: 503,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    if (!adminKey || adminKey !== ADMIN_KEY) {
+      console.warn('Неавторизованная попытка доступа к Admin API');
+      return new Response(JSON.stringify({ 
+        error: 'Unauthorized - Invalid or missing admin key' 
       }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
