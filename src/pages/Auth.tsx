@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Zap, Shield, Lock, Mail, User, Eye, EyeOff, Building, Briefcase, Phone, MessageCircle } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
-import AnimatedStarfield from "@/components/AnimatedStarfield";
+import CyberBackground from "@/components/AnimatedStarfield";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -156,7 +156,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-6">
-      <AnimatedStarfield />
+      <CyberBackground />
       <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
