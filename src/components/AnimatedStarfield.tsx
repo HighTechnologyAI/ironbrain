@@ -1,4 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, Suspense } from 'react';
+import { Canvas } from '@react-three/fiber';
+import StarEntity from './StarEntity';
 
 interface Star {
   x: number;
@@ -102,11 +104,22 @@ const AnimatedStarfield = () => {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0"
-      style={{ background: 'rgb(10, 10, 10)' }}
-    />
+    <div className="fixed inset-0 pointer-events-none z-0">
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0"
+        style={{ background: 'rgb(10, 10, 10)' }}
+      />
+      <Canvas
+        className="absolute inset-0"
+        camera={{ position: [0, 0, 10], fov: 60 }}
+        style={{ background: 'transparent' }}
+      >
+        <Suspense fallback={null}>
+          <StarEntity />
+        </Suspense>
+      </Canvas>
+    </div>
   );
 };
 
