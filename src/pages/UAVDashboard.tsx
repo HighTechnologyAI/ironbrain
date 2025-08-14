@@ -170,35 +170,34 @@ const UAVDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* System Status Panel */}
-        <Card className="bg-surface-1 border-border">
-          <CardHeader>
-            <CardTitle className="text-lg font-ui flex items-center gap-2">
-              <Activity className="h-5 w-5 text-primary" />
-              {t.systemStatusLabel || "Системный статус"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {systemMetrics.map((metric, index) => (
-                <div key={index} className="text-center p-3 rounded-lg bg-surface-2 border border-border">
-                  <metric.icon className="h-6 w-6 mx-auto mb-2 text-primary" />
-                  <div className="text-xs text-muted-foreground mb-1">{metric.label}</div>
-                  <div className="font-mono font-semibold text-sm">{metric.value}</div>
-                  <StatusChip 
-                    variant={metric.status as any} 
-                    className="mt-2 text-xs scale-75"
-                  >
-                    {metric.status === "ready" ? "ОК" : "ВНИМАНИЕ"}
+        {/* KPI Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {kpiCards.map((kpi, index) => (
+            <Card key={index} className="bg-surface-1 border-border hover:shadow-medium transition-all duration-300">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
+                  {kpi.title}
+                </CardTitle>
+                <kpi.icon className="h-5 w-5 text-primary" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold font-mono text-foreground">{kpi.value}</div>
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center gap-1 text-xs">
+                    <TrendingUp className="h-3 w-3 text-success" />
+                    <span className="text-success font-semibold">{kpi.change}</span>
+                  </div>
+                  <StatusChip variant={kpi.status} className="text-xs">
+                    {kpi.status === "armed" ? t.armedStatus || "ВООРУЖЕН" : 
+                     kpi.status === "ready" ? t.readyStatus || "ГОТОВ" : 
+                     kpi.status === "info" ? "ИНФО" : t.warningStatus || "ПРЕДУПРЕЖДЕНИЕ"}
                   </StatusChip>
                 </div>
-              ))}
-            </div>
-            <div className="mt-4 text-xs text-muted-foreground text-center font-mono">
-              Последнее обновление: {currentTime.toLocaleString()}
-            </div>
-          </CardContent>
-        </Card>
+                <p className="text-xs text-muted-foreground mt-1">{kpi.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
         {/* Quick Actions Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -249,34 +248,35 @@ const UAVDashboard = () => {
           </Button>
         </div>
 
-        {/* KPI Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {kpiCards.map((kpi, index) => (
-            <Card key={index} className="bg-surface-1 border-border hover:shadow-medium transition-all duration-300">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
-                  {kpi.title}
-                </CardTitle>
-                <kpi.icon className="h-5 w-5 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold font-mono text-foreground">{kpi.value}</div>
-                <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center gap-1 text-xs">
-                    <TrendingUp className="h-3 w-3 text-success" />
-                    <span className="text-success font-semibold">{kpi.change}</span>
-                  </div>
-                  <StatusChip variant={kpi.status} className="text-xs">
-                    {kpi.status === "armed" ? t.armedStatus || "ВООРУЖЕН" : 
-                     kpi.status === "ready" ? t.readyStatus || "ГОТОВ" : 
-                     kpi.status === "info" ? "ИНФО" : t.warningStatus || "ПРЕДУПРЕЖДЕНИЕ"}
+        {/* System Status Panel */}
+        <Card className="bg-surface-1 border-border">
+          <CardHeader>
+            <CardTitle className="text-lg font-ui flex items-center gap-2">
+              <Activity className="h-5 w-5 text-primary" />
+              {t.systemStatusLabel || "Системный статус"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {systemMetrics.map((metric, index) => (
+                <div key={index} className="text-center p-3 rounded-lg bg-surface-2 border border-border">
+                  <metric.icon className="h-6 w-6 mx-auto mb-2 text-primary" />
+                  <div className="text-xs text-muted-foreground mb-1">{metric.label}</div>
+                  <div className="font-mono font-semibold text-sm">{metric.value}</div>
+                  <StatusChip 
+                    variant={metric.status as any} 
+                    className="mt-2 text-xs scale-75"
+                  >
+                    {metric.status === "ready" ? "ОК" : "ВНИМАНИЕ"}
                   </StatusChip>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">{kpi.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              ))}
+            </div>
+            <div className="mt-4 text-xs text-muted-foreground text-center font-mono">
+              Последнее обновление: {currentTime.toLocaleString()}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
