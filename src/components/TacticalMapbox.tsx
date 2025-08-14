@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Drone } from '@/hooks/use-drones';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface TacticalMapboxProps {
   drones: Drone[];
@@ -75,27 +76,22 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Проверяем, есть ли токен в Supabase secrets или запрашиваем у пользователя
+    // Получаем токен из Supabase edge function
     const initializeMap = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        // Попробуем получить токен из переменной окружения или локального хранилища
-        let token = localStorage.getItem('mapbox_token');
+        // Получаем токен через edge function
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
         
-        if (!token) {
-          // Если токена нет, запросим у пользователя
-          token = prompt('Введите ваш Mapbox Public Token (можно получить на https://mapbox.com/):');
-          if (token) {
-            localStorage.setItem('mapbox_token', token);
-          } else {
-            setError('Требуется Mapbox токен для отображения карты');
-            setLoading(false);
-            return;
-          }
+        if (error || !data?.token) {
+          setError('Ошибка получения Mapbox токена');
+          setLoading(false);
+          return;
         }
 
+        const token = data.token;
         setMapboxToken(token);
         mapboxgl.accessToken = token;
 
@@ -224,23 +220,13 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     }
   };
 
-  const clearToken = () => {
-    localStorage.removeItem('mapbox_token');
-    window.location.reload();
-  };
-
   if (error) {
     return (
       <div className={`h-64 bg-surface-2 rounded-lg flex items-center justify-center border border-border ${className}`}>
         <div className="text-center">
           <AlertTriangle className="h-12 w-12 mx-auto text-destructive mb-2" />
           <p className="text-destructive font-ui mb-2">{error}</p>
-          <button 
-            onClick={clearToken}
-            className="text-sm text-primary hover:underline"
-          >
-            Обновить токен
-          </button>
+          <p className="text-sm text-muted-foreground">Проверьте настройку Mapbox токена в Supabase</p>
         </div>
       </div>
     );
