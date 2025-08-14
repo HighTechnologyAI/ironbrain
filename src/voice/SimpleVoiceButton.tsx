@@ -40,23 +40,30 @@ export const SimpleVoiceButton: React.FC = () => {
         return;
       }
 
-      console.log('✅ TTS Response received, size:', data?.size || 'unknown');
+      if (!data) {
+        console.error('❌ No audio data received');
+        fallbackSpeak(text);
+        return;
+      }
 
-      // Создаем Audio объект напрямую из ответа
-      const audio = new Audio();
-      audio.src = URL.createObjectURL(new Blob([data], { type: 'audio/mpeg' }));
+      console.log('✅ TTS Response received');
+
+      // Создаем аудио из blob данных
+      const audioBlob = new Blob([data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
       
       audio.onloadstart = () => console.log('🎵 Audio loading started');
       audio.oncanplay = () => console.log('🎵 Audio can play');
       audio.onplay = () => console.log('🎵 Audio started playing');
       audio.onended = () => {
         console.log('🎵 Audio finished playing');
-        URL.revokeObjectURL(audio.src);
+        URL.revokeObjectURL(audioUrl);
       };
       
       audio.onerror = (e) => {
         console.error('❌ Audio playback error:', e);
-        URL.revokeObjectURL(audio.src);
+        URL.revokeObjectURL(audioUrl);
         fallbackSpeak(text);
       };
       
