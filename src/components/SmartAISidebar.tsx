@@ -597,22 +597,6 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
                 {isGeneratingSubtasks ? 'Генерация...' : 'Предложить подзадачи'}
               </Button>
 
-              {/* Test button to show AI results immediately */}
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start bg-primary/10"
-                onClick={() => {
-                  setAiResults({
-                    type: 'analysis',
-                    content: 'Тестовый AI анализ:\n\n• Задача требует внимания\n• Рекомендуется обновить статус\n• Добавить комментарий о прогрессе\n\nЭто демонстрация того, как отображаются AI результаты в sidebar.',
-                    timestamp: new Date()
-                  });
-                }}
-              >
-                <Lightbulb className="h-4 w-4 mr-2" />
-                Тест AI результатов
-              </Button>
               
               <Button 
                 variant="outline" 
