@@ -56,8 +56,7 @@ const UAVDashboard = () => {
       icon: Plane,
       status: "armed" as const,
       description: "Drones in flight",
-      onClick: () => navigate('/mission-control'),
-      showButton: true
+      onClick: () => navigate('/mission-control')
     },
     {
       title: "Production Line", 
@@ -66,8 +65,7 @@ const UAVDashboard = () => {
       icon: Target,
       status: "ready" as const,
       description: "Units in production",
-      onClick: () => navigate('/production-kanban'),
-      showButton: true
+      onClick: () => navigate('/production-kanban')
     },
     {
       title: "Technical Status",
@@ -75,8 +73,7 @@ const UAVDashboard = () => {
       change: "+0.5%",
       icon: ShieldCheck,
       status: "ready" as const,
-      description: "System health",
-      showButton: false
+      description: "System health"
     },
     {
       title: "Team Members",
@@ -85,8 +82,7 @@ const UAVDashboard = () => {
       icon: Users,
       status: "info" as const,
       description: "Operators online",
-      onClick: () => navigate('/team'),
-      showButton: false
+      onClick: () => navigate('/team')
     }
   ];
 
@@ -185,10 +181,10 @@ const UAVDashboard = () => {
           {kpiCards.map((kpi, index) => (
             <Card 
               key={index} 
-              className={`bg-surface-1 border-border hover:shadow-medium transition-all duration-300 ${
-                kpi.onClick && !kpi.showButton ? 'cursor-pointer' : ''
+              className={`bg-surface-1 border-border transition-all duration-300 hover:shadow-medium hover-scale ${
+                kpi.onClick ? 'cursor-pointer' : ''
               }`}
-              onClick={kpi.onClick && !kpi.showButton ? kpi.onClick : undefined}
+              onClick={kpi.onClick}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
@@ -209,20 +205,7 @@ const UAVDashboard = () => {
                      kpi.status === "info" ? "ИНФО" : "ПРЕДУПРЕЖДЕНИЕ"}
                   </StatusChip>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1 mb-3">{kpi.description}</p>
-                {kpi.showButton && kpi.onClick && (
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      kpi.onClick();
-                    }}
-                  >
-                    Перейти
-                  </Button>
-                )}
+                <p className="text-xs text-muted-foreground mt-1">{kpi.description}</p>
               </CardContent>
             </Card>
           ))}
