@@ -124,7 +124,10 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         setError(null);
         
         // Получаем токен через edge function
+        console.log('Calling get-mapbox-token edge function...');
         const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        
+        console.log('Edge function response:', { data, error });
         
         if (error) {
           console.error('Edge function error:', error);
@@ -134,7 +137,8 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         }
 
         if (!data?.token) {
-          setError('Mapbox токен не настроен в системе');
+          console.error('No token in response:', data);
+          setError('Mapbox токен не найден в ответе сервера');
           setLoading(false);
           return;
         }
