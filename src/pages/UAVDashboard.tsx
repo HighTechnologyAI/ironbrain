@@ -65,7 +65,7 @@ const UAVDashboard = () => {
       icon: Target,
       status: "ready" as const,
       description: "Units in production",
-      onClick: () => navigate('/production-kanban')
+      onClick: () => navigate('/production')
     },
     {
       title: "Technical Status",
