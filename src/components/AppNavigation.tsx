@@ -140,18 +140,6 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
           {/* Left Section */}
           <div className="flex items-center gap-3">
             <SidebarTrigger />
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 hover:opacity-90 transition-opacity"
-              aria-label={t.dashboard || 'Главная'}
-            >
-              <img
-                src="/lovable-uploads/b9c645a9-9cf4-49fc-9d3b-d74b8e43825e.png"
-                alt="TIGER CRM"
-                className="h-8 w-8"
-                loading="lazy"
-              />
-            </button>
             {showBackButton && (
               <Button 
                 variant="ghost" 
