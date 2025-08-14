@@ -17,9 +17,16 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
+  const loadingRef = useRef(true);
 
   // Жестко зашитый токен для тестирования
   const MAPBOX_TOKEN = 'pk.eyJ1IjoiaGlnaHRlY2hhaSIsImEiOiJjbWViZTBoaW0wbzVwMmpxdmFpeTVnbWdsIn0.8-x4oZ4TfetTTa5BEAXDYg';
+
+  // Отслеживание изменений loading
+  useEffect(() => {
+    console.log('🔄 [LOADING STATE] loading изменился на:', loading);
+    loadingRef.current = loading;
+  }, [loading]);
 
   // Создание HTML-элемента маркера для дрона
   const createDroneMarker = (drone: Drone) => {
@@ -86,11 +93,20 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         // Обработчики событий
         mapInstance.on('load', () => {
           console.log('✅ [SUCCESS] Карта загружена успешно!');
+          console.log('🔄 [STATE] Устанавливаем loading = false');
           map.current = mapInstance;
-          setLoading(false);
           
-          // Добавляем маркеры дронов
-          addDroneMarkers();
+          // Принудительно сбрасываем loading
+          console.log('🔄 [BEFORE] loading состояние перед сбросом:', loading);
+          setLoading(false);
+          loadingRef.current = false;
+          console.log('🔄 [AFTER] Вызвали setLoading(false)');
+          
+          // Проверяем что состояние сброшено
+          setTimeout(() => {
+            console.log('🔍 [CHECK] Проверяем состояние loading через 200ms:', loadingRef.current);
+            addDroneMarkers();
+          }, 200);
         });
         
         mapInstance.on('error', (e) => {
@@ -108,7 +124,14 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
 
     // Добавление маркеров дронов
     const addDroneMarkers = () => {
-      if (!map.current) return;
+      console.log('📍 [MARKERS START] Проверяем карту и дроны...');
+      console.log('📍 [MAP STATE] map.current существует:', !!map.current);
+      console.log('📍 [DRONES COUNT] Количество дронов:', drones.length);
+      
+      if (!map.current) {
+        console.error('❌ [MARKERS ERROR] Карта не инициализирована!');
+        return;
+      }
       
       console.log('📍 [MARKERS] Добавляем маркеры дронов...', drones.length);
       
@@ -223,15 +246,19 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
   }
 
   if (loading) {
+    console.log('🔄 [RENDER] Показываем экран загрузки, loading =', loading);
     return (
       <div className={`relative w-full h-full min-h-[400px] bg-surface-1 rounded-lg border border-border ${className}`}>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
           <p className="text-sm text-muted-foreground">Загрузка тактической карты...</p>
+          <p className="text-xs text-muted-foreground mt-2">Инициализация Mapbox...</p>
         </div>
       </div>
     );
   }
+
+  console.log('🗺️ [RENDER] Рендерим карту, loading =', loading);
 
   return (
     <div className={`relative w-full h-full min-h-[400px] ${className}`}>
