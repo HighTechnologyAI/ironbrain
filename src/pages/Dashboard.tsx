@@ -18,7 +18,8 @@ import {
   CheckCircle,
   ArrowRight,
   TrendingUp,
-  Clock
+  Clock,
+  TestTube
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -99,6 +100,15 @@ const Dashboard: React.FC = () => {
         variant: 'neon' as const
       });
     }
+    
+    // Always add Testing Center for quality assurance
+    actions.push({
+      title: 'Testing Center',
+      description: 'Quality assurance and system testing',
+      icon: TestTube,
+      action: () => navigate('/testing'),
+      variant: 'neon-outline' as const
+    });
     
     return actions;
   };

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { TestTube, Zap, Shield, Monitor, Smartphone, Database } from 'lucide-react';
 
 export const TestingCenter: React.FC = () => {
+  console.log('TestingCenter component loaded successfully');
   const testCategories = [
     {
       icon: <TestTube className="h-5 w-5" />,

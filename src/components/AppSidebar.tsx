@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LucideIcon, Home, Bot, CheckSquare, Users, Target, BarChart3, Shield, Award, ExternalLink, Settings, Plane, Factory, Wrench, Sparkles, Activity, Map, Radio, FileText } from 'lucide-react';
+import { LucideIcon, Home, Bot, CheckSquare, Users, Target, BarChart3, Shield, Award, ExternalLink, Settings, Plane, Factory, Wrench, Sparkles, Activity, Map, Radio, FileText, TestTube } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -83,6 +83,7 @@ export function AppSidebar() {
     ...(isFeatureEnabled('UAV_OPERATIONS') ? [
       { title: 'AI Operations', url: '/ai-operations', icon: Sparkles, badge: 'AI' }
     ] : []),
+    { title: 'Testing Center', url: '/testing', icon: TestTube, badge: 'QA' },
     ...(isFeatureEnabled('INTEGRATIONS') ? [
       { title: t.integrations || 'Интеграции', url: '/integrations', icon: ExternalLink }
     ] : []),
