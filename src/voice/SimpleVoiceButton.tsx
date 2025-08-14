@@ -145,12 +145,11 @@ export const SimpleVoiceButton: React.FC = () => {
     }
   };
 
-  // Проверяем, включена ли функция
-  const isVoiceEnabled = import.meta.env.VITE_VOICE_AI_ENABLED === 'true';
-  
-  if (!isVoiceEnabled) {
-    return null;
-  }
+  // Всегда показываем кнопку (упрощенная версия)
+  // const isVoiceEnabled = import.meta.env.VITE_VOICE_AI_ENABLED === 'true';
+  // if (!isVoiceEnabled) {
+  //   return null;
+  // }
 
   const button = (
     <div className="fixed bottom-6 right-6 z-[9999]">
