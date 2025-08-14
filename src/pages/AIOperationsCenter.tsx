@@ -15,6 +15,8 @@ import AIDecisionSupport from '@/components/AIDecisionSupport';
 import AIRealtimeStreaming from '@/components/AIRealtimeStreaming';
 import AIAutomatedInsights from '@/components/AIAutomatedInsights';
 import AIVoiceAssistant from '@/components/AIVoiceAssistant';
+import AIEnhancedVoice from '@/components/AIEnhancedVoice';
+import AIPlatformMonitoring from '@/components/AIPlatformMonitoring';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
 import { 
@@ -31,7 +33,9 @@ import {
   Target,
   Wifi,
   Sparkles as SparklesIcon,
-  Mic
+  Mic,
+  Volume2,
+  Server
 } from 'lucide-react';
 
 const AIAssistantPage: React.FC = () => {
@@ -65,7 +69,7 @@ const AIAssistantPage: React.FC = () => {
 
       {/* AI Tools */}
       <Tabs defaultValue="enhanced" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-13">
+        <TabsList className="grid w-full grid-cols-15">
           <TabsTrigger value="enhanced" className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             Enhanced AI
@@ -113,6 +117,14 @@ const AIAssistantPage: React.FC = () => {
           <TabsTrigger value="voice" className="flex items-center gap-2">
             <Mic className="h-4 w-4" />
             Voice
+          </TabsTrigger>
+          <TabsTrigger value="tts" className="flex items-center gap-2">
+            <Volume2 className="h-4 w-4" />
+            TTS
+          </TabsTrigger>
+          <TabsTrigger value="monitoring" className="flex items-center gap-2">
+            <Server className="h-4 w-4" />
+            Monitoring
           </TabsTrigger>
           <TabsTrigger value="metrics" className="flex items-center gap-2">
             <Monitor className="h-4 w-4" />
@@ -166,6 +178,14 @@ const AIAssistantPage: React.FC = () => {
 
         <TabsContent value="voice" className="space-y-6">
           <AIVoiceAssistant />
+        </TabsContent>
+
+        <TabsContent value="tts" className="space-y-6">
+          <AIEnhancedVoice />
+        </TabsContent>
+
+        <TabsContent value="monitoring" className="space-y-6">
+          <AIPlatformMonitoring />
         </TabsContent>
 
         <TabsContent value="metrics" className="space-y-6">
