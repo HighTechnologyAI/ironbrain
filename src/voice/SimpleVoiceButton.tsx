@@ -88,7 +88,7 @@ export const SimpleVoiceButton: React.FC = () => {
   };
 
   const handleTranscript = async (transcript: string) => {
-    console.log('Распознано:', transcript);
+    console.log('🎙️ Распознано:', transcript);
     
     // Показываем что обрабатываем
     toast({
@@ -98,6 +98,8 @@ export const SimpleVoiceButton: React.FC = () => {
     
     try {
       const { data: user } = await supabase.auth.getUser();
+      
+      console.log('📤 Отправляю в AI роутер:', transcript);
       
       // Отправляем в AI роутер для живого общения
       const { data, error } = await supabase.functions.invoke('ai-router', {
@@ -115,9 +117,11 @@ export const SimpleVoiceButton: React.FC = () => {
         }
       });
 
+      console.log('📥 Ответ от AI роутера:', data, error);
+
       if (error) {
-        console.error('AI Router error:', error);
-        speak('Извините, произошла ошибка при обращении к помощнику');
+        console.error('❌ AI Router error:', error);
+        await speak('Извините, произошла ошибка при обращении к помощнику');
         toast({
           title: "Ошибка",
           description: "Не удалось связаться с AI помощником",
@@ -126,21 +130,27 @@ export const SimpleVoiceButton: React.FC = () => {
         return;
       }
 
-      console.log('AI Response:', data);
-
       // Произносим ответ
       if (data?.replyText) {
-        speak(data.replyText);
+        console.log('🔊 Начинаю говорить:', data.replyText);
+        await speak(data.replyText);
         toast({
           title: "IronBrain говорит:",
           description: data.replyText,
         });
       } else {
-        speak('Не удалось получить ответ от помощника');
+        console.log('⚠️ Нет replyText в ответе AI роутера, полный ответ:', data);
+        await speak('Не удалось получить ответ от помощника');
+        toast({
+          title: "Проблема",
+          description: "Получен пустой ответ от помощника",
+          variant: "destructive"
+        });
       }
 
       // Выполняем команды если есть
       if (data?.commands) {
+        console.log('⚡ Выполняю команды:', data.commands);
         for (const command of data.commands) {
           console.log('Executing command:', command);
           const result = await commandDispatcher.current.execute(command);
@@ -149,8 +159,8 @@ export const SimpleVoiceButton: React.FC = () => {
       }
 
     } catch (error) {
-      console.error('Error processing transcript:', error);
-      speak('Произошла ошибка при обработке запроса');
+      console.error('❌ Error processing transcript:', error);
+      await speak('Произошла ошибка при обработке запроса');
       toast({
         title: "Ошибка",
         description: "Не удалось обработать голосовую команду",
