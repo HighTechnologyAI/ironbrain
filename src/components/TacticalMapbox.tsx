@@ -66,7 +66,18 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
   };
 
   useEffect(() => {
-    if (!mapContainer.current) return;
+    console.log('🔄 [EFFECT] useEffect запущен, mapContainer.current:', !!mapContainer.current);
+    console.log('🔄 [EFFECT] Карта уже существует:', !!map.current);
+    
+    if (!mapContainer.current) {
+      console.log('❌ [EFFECT] mapContainer.current отсутствует, выходим');
+      return;
+    }
+
+    if (map.current) {
+      console.log('🔄 [EFFECT] Карта уже инициализирована, пропускаем');
+      return;
+    }
 
     const initializeMap = () => {
       try {
