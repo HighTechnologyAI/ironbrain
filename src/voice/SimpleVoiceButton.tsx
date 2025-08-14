@@ -35,14 +35,26 @@ export const SimpleVoiceButton: React.FC = () => {
   const handleTranscript = async (transcript: string) => {
     console.log('Распознано:', transcript);
     
+    // Показываем что обрабатываем
+    toast({
+      title: "Обрабатываю...",
+      description: transcript,
+    });
+    
     try {
       const { data: user } = await supabase.auth.getUser();
       
-      // Отправляем в AI роутер
+      // Отправляем в AI роутер для живого общения
       const { data, error } = await supabase.functions.invoke('ai-router', {
         body: {
           transcript,
-          events: [],
+          events: [
+            {
+              type: 'voice_chat',
+              route: window.location.pathname,
+              timestamp: Date.now()
+            }
+          ],
           locale: 'ru-RU',
           user_id: user.user?.id
         }
@@ -50,25 +62,45 @@ export const SimpleVoiceButton: React.FC = () => {
 
       if (error) {
         console.error('AI Router error:', error);
-        speak('Ошибка обработки команды');
+        speak('Извините, произошла ошибка при обращении к помощнику');
+        toast({
+          title: "Ошибка",
+          description: "Не удалось связаться с AI помощником",
+          variant: "destructive"
+        });
         return;
       }
 
+      console.log('AI Response:', data);
+
       // Произносим ответ
-      if (data.replyText) {
+      if (data?.replyText) {
         speak(data.replyText);
+        toast({
+          title: "IronBrain говорит:",
+          description: data.replyText,
+        });
+      } else {
+        speak('Не удалось получить ответ от помощника');
       }
 
-      // Выполняем команды
-      if (data.commands) {
+      // Выполняем команды если есть
+      if (data?.commands) {
         for (const command of data.commands) {
-          await commandDispatcher.current.execute(command);
+          console.log('Executing command:', command);
+          const result = await commandDispatcher.current.execute(command);
+          console.log('Command result:', result);
         }
       }
 
     } catch (error) {
       console.error('Error processing transcript:', error);
-      speak('Произошла ошибка');
+      speak('Произошла ошибка при обработке запроса');
+      toast({
+        title: "Ошибка",
+        description: "Не удалось обработать голосовую команду",
+        variant: "destructive"
+      });
     }
   };
 
