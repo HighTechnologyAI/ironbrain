@@ -16,9 +16,18 @@ interface RealtimeAudioData {
 // Type declarations for Web Speech API
 declare global {
   interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
   }
+}
+
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
 }
 
 export const useSTT = (options: STTOptions) => {
@@ -28,7 +37,7 @@ export const useSTT = (options: STTOptions) => {
   const [interimText, setInterimText] = useState('');
   const [finalText, setFinalText] = useState('');
   
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const recorderRef = useRef<any>(null);
@@ -140,7 +149,7 @@ export const useSTT = (options: STTOptions) => {
       return null;
     }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     
     recognition.continuous = true;
@@ -151,7 +160,7 @@ export const useSTT = (options: STTOptions) => {
       setIsListening(true);
     };
     
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any) => {
       let interim = '';
       let final = '';
       
@@ -176,7 +185,7 @@ export const useSTT = (options: STTOptions) => {
       }
     };
     
-    recognition.onerror = (event) => {
+    recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
       onError?.(event.error);
       setIsListening(false);

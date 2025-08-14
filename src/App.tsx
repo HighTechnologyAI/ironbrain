@@ -39,6 +39,9 @@ import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import RealTimeAlerts from "@/components/RealTimeAlerts";
+// Voice AI components
+import { VoiceAssistantProvider } from "@/voice/VoiceAssistantProvider";
+import { VoiceOverlay } from "@/voice/VoiceOverlay";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +73,7 @@ const AppShell = () => {
           <ConnectionStatus />
           <NotificationsBoot />
           <RealTimeAlerts />
+          <VoiceOverlay />
           <Toaster />
           <Sonner />
           <Routes>
@@ -122,13 +126,15 @@ const App = () => (
     <AuthProvider>
       <LanguageProvider>
         <OfflineProvider>
-          <SafeAreaContainer>
-            <TooltipProvider>
-              <BrowserRouter>
-                <AppShell />
-              </BrowserRouter>
-            </TooltipProvider>
-          </SafeAreaContainer>
+          <VoiceAssistantProvider>
+            <SafeAreaContainer>
+              <TooltipProvider>
+                <BrowserRouter>
+                  <AppShell />
+                </BrowserRouter>
+              </TooltipProvider>
+            </SafeAreaContainer>
+          </VoiceAssistantProvider>
         </OfflineProvider>
       </LanguageProvider>
     </AuthProvider>
