@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useI18n } from '@/i18n/useI18n';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/neon/Button';
 import { StatusChip } from '@/components/neon/StatusChip';
@@ -17,7 +17,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 
 const CommandCenter: React.FC = () => {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const [dryRunMode, setDryRunMode] = useState(true);
 
   // Feature flag check

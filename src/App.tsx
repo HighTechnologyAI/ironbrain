@@ -29,11 +29,11 @@ import ProductionKanban from "./pages/ProductionKanban";
 import MaintenanceCenter from "./pages/MaintenanceCenter";
 import DocumentCenter from "./pages/DocumentCenter";
 // Operations Center pages
-import OpsCenter from "./pages/ops-center";
-import MissionControlPage from "./pages/mission-control";
-import FleetPage from "./pages/fleet";
-import CommandCenterPage from "./pages/command-center";
-import LogsPage from "./pages/logs";
+import OpsCenter from "./pages/OpsCenter";
+import MissionControlPage from "./pages/MissionControlOps";
+import FleetPage from "./pages/FleetManagement";
+import CommandCenterPage from "./pages/CommandCenter";
+import SystemLogsPage from "./pages/SystemLogs";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -98,7 +98,7 @@ const AppShell = () => {
               <Route path="/command-center" element={<ProtectedRoute><CommandCenterPage /></ProtectedRoute>} />
             )}
             {import.meta.env.VITE_FEATURE_LOGS === 'true' && (
-              <Route path="/logs" element={<ProtectedRoute><LogsPage /></ProtectedRoute>} />
+              <Route path="/logs" element={<ProtectedRoute><SystemLogsPage /></ProtectedRoute>} />
             )}
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<AdminPanel />} />

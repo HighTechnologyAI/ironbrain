@@ -1,12 +1,12 @@
 import React from 'react';
-import { useI18n } from '@/i18n/useI18n';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusChip } from '@/components/neon/StatusChip';
 import { EmptyState } from '@/components/neon/EmptyState';
 import { Map, Navigation, Radio, Gauge, Battery, Thermometer } from 'lucide-react';
 
 const MissionControl: React.FC = () => {
-  const { t } = useI18n();
+  const { t } = useTranslation();
 
   // Feature flag check
   if (import.meta.env.VITE_FEATURE_MISSION_CONTROL !== 'true') {

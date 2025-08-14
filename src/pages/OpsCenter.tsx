@@ -1,5 +1,5 @@
 import React from 'react';
-import { useI18n } from '@/i18n/useI18n';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusChip } from '@/components/neon/StatusChip';
 import { EmptyState } from '@/components/neon/EmptyState';
@@ -7,7 +7,7 @@ import { Activity, AlertTriangle, Zap, Users, Database, Cpu, Wifi, Battery } fro
 import { cn } from '@/lib/utils';
 
 const OpsCenter: React.FC = () => {
-  const { t } = useI18n();
+  const { t } = useTranslation();
 
   // Feature flag check
   if (import.meta.env.VITE_FEATURE_OPS_CENTER !== 'true') {

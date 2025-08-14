@@ -1,5 +1,5 @@
 import React from 'react';
-import { useI18n } from '@/i18n/useI18n';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +9,7 @@ import { Plane, Battery, MapPin, Clock, Settings } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 const Fleet: React.FC = () => {
-  const { t } = useI18n();
+  const { t } = useTranslation();
 
   // Feature flag check
   if (import.meta.env.VITE_FEATURE_FLEET !== 'true') {
