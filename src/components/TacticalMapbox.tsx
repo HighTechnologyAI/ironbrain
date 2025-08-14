@@ -131,9 +131,13 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         
         let tokenData;
         try {
-          const result = await supabase.functions.invoke('get-mapbox-token');
+          const result = await supabase.functions.invoke('get-mapbox-token', {
+            body: { 
+              token: 'pk.eyJ1IjoiaGlnaHRlY2hhaSIsImEiOiJjbWViZTBoaW0wbzVwMmpxdmFpeTVnbWdsIn0.8-x4oZ4TfetTTa5BEAXDYg' 
+            }
+          });
           tokenData = result;
-          console.log('📡 Результат:', tokenData);
+          console.log('📡 Результат edge function:', tokenData);
         } catch (funcError) {
           console.error('📡 Ошибка edge function:', funcError);
           setShowTokenInput(true);
