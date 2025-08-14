@@ -18,11 +18,13 @@ const AnimatedStarfield = () => {
     const c = canvas.getContext('2d');
     if (!c) return null;
     
+    // Устанавливаем размер под окно
     const w = window.innerWidth;
     const h = window.innerHeight;
     canvas.width = w;
     canvas.height = h;
     
+    // Фон
     c.fillStyle = "rgb(30,30,30)";
     c.fillRect(0, 0, w, h);
     
