@@ -15,21 +15,31 @@ serve(async (req) => {
   }
 
   try {
-    console.log('🔍 Getting MAPBOX_PUBLIC_TOKEN from environment...')
+    console.log('🔍 [DEBUG] Getting MAPBOX_PUBLIC_TOKEN from environment...')
+    
+    // Получаем все переменные окружения для диагностики
+    const allEnvVars = Deno.env.toObject()
+    console.log('📋 [DEBUG] All environment variables:', Object.keys(allEnvVars))
+    console.log('📋 [DEBUG] Mapbox related vars:', Object.keys(allEnvVars).filter(k => k.toLowerCase().includes('mapbox')))
+    
     const mapboxToken = Deno.env.get('MAPBOX_PUBLIC_TOKEN')
     
-    console.log('✅ Token exists:', !!mapboxToken)
-    console.log('🔢 Token length:', mapboxToken?.length || 0)
+    console.log('✅ [DEBUG] Token exists:', !!mapboxToken)
+    console.log('🔢 [DEBUG] Token length:', mapboxToken?.length || 0)
     
-    if (!mapboxToken) {
-      console.error('❌ CRITICAL: Mapbox token not found in environment variables')
-      console.error('📋 Available env vars:', Object.keys(Deno.env.toObject()).filter(k => k.includes('MAPBOX')))
+    if (mapboxToken) {
+      console.log('🔍 [DEBUG] Token first 20 chars:', mapboxToken.substring(0, 20))
+      console.log('🔍 [DEBUG] Token last 10 chars:', mapboxToken.substring(mapboxToken.length - 10))
+    }
+    
+    if (!mapboxToken || mapboxToken.trim() === '') {
+      console.error('❌ CRITICAL: Mapbox token not found or empty')
       return new Response(
         JSON.stringify({ 
-          error: 'MAPBOX_PUBLIC_TOKEN not configured',
+          error: 'MAPBOX_PUBLIC_TOKEN not configured or empty',
           details: 'Token missing from environment variables',
-          available_env: Object.keys(Deno.env.toObject()).filter(k => k.includes('MAPBOX')),
-          hint: 'Check Supabase project secrets'
+          available_mapbox_vars: Object.keys(allEnvVars).filter(k => k.toLowerCase().includes('mapbox')),
+          hint: 'Please set MAPBOX_PUBLIC_TOKEN in Supabase Edge Function Secrets'
         }),
         { 
           status: 500, 
@@ -38,16 +48,20 @@ serve(async (req) => {
       )
     }
 
-    console.log('🔍 Token prefix check:', mapboxToken.substring(0, 3))
-    if (!mapboxToken.startsWith('pk.')) {
+    const cleanToken = mapboxToken.trim()
+    console.log('🔍 [DEBUG] Clean token prefix check:', cleanToken.substring(0, 3))
+    
+    if (!cleanToken.startsWith('pk.')) {
       console.error('❌ CRITICAL: Invalid Mapbox token format')
-      console.error('🔍 Received prefix:', mapboxToken.substring(0, 10))
+      console.error('🔍 Expected: starts with "pk."')
+      console.error('🔍 Received prefix:', cleanToken.substring(0, 10))
       return new Response(
         JSON.stringify({ 
           error: 'Invalid MAPBOX_PUBLIC_TOKEN format',
-          details: 'Token should start with "pk."',
-          received_prefix: mapboxToken.substring(0, 10),
-          token_length: mapboxToken.length
+          details: 'Public token should start with "pk."',
+          received_prefix: cleanToken.substring(0, 10),
+          token_length: cleanToken.length,
+          hint: 'Get your public token from https://account.mapbox.com/access-tokens/'
         }),
         { 
           status: 500, 
