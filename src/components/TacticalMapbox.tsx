@@ -118,62 +118,61 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Получаем токен из Supabase edge function
+    // Простая инициализация с fallback
     const initializeMap = async () => {
       try {
         setLoading(true);
         setError(null);
         
         console.log('🗺️ Инициализация карты...');
-        console.log('🔗 Supabase client ready');
         
-        // Получаем токен через edge function с таймаутом
-        console.log('📡 Вызов get-mapbox-token edge function...');
+        // Простой вызов без Promise.race для начала
+        console.log('📡 Вызов get-mapbox-token...');
         
-        const startTime = Date.now();
-        const { data, error } = await Promise.race([
-          supabase.functions.invoke('get-mapbox-token'),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), 5000)
-          )
-        ]) as any;
+        let tokenData;
+        try {
+          const result = await supabase.functions.invoke('get-mapbox-token');
+          tokenData = result;
+          console.log('📡 Результат:', tokenData);
+        } catch (funcError) {
+          console.error('📡 Ошибка edge function:', funcError);
+          setShowTokenInput(true);
+          setLoading(false);
+          return;
+        }
         
-        const endTime = Date.now();
-        console.log(`📡 Ответ edge function за ${endTime - startTime}ms:`, { data, error });
-        
-        if (error) {
-          console.error('❌ Ошибка edge function:', error);
+        if (tokenData.error) {
+          console.error('❌ Ошибка в ответе:', tokenData.error);
           setShowTokenInput(true);
           setLoading(false);
           return;
         }
 
-        if (!data?.token) {
-          console.error('❌ Токен не найден в ответе:', data);
+        if (!tokenData.data?.token) {
+          console.error('❌ Токен не найден:', tokenData.data);
           setShowTokenInput(true);
           setLoading(false);
           return;
         }
 
-        const token = data.token;
-        console.log('✅ Токен получен успешно');
+        const token = tokenData.data.token;
+        console.log('✅ Токен получен');
         setMapboxToken(token);
         mapboxgl.accessToken = token;
 
-        console.log('🗺️ Создание экземпляра карты...');
-        // Инициализируем карту с кибер-стилем
+        console.log('🗺️ Создание карты...');
+        // Инициализируем карту
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/dark-v11', // Темная тема
-          center: [26.8855, 43.3889], // Timarevo Airfield, Bulgaria
+          style: 'mapbox://styles/mapbox/dark-v11',
+          center: [26.8855, 43.3889],
           zoom: 8,
           pitch: 45,
           bearing: 0,
           antialias: true
         });
 
-        console.log('🗺️ Добавление контролов навигации...');
-        // Добавляем контролы навигации
+        console.log('🗺️ Добавление контролов...');
         map.current.addControl(
           new mapboxgl.NavigationControl({
             visualizePitch: true,
@@ -181,72 +180,25 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
           'top-right'
         );
 
-        // Таймаут для загрузки карты
-        const loadTimeout = setTimeout(() => {
-          console.error('⏰ Таймаут загрузки карты');
-          setError('Таймаут загрузки карты. Попробуйте еще раз.');
-          setLoading(false);
-        }, 15000);
-
-        // Кастомизация стиля карты для кибер-эффекта
-        map.current.on('style.load', () => {
-          console.log('🎨 Стиль карты загружен');
-          clearTimeout(loadTimeout);
-          
-          if (!map.current) return;
-          
-          try {
-            // Добавляем туман для кибер-эффекта
-            map.current.setFog({
-              color: 'rgb(20, 20, 40)',
-              'high-color': 'rgb(0, 255, 255)',
-              'horizon-blend': 0.1,
-              'space-color': 'rgb(0, 0, 20)',
-              'star-intensity': 0.8
-            });
-
-            // Меняем цвета на кибер-палитру
-            if (map.current.getLayer('water')) {
-              map.current.setPaintProperty('water', 'fill-color', '#001122');
-            }
-            if (map.current.getLayer('land')) {
-              map.current.setPaintProperty('land', 'fill-color', '#0a0a0f');
-            }
-          } catch (err) {
-            console.warn('⚠️ Ошибка кастомизации стиля:', err);
-          }
-          
-          console.log('✅ Карта готова к использованию');
+        // Простой обработчик загрузки
+        map.current.on('load', () => {
+          console.log('🗺️ Карта загружена');
           setLoading(false);
         });
 
         map.current.on('error', (e) => {
-          console.error('❌ Ошибка Mapbox:', e);
-          clearTimeout(loadTimeout);
-          
+          console.error('❌ Ошибка карты:', e);
           if (e.error?.message?.includes('401')) {
-            setError('Неверный Mapbox токен. Проверьте настройки.');
+            setError('Неверный Mapbox токен');
           } else {
-            setError('Ошибка загрузки карты: ' + (e.error?.message || 'неизвестная ошибка'));
+            setError('Ошибка загрузки карты');
           }
           setLoading(false);
         });
-
-        map.current.on('load', () => {
-          console.log('🗺️ Карта полностью загружена');
-          clearTimeout(loadTimeout);
-          setLoading(false);
-        });
-
+          
       } catch (err) {
-        console.error('❌ Ошибка инициализации карты:', err);
-        console.error('❌ Stack trace:', err instanceof Error ? err.stack : 'No stack');
-        if (err instanceof Error && err.message === 'Timeout') {
-          console.log('⏰ Таймаут - показываем поле ввода токена');
-          setShowTokenInput(true);
-        } else {
-          setError('Ошибка инициализации карты: ' + (err instanceof Error ? err.message : 'неизвестная ошибка'));
-        }
+        console.error('❌ Общая ошибка:', err);
+        setShowTokenInput(true);
         setLoading(false);
       }
     };
