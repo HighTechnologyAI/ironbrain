@@ -125,10 +125,12 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         setError(null);
         
         console.log('🗺️ Инициализация карты...');
+        console.log('🔗 Supabase client ready');
         
         // Получаем токен через edge function с таймаутом
         console.log('📡 Вызов get-mapbox-token edge function...');
         
+        const startTime = Date.now();
         const { data, error } = await Promise.race([
           supabase.functions.invoke('get-mapbox-token'),
           new Promise((_, reject) => 
@@ -136,7 +138,8 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
           )
         ]) as any;
         
-        console.log('📡 Ответ edge function:', { data, error });
+        const endTime = Date.now();
+        console.log(`📡 Ответ edge function за ${endTime - startTime}ms:`, { data, error });
         
         if (error) {
           console.error('❌ Ошибка edge function:', error);
@@ -237,7 +240,9 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
 
       } catch (err) {
         console.error('❌ Ошибка инициализации карты:', err);
+        console.error('❌ Stack trace:', err instanceof Error ? err.stack : 'No stack');
         if (err instanceof Error && err.message === 'Timeout') {
+          console.log('⏰ Таймаут - показываем поле ввода токена');
           setShowTokenInput(true);
         } else {
           setError('Ошибка инициализации карты: ' + (err instanceof Error ? err.message : 'неизвестная ошибка'));
