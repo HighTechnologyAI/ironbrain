@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AIAnalyticsPanel } from '@/components/AIAnalyticsPanel';
 import { AIMissionPlanner } from '@/components/AIMissionPlanner';
 import { EnhancedAIPanel } from '@/components/EnhancedAIPanel';
+import { AIAnalysisHistory } from '@/components/AIAnalysisHistory';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
 import { 
@@ -12,7 +13,8 @@ import {
   Route, 
   BarChart3, 
   Activity,
-  Sparkles
+  Sparkles,
+  Clock
 } from 'lucide-react';
 
 const AIAssistantPage: React.FC = () => {
@@ -46,10 +48,14 @@ const AIAssistantPage: React.FC = () => {
 
       {/* AI Tools */}
       <Tabs defaultValue="enhanced" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="enhanced" className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             Enhanced AI
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Analysis History
           </TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center gap-2">
             <Brain className="h-4 w-4" />
@@ -63,6 +69,10 @@ const AIAssistantPage: React.FC = () => {
 
         <TabsContent value="enhanced" className="space-y-6">
           <EnhancedAIPanel />
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-6">
+          <AIAnalysisHistory />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">

@@ -88,6 +88,51 @@ export type Database = {
           },
         ]
       }
+      ai_analysis_history: {
+        Row: {
+          analysis_type: string
+          created_at: string
+          error_message: string | null
+          execution_time_ms: number | null
+          id: string
+          input_data: Json | null
+          model_used: string | null
+          provider: string
+          result_data: string | null
+          success: boolean
+          tokens_used: number | null
+          user_id: string
+        }
+        Insert: {
+          analysis_type: string
+          created_at?: string
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          input_data?: Json | null
+          model_used?: string | null
+          provider: string
+          result_data?: string | null
+          success?: boolean
+          tokens_used?: number | null
+          user_id: string
+        }
+        Update: {
+          analysis_type?: string
+          created_at?: string
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          input_data?: Json | null
+          model_used?: string | null
+          provider?: string
+          result_data?: string | null
+          success?: boolean
+          tokens_used?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       budget_entries: {
         Row: {
           actual_amount: number
@@ -1528,7 +1573,26 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      recent_telemetry_summary: {
+        Row: {
+          battery_level: number | null
+          drone_name: string | null
+          latest_data: Json | null
+          model: string | null
+          status: string | null
+        }
+        Relationships: []
+      }
+      uav_analytics_summary: {
+        Row: {
+          active_days_this_month: number | null
+          avg_battery_level: number | null
+          offline_drones: number | null
+          online_drones: number | null
+          total_drones: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_current_user_profile: {

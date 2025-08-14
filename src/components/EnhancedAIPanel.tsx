@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/neon/Button';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,6 +22,7 @@ import {
   Bot
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { UAVDataConnector } from './UAVDataConnector';
 
 interface AIRequest {
   provider: 'openai' | 'anthropic' | 'perplexity';
@@ -34,9 +36,14 @@ export const EnhancedAIPanel: React.FC = () => {
   const [analysisType, setAnalysisType] = useState<string>('');
   const [inputData, setInputData] = useState('');
   const [result, setResult] = useState<string>('');
+  const [analysisStartTime, setAnalysisStartTime] = useState<number>(0);
+  
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const analysisMutation = useMutation({
     mutationFn: async (request: AIRequest) => {
+      setAnalysisStartTime(Date.now());
       const { data, error } = await supabase.functions.invoke('ai-multi-provider', {
         body: request
       });
@@ -44,19 +51,92 @@ export const EnhancedAIPanel: React.FC = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data, variables) => {
+      const executionTime = Date.now() - analysisStartTime;
+      
       if (data.success) {
         setResult(data.response);
         toast.success(`${data.provider.toUpperCase()} analysis completed`);
+        
+        // Save to analysis history
+        if (user) {
+          try {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('id')
+              .eq('user_id', user.id)
+              .single();
+              
+            if (profile) {
+              await supabase.from('ai_analysis_history').insert({
+                user_id: profile.id,
+                provider: data.provider,
+                analysis_type: variables.action,
+                input_data: variables.data,
+                result_data: data.response,
+                model_used: variables.model || 'unknown',
+                execution_time_ms: executionTime,
+                success: true
+              });
+              
+              // Refresh history query
+              queryClient.invalidateQueries({ queryKey: ['ai-analysis-history'] });
+            }
+          } catch (error) {
+            console.error('Failed to save analysis history:', error);
+          }
+        }
       } else {
         throw new Error(data.error);
       }
     },
-    onError: (error) => {
+    onError: async (error, variables) => {
+      const executionTime = Date.now() - analysisStartTime;
       console.error('AI Analysis failed:', error);
       toast.error(`Failed to complete AI analysis: ${error.message}`);
+      
+      // Save failed analysis to history
+      if (user) {
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('user_id', user.id)
+            .single();
+            
+          if (profile) {
+            await supabase.from('ai_analysis_history').insert({
+              user_id: profile.id,
+              provider: variables.provider,
+              analysis_type: variables.action,
+              input_data: variables.data,
+              model_used: variables.model || 'unknown',
+              execution_time_ms: executionTime,
+              success: false,
+              error_message: error.message
+            });
+            
+            queryClient.invalidateQueries({ queryKey: ['ai-analysis-history'] });
+          }
+        } catch (historyError) {
+          console.error('Failed to save failed analysis history:', historyError);
+        }
+      }
     }
   });
+
+  const handleUAVDataSelect = (data: any, type: string) => {
+    setInputData(JSON.stringify(data, null, 2));
+    
+    // Auto-select appropriate analysis type based on data type
+    if (type === 'fleet_summary') {
+      setAnalysisType('optimize_operations');
+    } else if (type === 'telemetry_analysis') {
+      setAnalysisType('analyze_telemetry');
+    } else if (type === 'drone_performance') {
+      setAnalysisType('predict_maintenance');
+    }
+  };
 
   const handleAnalyze = () => {
     if (!analysisType || !inputData.trim()) {
@@ -324,6 +404,9 @@ export const EnhancedAIPanel: React.FC = () => {
           </Button>
         </CardContent>
       </Card>
+
+      {/* UAV Data Connector */}
+      <UAVDataConnector onDataSelect={handleUAVDataSelect} />
 
       {result && (
         <Card>
