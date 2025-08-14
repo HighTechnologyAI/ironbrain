@@ -22,7 +22,58 @@ export const SimpleVoiceButton: React.FC = () => {
     }
   }, []);
 
-  const speak = (text: string) => {
+  const speak = async (text: string) => {
+    try {
+      console.log('Speaking with OpenAI TTS:', text);
+      
+      // Используем OpenAI TTS для живого голоса
+      const response = await fetch(`https://zqnjgwrvvrqaenzmlvfx.supabase.co/functions/v1/ai-text-to-speech`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpxbmpnd3J2dnJxYWVuem1sdmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyNDYwNDcsImV4cCI6MjA2OTgyMjA0N30.uv41CLbWP5ZMnQLymCIE9uB9m4wC9xyKNSOU3btqcR8'}`
+        },
+        body: JSON.stringify({ 
+          text, 
+          voice: 'alloy' // Можно изменить на: echo, fable, onyx, nova, shimmer
+        })
+      });
+
+      if (!response.ok) {
+        console.error('TTS Error:', response.status, response.statusText);
+        // Fallback к браузерному TTS
+        fallbackSpeak(text);
+        return;
+      }
+
+      // Воспроизводим живой голос
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      audio.onerror = (e) => {
+        console.error('Audio playback error:', e);
+        URL.revokeObjectURL(audioUrl);
+        // Fallback к браузерному TTS
+        fallbackSpeak(text);
+      };
+      
+      await audio.play();
+      console.log('Playing live voice audio');
+      
+    } catch (error) {
+      console.error('Speech error:', error);
+      // Fallback к браузерному TTS
+      fallbackSpeak(text);
+    }
+  };
+
+  const fallbackSpeak = (text: string) => {
+    console.log('Using fallback browser TTS');
     if ('speechSynthesis' in window) {
       speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
