@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/use-language';
+import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Brain, 
@@ -64,6 +65,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
     timestamp: Date
   } | null>(null);
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   // Анализ рисков для выбранной задачи
   const analyzeTaskRisks = (task: Task) => {
@@ -290,24 +292,117 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
         case 'start_task':
           updateData = { status: 'in_progress' };
           break;
+          
         case 'update_progress':
-          // Здесь можно открыть модальное окно для обновления прогресса
+          // Добавляем автоматический комментарий о прогрессе
+          const progressComment = `📊 Обновление прогресса: Задача находится в работе. Текущий статус: ${selectedTask.status}. Приоритет: ${selectedTask.priority}.`;
+          
+          const { error: commentError } = await supabase
+            .from('task_comments')
+            .insert({
+              task_id: taskId,
+              user_id: selectedTask.assigned_to?.id || selectedTask.created_by?.id,
+              content: progressComment,
+              language: 'ru'
+            });
+
+          if (commentError) throw commentError;
+
           toast({
-            title: "Обновление прогресса",
-            description: "Добавьте комментарий к задаче для обновления прогресса",
+            title: "✅ Прогресс обновлен",
+            description: "Комментарий о текущем состоянии добавлен к задаче",
           });
+          
+          onTaskUpdate?.();
           setIsLoadingAction(null);
           return;
+          
         case 'log_time':
-          // Здесь можно открыть модальное окно для ввода времени
+          // Добавляем 1 час к затраченному времени как пример
+          const currentHours = selectedTask.actual_hours || 0;
+          const newHours = currentHours + 1;
+          
+          updateData = { 
+            actual_hours: newHours 
+          };
+          
+          // Также добавляем комментарий о времени
+          const timeComment = `⏱️ Зафиксировано время: +1 час. Общее затраченное время: ${newHours} ч.`;
+          
+          const { error: timeCommentError } = await supabase
+            .from('task_comments')
+            .insert({
+              task_id: taskId,
+              user_id: selectedTask.assigned_to?.id || selectedTask.created_by?.id,
+              content: timeComment,
+              language: 'ru'
+            });
+
+          if (timeCommentError) console.warn('Failed to add time comment:', timeCommentError);
+          break;
+          
+        case 'escalate':
+          // Создаем уведомление для руководителя/коллег
+          const escalationComment = `🚨 Запрос помощи: Задача требует дополнительного внимания. Исполнитель: ${selectedTask.assigned_to?.full_name || 'Не назначен'}. Необходима консультация или поддержка.`;
+          
+          const { error: escalationError } = await supabase
+            .from('task_comments')
+            .insert({
+              task_id: taskId,
+              user_id: selectedTask.assigned_to?.id || selectedTask.created_by?.id,
+              content: escalationComment,
+              language: 'ru'
+            });
+
+          if (escalationError) throw escalationError;
+
+          // Попытаемся найти админов для уведомления
+          const { data: admins } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('role', 'admin')
+            .eq('is_active', true)
+            .limit(3);
+
+          if (admins && admins.length > 0) {
+            // Создаем уведомления для админов
+            const notifications = admins.map(admin => ({
+              user_id: admin.id,
+              title: 'Запрос помощи по задаче',
+              message: `Задача "${selectedTask.title}" требует внимания`,
+              type: 'escalation',
+              data: { task_id: taskId, requester_id: selectedTask.assigned_to?.id || selectedTask.created_by?.id }
+            }));
+
+            await supabase
+              .from('notifications')
+              .insert(notifications);
+          }
+
           toast({
-            title: "Фиксация времени",
-            description: "Используйте форму редактирования задачи для добавления времени",
+            title: "🤝 Помощь запрошена",
+            description: "Уведомление отправлено коллегам и руководству",
           });
+          
+          onTaskUpdate?.();
           setIsLoadingAction(null);
           return;
+          
         case 'resolve_blocker':
           updateData = { status: 'in_progress' };
+          
+          const blockerComment = `🔓 Блокировка устранена: Препятствия для выполнения задачи решены. Работа возобновлена.`;
+          
+          const { error: blockerError } = await supabase
+            .from('task_comments')
+            .insert({
+              task_id: taskId,
+              user_id: selectedTask.assigned_to?.id || selectedTask.created_by?.id,
+              content: blockerComment,
+              language: 'ru'
+            });
+
+          if (blockerError) console.warn('Failed to add blocker comment:', blockerError);
           break;
       }
 
@@ -322,9 +417,15 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
 
         if (error) throw error;
 
+        const actionTitles = {
+          'start_task': 'Задача запущена',
+          'log_time': 'Время зафиксировано',
+          'resolve_blocker': 'Блокировка устранена'
+        };
+
         toast({
-          title: "Задача обновлена",
-          description: `Действие "${action}" выполнено успешно`,
+          title: actionTitles[action] || "Задача обновлена",
+          description: "Изменения сохранены успешно",
         });
 
         onTaskUpdate?.();
