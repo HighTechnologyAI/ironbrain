@@ -5,11 +5,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusChip } from '@/components/neon/StatusChip';
 import { EmptyState } from '@/components/neon/EmptyState';
-import { Plane, Battery, MapPin, Clock, Settings } from 'lucide-react';
+import { Plane, Battery, MapPin, Clock, Settings, Plus } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { CreateDroneForm } from '@/components/CreateDroneForm';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/neon/Button';
 
 const Fleet: React.FC = () => {
   const { t } = useTranslation();
+  const [showCreateForm, setShowCreateForm] = React.useState(false);
 
   // Feature flag check
   if (import.meta.env.VITE_FEATURE_FLEET !== 'true') {
@@ -70,13 +74,29 @@ const Fleet: React.FC = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          {t('ops.fleet.title')}
-        </h1>
-        <p className="text-muted-foreground">
-          {t('ops.fleet.subtitle')}
-        </p>
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t('ops.fleet.title')}
+          </h1>
+          <p className="text-muted-foreground">
+            {t('ops.fleet.subtitle')}
+          </p>
+        </div>
+        <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
+          <DialogTrigger asChild>
+            <Button variant="neon" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              {t('ops.fleet.addDrone', 'Add Drone')}
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-md">
+            <CreateDroneForm
+              onSuccess={() => setShowCreateForm(false)}
+              onCancel={() => setShowCreateForm(false)}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Drone Grid */}
