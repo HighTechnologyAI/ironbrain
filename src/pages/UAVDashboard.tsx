@@ -56,7 +56,7 @@ const UAVDashboard = () => {
       icon: Plane,
       status: "armed" as const,
       description: "Drones in flight",
-      onClick: () => navigate('/mission-control')
+      onClick: () => navigate('/missions')
     },
     {
       title: "Production Line", 
