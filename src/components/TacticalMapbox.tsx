@@ -69,14 +69,34 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     console.log('🔄 [EFFECT] useEffect запущен, mapContainer.current:', !!mapContainer.current);
     console.log('🔄 [EFFECT] Карта уже существует:', !!map.current);
     
-    if (!mapContainer.current) {
-      console.log('❌ [EFFECT] mapContainer.current отсутствует, выходим');
-      return;
-    }
-
     if (map.current) {
       console.log('🔄 [EFFECT] Карта уже инициализирована, пропускаем');
       return;
+    }
+
+    // Ждем пока ref будет установлен
+    if (!mapContainer.current) {
+      console.log('⏳ [EFFECT] mapContainer.current отсутствует, ждем...');
+      const checkContainer = () => {
+        if (mapContainer.current && !map.current) {
+          console.log('✅ [EFFECT] mapContainer.current найден, инициализируем карту');
+          initializeMap();
+        }
+      };
+      
+      // Проверяем через небольшой интервал
+      const intervalId = setInterval(checkContainer, 100);
+      const timeoutId = setTimeout(() => {
+        clearInterval(intervalId);
+        console.log('❌ [EFFECT] Таймаут ожидания mapContainer.current');
+        setError('Не удалось инициализировать контейнер карты');
+        setLoading(false);
+      }, 5000);
+      
+      return () => {
+        clearInterval(intervalId);
+        clearTimeout(timeoutId);
+      };
     }
 
     const initializeMap = () => {
