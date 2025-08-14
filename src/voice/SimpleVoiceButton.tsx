@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Volume2 } from 'lucide-react';
+import { Mic, MicOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { CommandDispatcher } from './commandSchema';
 import { toast } from '@/components/ui/use-toast';
+import { useTTS } from './hooks/useTTS';
 
 export const SimpleVoiceButton: React.FC = () => {
   const [isListening, setIsListening] = useState(false);
@@ -22,84 +23,8 @@ export const SimpleVoiceButton: React.FC = () => {
     }
   }, []);
 
-  const speak = async (text: string) => {
-    try {
-      console.log('🎤 Начинаю озвучивание:', text);
-      
-      // Используем Supabase client для вызова edge функции
-      const { data, error } = await supabase.functions.invoke('ai-text-to-speech', {
-        body: { 
-          text, 
-          voice: 'alloy'
-        }
-      });
-
-      if (error) {
-        console.error('❌ TTS Edge Function Error:', error);
-        fallbackSpeak(text);
-        return;
-      }
-
-      if (!data) {
-        console.error('❌ No audio data received');
-        fallbackSpeak(text);
-        return;
-      }
-
-      console.log('✅ TTS Response received');
-
-      // Создаем аудио из ArrayBuffer
-      const audioBlob = new Blob([data], { type: 'audio/mpeg' });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio();
-      
-      // Устанавливаем источник
-      audio.src = audioUrl;
-      audio.preload = 'auto';
-      
-      // Добавляем обработчики событий
-      audio.addEventListener('loadstart', () => console.log('🎵 Audio loading started'));
-      audio.addEventListener('canplay', () => console.log('🎵 Audio can play'));
-      audio.addEventListener('play', () => console.log('🎵 Audio started playing'));
-      audio.addEventListener('ended', () => {
-        console.log('🎵 Audio finished playing');
-        URL.revokeObjectURL(audioUrl);
-      });
-      
-      audio.addEventListener('error', (e) => {
-        console.error('❌ Audio playback error:', e);
-        console.error('❌ Audio error details:', audio.error);
-        URL.revokeObjectURL(audioUrl);
-        fallbackSpeak(text);
-      });
-
-      // Пытаемся загрузить и воспроизвести
-      try {
-        await audio.load();
-        await audio.play();
-        console.log('🎵 Live voice audio playing...');
-      } catch (playError) {
-        console.error('❌ Play error:', playError);
-        URL.revokeObjectURL(audioUrl);
-        fallbackSpeak(text);
-      }
-      
-    } catch (error) {
-      console.error('❌ Speech error:', error);
-      fallbackSpeak(text);
-    }
-  };
-
-  const fallbackSpeak = (text: string) => {
-    console.log('Using fallback browser TTS');
-    if ('speechSynthesis' in window) {
-      speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'ru-RU';
-      utterance.rate = 0.9;
-      speechSynthesis.speak(utterance);
-    }
-  };
+  // Используем централизованный TTS hook
+  const { speak } = useTTS({ language: 'ru-RU' });
 
   const handleTranscript = async (transcript: string) => {
     console.log('🎙️ Распознано:', transcript);
@@ -135,7 +60,7 @@ export const SimpleVoiceButton: React.FC = () => {
 
       if (error) {
         console.error('❌ AI Router error:', error);
-        await speak('Извините, произошла ошибка при обращении к помощнику');
+        speak('Извините, произошла ошибка при обращении к помощнику');
         toast({
           title: "Ошибка",
           description: "Не удалось связаться с AI помощником",
@@ -147,14 +72,14 @@ export const SimpleVoiceButton: React.FC = () => {
       // Произносим ответ
       if (data?.replyText) {
         console.log('🔊 Начинаю говорить:', data.replyText);
-        await speak(data.replyText);
+        speak(data.replyText);
         toast({
           title: "IronBrain говорит:",
           description: data.replyText,
         });
       } else {
         console.log('⚠️ Нет replyText в ответе AI роутера, полный ответ:', data);
-        await speak('Не удалось получить ответ от помощника');
+        speak('Не удалось получить ответ от помощника');
         toast({
           title: "Проблема",
           description: "Получен пустой ответ от помощника",
@@ -174,7 +99,7 @@ export const SimpleVoiceButton: React.FC = () => {
 
     } catch (error) {
       console.error('❌ Error processing transcript:', error);
-      await speak('Произошла ошибка при обработке запроса');
+      speak('Произошла ошибка при обработке запроса');
       toast({
         title: "Ошибка",
         description: "Не удалось обработать голосовую команду",

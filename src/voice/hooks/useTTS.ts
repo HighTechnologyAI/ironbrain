@@ -9,89 +9,95 @@ interface TTSOptions {
 }
 
 export const useTTS = (options: TTSOptions) => {
-  const { language, voice, rate = 1, pitch = 1, volume = 1 } = options;
+  const { language = 'ru-RU' } = options;
   
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isSupported] = useState(() => 'speechSynthesis' in window);
-  
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  const speak = useCallback((text: string) => {
-    if (!isSupported) {
-      console.warn('Speech synthesis not supported');
-      return;
-    }
+  const speak = useCallback(async (text: string) => {
+    if (!text.trim()) return;
 
-    // Stop any ongoing speech
-    speechSynthesis.cancel();
+    try {
+      // Попробуем использовать OpenAI TTS сначала
+      console.log('🎤 Начинаю озвучивание:', text);
+      
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data, error } = await supabase.functions.invoke('ai-text-to-speech', {
+        body: { 
+          text, 
+          voice: 'alloy'
+        }
+      });
+
+      if (!error && data) {
+        console.log('✅ TTS Response received');
+        
+        // Создаем аудио из ArrayBuffer
+        const audioBlob = new Blob([data], { type: 'audio/mpeg' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio();
+        
+        audio.src = audioUrl;
+        audio.preload = 'auto';
+        
+        setIsSpeaking(true);
+        
+        audio.addEventListener('ended', () => {
+          console.log('🎵 Audio finished playing');
+          setIsSpeaking(false);
+          URL.revokeObjectURL(audioUrl);
+        });
+        
+        audio.addEventListener('error', (e) => {
+          console.error('❌ Audio playback error:', e);
+          setIsSpeaking(false);
+          URL.revokeObjectURL(audioUrl);
+          // Fallback to browser TTS
+          fallbackSpeak(text);
+        });
+
+        await audio.load();
+        await audio.play();
+        console.log('🎵 OpenAI voice audio playing...');
+        return;
+      }
+    } catch (error) {
+      console.error('❌ OpenAI TTS failed:', error);
+    }
+    
+    // Fallback to browser speech synthesis
+    fallbackSpeak(text);
+  }, [language]);
+
+  const fallbackSpeak = useCallback((text: string) => {
+    console.log('Using fallback browser TTS');
+    
+    if (speechSynthesis.speaking) {
+      speechSynthesis.cancel();
+    }
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utteranceRef.current = utterance;
-
-    // Set voice properties
     utterance.lang = language;
-    utterance.rate = rate;
-    utterance.pitch = pitch;
-    utterance.volume = volume;
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
 
-    // Find appropriate voice
-    const voices = speechSynthesis.getVoices();
-    if (voice) {
-      const selectedVoice = voices.find(v => v.name === voice || v.lang === voice);
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-      }
-    } else {
-      // Find voice matching language
-      const langVoice = voices.find(v => v.lang.startsWith(language.split('-')[0]));
-      if (langVoice) {
-        utterance.voice = langVoice;
-      }
-    }
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
 
-    utterance.onstart = () => {
-      setIsSpeaking(true);
-    };
-
-    utterance.onend = () => {
-      setIsSpeaking(false);
-      utteranceRef.current = null;
-    };
-
-    utterance.onerror = (event) => {
-      console.error('Speech synthesis error:', event);
-      setIsSpeaking(false);
-      utteranceRef.current = null;
-    };
-
+    utteranceRef.current = utterance;
     speechSynthesis.speak(utterance);
-  }, [isSupported, language, voice, rate, pitch, volume]);
+  }, [language]);
 
   const stop = useCallback(() => {
-    speechSynthesis.cancel();
     setIsSpeaking(false);
-    utteranceRef.current = null;
-  }, []);
-
-  const pause = useCallback(() => {
-    speechSynthesis.pause();
-  }, []);
-
-  const resume = useCallback(() => {
-    speechSynthesis.resume();
-  }, []);
-
-  const getVoices = useCallback(() => {
-    return speechSynthesis.getVoices();
+    speechSynthesis.cancel();
   }, []);
 
   return {
     isSpeaking,
-    isSupported,
     speak,
-    stop,
-    pause,
-    resume,
-    getVoices
+    stop
   };
 };
