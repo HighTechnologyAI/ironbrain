@@ -10,6 +10,8 @@ import AIPredictiveAnalytics from '@/components/AIPredictiveAnalytics';
 import AIReportGenerator from '@/components/AIReportGenerator';
 import AISystemMetrics from '@/components/AISystemMetrics';
 import AIVisualAnalytics from '@/components/AIVisualAnalytics';
+import AIRealtimeDashboard from '@/components/AIRealtimeDashboard';
+import AIDecisionSupport from '@/components/AIDecisionSupport';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
 import { 
@@ -22,7 +24,8 @@ import {
   TrendingUp,
   FileText,
   Monitor,
-  Image
+  Image,
+  Target
 } from 'lucide-react';
 
 const AIAssistantPage: React.FC = () => {
@@ -56,7 +59,7 @@ const AIAssistantPage: React.FC = () => {
 
       {/* AI Tools */}
       <Tabs defaultValue="enhanced" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-10">
           <TabsTrigger value="enhanced" className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             Enhanced AI
@@ -84,6 +87,14 @@ const AIAssistantPage: React.FC = () => {
           <TabsTrigger value="visuals" className="flex items-center gap-2">
             <Image className="h-4 w-4" />
             Visuals
+          </TabsTrigger>
+          <TabsTrigger value="realtime" className="flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            Realtime
+          </TabsTrigger>
+          <TabsTrigger value="decisions" className="flex items-center gap-2">
+            <Target className="h-4 w-4" />
+            Decisions
           </TabsTrigger>
           <TabsTrigger value="metrics" className="flex items-center gap-2">
             <Monitor className="h-4 w-4" />
@@ -117,6 +128,14 @@ const AIAssistantPage: React.FC = () => {
 
         <TabsContent value="visuals" className="space-y-6">
           <AIVisualAnalytics />
+        </TabsContent>
+
+        <TabsContent value="realtime" className="space-y-6">
+          <AIRealtimeDashboard />
+        </TabsContent>
+
+        <TabsContent value="decisions" className="space-y-6">
+          <AIDecisionSupport />
         </TabsContent>
 
         <TabsContent value="metrics" className="space-y-6">
