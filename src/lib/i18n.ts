@@ -44,35 +44,6 @@ export interface Translations {
   lastUpdate: string;
   aiAssistant: string;
   
-  // Notifications
-  notifications: string;
-  noNotifications: string;
-  markAsRead: string;
-  markAllAsRead: string;
-  
-  // Auth
-  login: string;
-  logout: string;
-  signup: string;
-  signupPrompt: string;
-  email: string;
-  password: string;
-  forgotPassword: string;
-  resetPassword: string;
-  confirmPassword: string;
-  fullName: string;
-  position: string;
-  department: string;
-  loginError: string;
-  signupError: string;
-  resetPasswordError: string;
-  resetPasswordSuccess: string;
-  authRedirect: string;
-  invalidCredentials: string;
-  passwordMismatch: string;
-  weakPassword: string;
-  userExists: string;
-  
   // Navigation
   dashboard: string;
   missionControl: string;
@@ -83,8 +54,6 @@ export interface Translations {
   issues: string;
   awards: string;
   admin: string;
-  
-  // UAV-specific navigation
   operations: string;
   production: string;
   maintenance: string;
@@ -99,27 +68,7 @@ export interface Translations {
   ready: string;
   launchMission: string;
   
-  // Tasks
-  allTasks: string;
-  myTasks: string;
-  searchTasks: string;
-  createTask: string;
-  taskTitle: string;
-  taskDescription: string;
-  priority: string;
-  dueDate: string;
-  assignee: string;
-  status: string;
-  
-  // Form elements
-  name: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  budget: string;
-  location: string;
-  
-  // UAV Dashboard specific
+  // UAV specific
   strategicGoal: string;
   increaseCapacity: string;
   productionUnit: string;
@@ -141,12 +90,51 @@ export interface Translations {
   operatorsOnline: string;
   lastUpdateTime: string;
   
-  // Status labels
+  // All missing keys with fallback to prevent build errors
+  notifications: string;
+  noNotifications: string;
+  markAsRead: string;
+  markAllAsRead: string;
+  login: string;
+  logout: string;
+  signup: string;
+  signupPrompt: string;
+  email: string;
+  password: string;
+  forgotPassword: string;
+  resetPassword: string;
+  confirmPassword: string;
+  fullName: string;
+  position: string;
+  department: string;
+  loginError: string;
+  signupError: string;
+  resetPasswordError: string;
+  resetPasswordSuccess: string;
+  authRedirect: string;
+  invalidCredentials: string;
+  passwordMismatch: string;
+  weakPassword: string;
+  userExists: string;
+  allTasks: string;
+  myTasks: string;
+  searchTasks: string;
+  createTask: string;
+  taskTitle: string;
+  taskDescription: string;
+  priority: string;
+  dueDate: string;
+  assignee: string;
+  status: string;
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  budget: string;
+  location: string;
   high: string;
   medium: string;
   low: string;
-  
-  // Departments
   depEngineering: string;
   depDesign: string;
   depMarketing: string;
@@ -155,8 +143,6 @@ export interface Translations {
   depHR: string;
   depFinance: string;
   depProduction: string;
-  
-  // Team
   addTeamMember: string;
   editTeamMember: string;
   deleteTeamMember: string;
@@ -165,8 +151,6 @@ export interface Translations {
   employee: string;
   teamLead: string;
   manager: string;
-  
-  // Common labels
   tryAgainLabel: string;
   noTeamMembersLabel: string;
   sinceLabel: string;
@@ -174,8 +158,6 @@ export interface Translations {
   roleLabel: string;
   cancelLabel: string;
   saveLabel: string;
-  
-  // AI Assistant
   aiAssistantDesc: string;
   aiErrorTitle: string;
   aiErrorDesc: string;
@@ -217,8 +199,6 @@ export interface Translations {
   aiModeSuggestOptimization: string;
   aiModeChat: string;
   hours: string;
-  
-  // Forms
   formAssignParticipant: string;
   formSelectEmployee: string;
   formNoAvailableEmployees: string;
@@ -240,8 +220,6 @@ export interface Translations {
   formSelectAssignee: string;
   formEnterTags: string;
   formTagsDescription: string;
-  
-  // Additional missing keys
   formAddNewCompany: string;
   formProjectName: string;
   formProjectNamePlaceholder: string;
@@ -315,8 +293,6 @@ export interface Translations {
   participantAdded: string;
   todayDate: string;
   systemMessage: string;
-  
-  // Additional missing keys for components
   comments: string;
   writeComment: string;
   commentFailed: string;
@@ -336,361 +312,553 @@ export interface Translations {
   addParticipantFailed: string;
   addParticipant: string;
   noParticipants: string;
+  tasksLoadError: string;
+  teamDesc: string;
+  tasksDescription: string;
+  noTasksFound: string;
+  aiCapabilitiesPersonalized: string;
+  aiCapabilitiesWorkload: string;
+  aiCapabilitiesOptimization: string;
+  aiCapabilitiesChat: string;
+  aiTipTitle: string;
+  aiTipText: string;
+  enterAdminKey: string;
+  loginToAdmin: string;
+  requestCompleted: string;
+  recordsReceived: string;
+  backupCreated: string;
+  fileDownloaded: string;
+  enterTaskName: string;
+  taskCreatedViaAPI: string;
+  checking: string;
+  systemAdministration: string;
+  adminModeActive: string;
+  fullAccess: string;
+  mainMenu: string;
+  update: string;
+  backup: string;
+  database: string;
+  totalUsers: string;
+  activeProfiles: string;
+  totalTasks: string;
+  allTime: string;
+  apiStatus: string;
+  recentTasks: string;
+  quickActions: string;
+  optimizeDB: string;
+  userManagement: string;
+  exportReports: string;
+  systemSettings: string;
+  completedTasksLabel: string;
+  activeEmployeesLabel: string;
+  averageTimeLabel: string;
+  achievementsLabel: string;
+  analyticsTitle: string;
+  performanceAnalysisDesc: string;
+  exportReportLabel: string;
+  periodLabel: string;
+  last7DaysLabel: string;
+  last30DaysLabel: string;
+  last3MonthsLabel: string;
+  lastYearLabel: string;
+  departmentLabel: string;
+  allDepartmentsLabel: string;
+  forPeriodLabel: string;
+  weeklyPerformanceLabel: string;
+  plannedVsCompletedLabel: string;
+  departmentPerformanceLabel: string;
+  tasksAndEfficiencyLabel: string;
+  awardsTitle: string;
+  motivationSystemDesc: string;
+  createAwardLabel: string;
+  totalAchievementsLabel: string;
+  issuesTitle: string;
+  issueTrackingDesc: string;
+  createIssueLabel: string;
+  searchIssuesPlaceholder: string;
+  statusLabel: string;
+  allStatusesLabel: string;
+  openStatus: string;
+  inProgressStatus: string;
+  resolvedStatus: string;
+  closedStatus: string;
+  missionControlTitle: string;
+  missionControlDesc: string;
+  
+  // Additional missing keys for remaining errors
+  missionControlCenter: string;
+  incoming: string;
+  mechanical: string;
+  electronics: string;
+  assembly: string;
+  testing: string;
+  packaging: string;
+  urgent: string;
+  normal: string;
+  productionKanban: string;
+  progress: string;
+  assignedTo: string;
+  estimatedCompletion: string;
+  taskStatusUpdated: string;
+  taskStatusUpdateError: string;
+  tasksTitle: string;
+  taskStatus: string;
+  allStatuses: string;
+  taskPriority: string;
+  allPriorities: string;
+  createdByMe: string;
+  noTasksFoundDesc: string;
+  noActiveTasks: string;
+  noActiveTasksDesc: string;
+  noCreatedTasks: string;
+  noCreatedTasksDesc: string;
+  away: string;
+  offline: string;
+  unknown: string;
+  administrator: string;
+  intern: string;
+  teamManagementDesc: string;
+  addEmployeeLabel: string;
+  loadingTeamLabel: string;
+  dataLoadErrorLabel: string;
+  technicalStatus: string;
 }
 
-export const translations: Record<string, Translations> = {
-  en: {
-    // Common
-    loading: 'Loading...',
-    error: 'Error',
-    success: 'Success',
-    save: 'Save',
-    cancel: 'Cancel',
-    delete: 'Delete',
-    edit: 'Edit',
-    create: 'Create',
-    search: 'Search',
-    filter: 'Filter',
-    send: 'Send',
-    sending: 'Sending...',
-    uploading: 'Uploading...',
-    edited: 'edited',
-    joined: 'joined',
-    
-    // Main page
-    title: 'TIGER CRM',
-    subtitle: 'Task & Project Management System',
-    welcome: 'Welcome',
-    welcomeDescription: 'Your comprehensive task and project management system',
-    systemStatus: 'System Status',
-    online: 'Online',
-    performance: 'Performance',
-    activeTasks: 'Active Tasks',
-    teamMembers: 'Team Members',
-    achievements: 'Achievements',
-    problems: 'Problems',
-    achievements_page: 'Awards',
-    lastUpdate: 'Last Update',
-    aiAssistant: 'AI Assistant',
-    
-    // Notifications
-    notifications: 'Notifications',
-    noNotifications: 'No notifications',
-    markAsRead: 'Mark as read',
-    markAllAsRead: 'Mark all as read',
-    
-    // Auth
-    login: 'Login',
-    logout: 'Logout',
-    signup: 'Sign Up',
-    signupPrompt: 'Don\'t have an account? Sign up',
-    email: 'Email',
-    password: 'Password',
-    forgotPassword: 'Forgot password?',
-    resetPassword: 'Reset Password',
-    confirmPassword: 'Confirm Password',
-    fullName: 'Full Name',
-    position: 'Position',
-    department: 'Department',
-    loginError: 'Login failed',
-    signupError: 'Registration failed',
-    resetPasswordError: 'Password reset failed',
-    resetPasswordSuccess: 'Password reset email sent',
-    authRedirect: 'Redirecting...',
-    invalidCredentials: 'Invalid email or password',
-    passwordMismatch: 'Passwords do not match',
-    weakPassword: 'Password too weak',
-    userExists: 'User already exists',
-    
-    // Navigation
-    dashboard: 'Dashboard',
-    missionControl: 'Mission Control',
-    tasks: 'Tasks',
-    team: 'Team',
-    projects: 'Projects',
-    analytics: 'Analytics',
-    issues: 'Issues',
-    awards: 'Awards',
-    admin: 'Admin',
-    
-    // UAV-specific navigation
-    operations: 'Operations',
-    production: 'Production',
-    maintenance: 'Maintenance',
-    documents: 'Documents',
-    integrations: 'Integrations',
-    
-    // Dashboard
-    operationalCenter: 'Operational Center',
-    uavSystem: 'UAV Management System',
-    welcomeUser: 'Welcome',
-    systems: 'Systems',
-    ready: 'READY',
-    launchMission: 'Launch Mission',
-    
-    // Tasks
-    allTasks: 'All Tasks',
-    myTasks: 'My Tasks',
-    searchTasks: 'Search tasks...',
-    createTask: 'Create Task',
-    taskTitle: 'Task Title',
-    taskDescription: 'Description',
-    priority: 'Priority',
-    dueDate: 'Due Date',
-    assignee: 'Assignee',
-    status: 'Status',
-    
-    // Form elements
-    name: 'Name',
-    description: 'Description',
-    startDate: 'Start Date',
-    endDate: 'End Date',
-    budget: 'Budget',
-    location: 'Location',
-    
-    // UAV Dashboard specific
-    strategicGoal: 'Strategic Goal',
-    increaseCapacity: 'Increase production capacity to 100 units/month',
-    productionUnit: 'Production',
-    quality: 'Quality',
-    deadline: 'Deadline',
-    activeMissionsLabel: 'Active Missions',
-    productionConveyor: 'Production Line',
-    unitsInProduction: 'Units in production',
-    systemStatusLabel: 'System Status',
-    onTrackStatus: 'ON TRACK',
-    armedStatus: 'ARMED',
-    readyStatus: 'READY',
-    infoStatus: 'INFO',
-    warningStatus: 'WARNING',
-    okStatus: 'OK',
-    attentionStatus: 'ATTENTION',
-    dronesInFlight: 'Drones in flight',
-    systemHealth: 'System health',
-    operatorsOnline: 'Operators online',
-    lastUpdateTime: 'Last update',
-    
-    // Status labels
-    high: 'High',
-    medium: 'Medium',
-    low: 'Low',
-    
-    // Departments
-    depEngineering: 'Engineering',
-    depDesign: 'Design',
-    depMarketing: 'Marketing',
-    depSales: 'Sales',
-    depSupport: 'Support',
-    depHR: 'HR',
-    depFinance: 'Finance',
-    depProduction: 'Production',
-    
-    // Team
-    addTeamMember: 'Add Team Member',
-    editTeamMember: 'Edit Team Member',
-    deleteTeamMember: 'Delete Team Member',
-    viewProfile: 'View Profile',
-    role: 'Role',
-    employee: 'Employee',
-    teamLead: 'Team Lead',
-    manager: 'Manager',
-    
-    // Common labels
-    tryAgainLabel: 'Try again',
-    noTeamMembersLabel: 'No team members found',
-    sinceLabel: 'since',
-    editLabel: 'Edit',
-    roleLabel: 'Role',
-    cancelLabel: 'Cancel',
-    saveLabel: 'Save',
-    
-    // AI Assistant
-    aiAssistantDesc: 'AI-powered task management assistant',
-    aiErrorTitle: 'AI Error',
-    aiErrorDesc: 'Failed to get response from AI',
-    aiAssistantReadyTitle: 'AI Analysis Ready',
-    aiAssistantReadyDesc: 'Tiger AI has responded with insights',
-    aiMessageRequired: 'Message is required',
-    aiEmployeeRequired: 'Employee selection is required',
-    aiProcessing: 'AI processing...',
-    aiRequest: 'Ask Tiger AI',
-    aiModeLabel: 'AI Assistant Mode',
-    aiModePlaceholder: 'Select mode',
-    aiEmployeePlaceholder: 'Select an employee',
-    aiTaskDescriptionLabel: 'Task description',
-    aiMessageLabel: 'Message for AI',
-    aiPlaceholderCreateTask: 'Describe the task in free form. AI will create a personalized task...',
-    aiPlaceholderSuggestOptimization: 'Describe a problem or area to optimize...',
-    aiPlaceholderChat: 'Ask any question about task management...',
-    aiResponseTitle: 'Tiger AI Response',
-    aiBadgeTask: 'Task',
-    aiBadgeAnalysis: 'Analysis',
-    aiBadgeOptimization: 'Optimization',
-    aiBadgeChat: 'Chat',
-    aiTaskName: 'Task name:',
-    aiDescription: 'Description:',
-    aiPriority: 'Priority',
-    aiTime: 'Time',
-    aiTags: 'Tags:',
-    aiRecommendations: 'Recommendations',
-    aiWorkloadStatus: 'Workload Status',
-    aiAnalysis: 'Analysis',
-    aiOptimizations: 'Optimizations',
-    aiSkillDevelopment: 'Skill Development',
-    aiAnswer: 'Answer',
-    taskCreatedTitle: 'Task Created',
-    taskAssigned: 'Task assigned to',
-    taskCreationError: 'Failed to create task',
-    aiModeCreateTask: 'Create Task',
-    aiModeAnalyzeWorkload: 'Analyze Workload',
-    aiModeSuggestOptimization: 'Suggest Optimization',
-    aiModeChat: 'Chat',
-    hours: 'hours',
-    
-    // Forms
-    formAssignParticipant: 'Assign Participant',
-    formSelectEmployee: 'Select Employee',
-    formNoAvailableEmployees: 'No available employees',
-    formAssign: 'Assign',
-    formCreateIssue: 'Create Issue',
-    formReportNewProblem: 'Report New Problem',
-    formProblemTitle: 'Problem Title',
-    formProblemTitlePlaceholder: 'Enter problem title',
-    formDetailedDescription: 'Detailed Description',
-    formDetailedDescriptionPlaceholder: 'Describe the problem in detail',
-    formSeverity: 'Severity',
-    formSelectSeverity: 'Select severity',
-    critical: 'Critical',
-    formCreating: 'Creating...',
-    formCreateProblem: 'Create Problem',
-    formCreateNewProject: 'Create New Project',
-    formCreateNewTask: 'Create New Task',
-    formSelectPriority: 'Select priority',
-    formSelectAssignee: 'Select assignee',
-    formEnterTags: 'Enter tags',
-    formTagsDescription: 'Enter tags separated by commas',
-    
-    // Additional missing keys
-    formAddNewCompany: 'Add New Company',
-    formProjectName: 'Project Name',
-    formProjectNamePlaceholder: 'Enter project name',
-    formIndustry: 'Industry',
-    formIndustryPlaceholder: 'Enter industry',
-    formCreatingNewTask: 'Create New Task',
-    formFillTaskInfo: 'Fill in task information',
-    formTaskTitle: 'Task Title',
-    formTaskTitlePlaceholder: 'Enter task title',
-    formTaskDescription: 'Task Description',
-    formTaskDescriptionPlaceholder: 'Enter task description',
-    invitationAccepted: 'Invitation Accepted',
-    invitationDeclined: 'Invitation Declined',
-    onlineUsersTitle: 'Online Users',
-    activeUsersInSystem: 'active users in system',
-    noActiveUsers: 'No active users',
-    moreUsersOnlinePrefix: 'and',
-    moreUsersOnlineSuffix: 'more users online',
-    smartAISidebar: 'Smart AI Sidebar',
-    selectTaskToSeeInsights: 'Select a task to see AI insights',
-    taskSummary: 'Task Summary',
-    completed: 'Completed',
-    inProgress: 'In Progress',
-    riskAnalysis: 'Risk Analysis',
-    riskCritical: 'Critical Risk',
-    recommendedActions: 'Recommended Actions',
-    taskIntelligence: 'Task Intelligence',
-    complexity: 'Complexity',
-    timeEstimation: 'Time Estimation',
-    noTaskSelected: 'No task selected',
-    aiActions: 'AI Actions',
-    generateSummary: 'Generate Summary',
-    suggestSubtasks: 'Suggest Subtasks',
-    findExperts: 'Find Experts',
-    strategicLoadingTitle: 'Loading Strategic Data',
-    strategicLoadingDesc: 'Please wait...',
-    strategicFocusTitle: 'Strategic Focus',
-    strategicNotFound: 'Strategic objective not found',
-    targetDate: 'Target Date',
-    strategicBudgetPlanned: 'Budget Planned',
-    strategicStatus: 'Status',
-    statusPlanned: 'Planned',
-    statusActive: 'Active',
-    statusDone: 'Done',
-    statusOnHold: 'On Hold',
-    strategicProgress: 'Progress',
-    strategicTarget: 'Target',
-    strategicCurrent: 'Current',
-    unsupportedFileType: 'Unsupported file type',
-    fileTooLarge: 'File too large',
-    uploadFailed: 'Upload failed',
-    userNotFound: 'User not found',
-    filesUploaded: 'Files uploaded',
-    downloadFailed: 'Download failed',
-    fileDeleted: 'File deleted',
-    deleteFailed: 'Delete failed',
-    attachments: 'Attachments',
-    addFile: 'Add File',
-    fileAttached: 'File attached',
-    participants: 'Participants',
-    sendMessage: 'Send Message',
-    messageNotSent: 'Message not sent',
-    failedToLoadChat: 'Failed to load chat',
-    todayLabel: 'Today',
-    yesterdayLabel: 'Yesterday',
-    typing: 'typing...',
-    taskCompleted: 'Task completed',
-    taskStarted: 'Task started',
-    taskStatusChanged: 'Task status changed',
-    commentAdded: 'Comment added',
-    participantAdded: 'Participant added',
-    todayDate: 'Today',
-    systemMessage: 'System Message',
-  },
+// Base English translations with all required keys
+const baseTranslations: Translations = {
+  // Common
+  loading: 'Loading...',
+  error: 'Error',
+  success: 'Success',
+  save: 'Save',
+  cancel: 'Cancel',
+  delete: 'Delete',
+  edit: 'Edit',
+  create: 'Create',
+  search: 'Search',
+  filter: 'Filter',
+  send: 'Send',
+  sending: 'Sending...',
+  uploading: 'Uploading...',
+  edited: 'edited',
+  joined: 'joined',
   
-  // Use English as fallback for now to prevent build errors
+  // Main page
+  title: 'TIGER CRM',
+  subtitle: 'Task & Project Management System',
+  welcome: 'Welcome',
+  welcomeDescription: 'Your comprehensive task and project management system',
+  systemStatus: 'System Status',
+  online: 'Online',
+  performance: 'Performance',
+  activeTasks: 'Active Tasks',
+  teamMembers: 'Team Members',
+  achievements: 'Achievements',
+  problems: 'Problems',
+  achievements_page: 'Awards',
+  lastUpdate: 'Last Update',
+  aiAssistant: 'AI Assistant',
+  
+  // Navigation
+  dashboard: 'Dashboard',
+  missionControl: 'Mission Control',
+  tasks: 'Tasks',
+  team: 'Team',
+  projects: 'Projects',
+  analytics: 'Analytics',
+  issues: 'Issues',
+  awards: 'Awards',
+  admin: 'Admin',
+  operations: 'Operations',
+  production: 'Production',
+  maintenance: 'Maintenance',
+  documents: 'Documents',
+  integrations: 'Integrations',
+  
+  // Dashboard
+  operationalCenter: 'Operational Center',
+  uavSystem: 'UAV Management System',
+  welcomeUser: 'Welcome',
+  systems: 'Systems',
+  ready: 'READY',
+  launchMission: 'Launch Mission',
+  
+  // UAV specific
+  strategicGoal: 'Strategic Goal',
+  increaseCapacity: 'Increase production capacity to 100 units/month',
+  productionUnit: 'Production',
+  quality: 'Quality',
+  deadline: 'Deadline',
+  activeMissionsLabel: 'Active Missions',
+  productionConveyor: 'Production Line',
+  unitsInProduction: 'Units in production',
+  systemStatusLabel: 'System Status',
+  onTrackStatus: 'ON TRACK',
+  armedStatus: 'ARMED',
+  readyStatus: 'READY',
+  infoStatus: 'INFO',
+  warningStatus: 'WARNING',
+  okStatus: 'OK',
+  attentionStatus: 'ATTENTION',
+  dronesInFlight: 'Drones in flight',
+  systemHealth: 'System health',
+  operatorsOnline: 'Operators online',
+  lastUpdateTime: 'Last update',
+  
+  // Auth & Forms
+  notifications: 'Notifications',
+  noNotifications: 'No notifications',
+  markAsRead: 'Mark as read',
+  markAllAsRead: 'Mark all as read',
+  login: 'Login',
+  logout: 'Logout',
+  signup: 'Sign Up',
+  signupPrompt: 'Don\'t have an account? Sign up',
+  email: 'Email',
+  password: 'Password',
+  forgotPassword: 'Forgot password?',
+  resetPassword: 'Reset Password',
+  confirmPassword: 'Confirm Password',
+  fullName: 'Full Name',
+  position: 'Position',
+  department: 'Department',
+  loginError: 'Login failed',
+  signupError: 'Registration failed',
+  resetPasswordError: 'Password reset failed',
+  resetPasswordSuccess: 'Password reset email sent',
+  authRedirect: 'Redirecting...',
+  invalidCredentials: 'Invalid email or password',
+  passwordMismatch: 'Passwords do not match',
+  weakPassword: 'Password too weak',
+  userExists: 'User already exists',
+  
+  // Tasks
+  allTasks: 'All Tasks',
+  myTasks: 'My Tasks',
+  searchTasks: 'Search tasks...',
+  createTask: 'Create Task',
+  taskTitle: 'Task Title',
+  taskDescription: 'Description',
+  priority: 'Priority',
+  dueDate: 'Due Date',
+  assignee: 'Assignee',
+  status: 'Status',
+  name: 'Name',
+  description: 'Description',
+  startDate: 'Start Date',
+  endDate: 'End Date',
+  budget: 'Budget',
+  location: 'Location',
+  high: 'High',
+  medium: 'Medium',
+  low: 'Low',
+  
+  // Departments
+  depEngineering: 'Engineering',
+  depDesign: 'Design',
+  depMarketing: 'Marketing',
+  depSales: 'Sales',
+  depSupport: 'Support',
+  depHR: 'HR',
+  depFinance: 'Finance',
+  depProduction: 'Production',
+  
+  // Team
+  addTeamMember: 'Add Team Member',
+  editTeamMember: 'Edit Team Member',
+  deleteTeamMember: 'Delete Team Member',
+  viewProfile: 'View Profile',
+  role: 'Role',
+  employee: 'Employee',
+  teamLead: 'Team Lead',
+  manager: 'Manager',
+  tryAgainLabel: 'Try again',
+  noTeamMembersLabel: 'No team members found',
+  sinceLabel: 'since',
+  editLabel: 'Edit',
+  roleLabel: 'Role',
+  cancelLabel: 'Cancel',
+  saveLabel: 'Save',
+  
+  // AI Assistant
+  aiAssistantDesc: 'AI-powered task management assistant',
+  aiErrorTitle: 'AI Error',
+  aiErrorDesc: 'Failed to get response from AI',
+  aiAssistantReadyTitle: 'AI Analysis Ready',
+  aiAssistantReadyDesc: 'Tiger AI has responded with insights',
+  aiMessageRequired: 'Message is required',
+  aiEmployeeRequired: 'Employee selection is required',
+  aiProcessing: 'AI processing...',
+  aiRequest: 'Ask Tiger AI',
+  aiModeLabel: 'AI Assistant Mode',
+  aiModePlaceholder: 'Select mode',
+  aiEmployeePlaceholder: 'Select an employee',
+  aiTaskDescriptionLabel: 'Task description',
+  aiMessageLabel: 'Message for AI',
+  aiPlaceholderCreateTask: 'Describe the task in free form. AI will create a personalized task...',
+  aiPlaceholderSuggestOptimization: 'Describe a problem or area to optimize...',
+  aiPlaceholderChat: 'Ask any question about task management...',
+  aiResponseTitle: 'Tiger AI Response',
+  aiBadgeTask: 'Task',
+  aiBadgeAnalysis: 'Analysis',
+  aiBadgeOptimization: 'Optimization',
+  aiBadgeChat: 'Chat',
+  aiTaskName: 'Task name:',
+  aiDescription: 'Description:',
+  aiPriority: 'Priority',
+  aiTime: 'Time',
+  aiTags: 'Tags:',
+  aiRecommendations: 'Recommendations',
+  aiWorkloadStatus: 'Workload Status',
+  aiAnalysis: 'Analysis',
+  aiOptimizations: 'Optimizations',
+  aiSkillDevelopment: 'Skill Development',
+  aiAnswer: 'Answer',
+  taskCreatedTitle: 'Task Created',
+  taskAssigned: 'Task assigned to',
+  taskCreationError: 'Failed to create task',
+  aiModeCreateTask: 'Create Task',
+  aiModeAnalyzeWorkload: 'Analyze Workload',
+  aiModeSuggestOptimization: 'Suggest Optimization',
+  aiModeChat: 'Chat',
+  hours: 'hours',
+  
+  // Forms
+  formAssignParticipant: 'Assign Participant',
+  formSelectEmployee: 'Select Employee',
+  formNoAvailableEmployees: 'No available employees',
+  formAssign: 'Assign',
+  formCreateIssue: 'Create Issue',
+  formReportNewProblem: 'Report New Problem',
+  formProblemTitle: 'Problem Title',
+  formProblemTitlePlaceholder: 'Enter problem title',
+  formDetailedDescription: 'Detailed Description',
+  formDetailedDescriptionPlaceholder: 'Describe the problem in detail',
+  formSeverity: 'Severity',
+  formSelectSeverity: 'Select severity',
+  critical: 'Critical',
+  formCreating: 'Creating...',
+  formCreateProblem: 'Create Problem',
+  formCreateNewProject: 'Create New Project',
+  formCreateNewTask: 'Create New Task',
+  formSelectPriority: 'Select priority',
+  formSelectAssignee: 'Select assignee',
+  formEnterTags: 'Enter tags',
+  formTagsDescription: 'Enter tags separated by commas',
+  formAddNewCompany: 'Add New Company',
+  formProjectName: 'Project Name',
+  formProjectNamePlaceholder: 'Enter project name',
+  formIndustry: 'Industry',
+  formIndustryPlaceholder: 'Enter industry',
+  formCreatingNewTask: 'Create New Task',
+  formFillTaskInfo: 'Fill in task information',
+  formTaskTitle: 'Task Title',
+  formTaskTitlePlaceholder: 'Enter task title',
+  formTaskDescription: 'Task Description',
+  formTaskDescriptionPlaceholder: 'Enter task description',
+  
+  // All other missing keys with default values
+  invitationAccepted: 'Invitation Accepted',
+  invitationDeclined: 'Invitation Declined',
+  onlineUsersTitle: 'Online Users',
+  activeUsersInSystem: 'active users in system',
+  noActiveUsers: 'No active users',
+  moreUsersOnlinePrefix: 'and',
+  moreUsersOnlineSuffix: 'more users online',
+  smartAISidebar: 'Smart AI Sidebar',
+  selectTaskToSeeInsights: 'Select a task to see AI insights',
+  taskSummary: 'Task Summary',
+  completed: 'Completed',
+  inProgress: 'In Progress',
+  riskAnalysis: 'Risk Analysis',
+  riskCritical: 'Critical Risk',
+  recommendedActions: 'Recommended Actions',
+  taskIntelligence: 'Task Intelligence',
+  complexity: 'Complexity',
+  timeEstimation: 'Time Estimation',
+  noTaskSelected: 'No task selected',
+  aiActions: 'AI Actions',
+  generateSummary: 'Generate Summary',
+  suggestSubtasks: 'Suggest Subtasks',
+  findExperts: 'Find Experts',
+  strategicLoadingTitle: 'Loading Strategic Data',
+  strategicLoadingDesc: 'Please wait...',
+  strategicFocusTitle: 'Strategic Focus',
+  strategicNotFound: 'Strategic objective not found',
+  targetDate: 'Target Date',
+  strategicBudgetPlanned: 'Budget Planned',
+  strategicStatus: 'Status',
+  statusPlanned: 'Planned',
+  statusActive: 'Active',
+  statusDone: 'Done',
+  statusOnHold: 'On Hold',
+  strategicProgress: 'Progress',
+  strategicTarget: 'Target',
+  strategicCurrent: 'Current',
+  unsupportedFileType: 'Unsupported file type',
+  fileTooLarge: 'File too large',
+  uploadFailed: 'Upload failed',
+  userNotFound: 'User not found',
+  filesUploaded: 'Files uploaded',
+  downloadFailed: 'Download failed',
+  fileDeleted: 'File deleted',
+  deleteFailed: 'Delete failed',
+  attachments: 'Attachments',
+  addFile: 'Add File',
+  fileAttached: 'File attached',
+  participants: 'Participants',
+  sendMessage: 'Send Message',
+  messageNotSent: 'Message not sent',
+  failedToLoadChat: 'Failed to load chat',
+  todayLabel: 'Today',
+  yesterdayLabel: 'Yesterday',
+  typing: 'typing...',
+  taskCompleted: 'Task completed',
+  taskStarted: 'Task started',
+  taskStatusChanged: 'Task status changed',
+  commentAdded: 'Comment added',
+  participantAdded: 'Participant added',
+  todayDate: 'Today',
+  systemMessage: 'System Message',
+  comments: 'Comments',
+  writeComment: 'Write Comment',
+  commentFailed: 'Comment Failed',
+  noComments: 'No Comments',
+  unknownUser: 'Unknown User',
+  pressCtrlEnter: 'Press Ctrl+Enter',
+  pending: 'Pending',
+  cancelled: 'Cancelled',
+  onHold: 'On Hold',
+  estimated: 'Estimated',
+  actual: 'Actual',
+  created: 'Created',
+  participantRemoved: 'Participant Removed',
+  removeParticipantFailed: 'Remove Participant Failed',
+  inviteParticipant: 'Invite Participant',
+  inviteToChat: 'Invite to Chat',
+  addParticipantFailed: 'Add Participant Failed',
+  addParticipant: 'Add Participant',
+  noParticipants: 'No Participants',
+  tasksLoadError: 'Tasks Load Error',
+  teamDesc: 'Team Description',
+  tasksDescription: 'Tasks Description',
+  noTasksFound: 'No Tasks Found',
+  aiCapabilitiesPersonalized: 'AI Capabilities Personalized',
+  aiCapabilitiesWorkload: 'AI Capabilities Workload',
+  aiCapabilitiesOptimization: 'AI Capabilities Optimization',
+  aiCapabilitiesChat: 'AI Capabilities Chat',
+  aiTipTitle: 'AI Tip Title',
+  aiTipText: 'AI Tip Text',
+  enterAdminKey: 'Enter Admin Key',
+  loginToAdmin: 'Login to Admin',
+  requestCompleted: 'Request Completed',
+  recordsReceived: 'Records Received',
+  backupCreated: 'Backup Created',
+  fileDownloaded: 'File Downloaded',
+  enterTaskName: 'Enter Task Name',
+  taskCreatedViaAPI: 'Task Created via API',
+  checking: 'Checking',
+  systemAdministration: 'System Administration',
+  adminModeActive: 'Admin Mode Active',
+  fullAccess: 'Full Access',
+  mainMenu: 'Main Menu',
+  update: 'Update',
+  backup: 'Backup',
+  database: 'Database',
+  totalUsers: 'Total Users',
+  activeProfiles: 'Active Profiles',
+  totalTasks: 'Total Tasks',
+  allTime: 'All Time',
+  apiStatus: 'API Status',
+  recentTasks: 'Recent Tasks',
+  quickActions: 'Quick Actions',
+  optimizeDB: 'Optimize DB',
+  userManagement: 'User Management',
+  exportReports: 'Export Reports',
+  systemSettings: 'System Settings',
+  completedTasksLabel: 'Completed Tasks',
+  activeEmployeesLabel: 'Active Employees',
+  averageTimeLabel: 'Average Time',
+  achievementsLabel: 'Achievements',
+  analyticsTitle: 'Analytics Title',
+  performanceAnalysisDesc: 'Performance Analysis Description',
+  exportReportLabel: 'Export Report',
+  periodLabel: 'Period',
+  last7DaysLabel: 'Last 7 Days',
+  last30DaysLabel: 'Last 30 Days',
+  last3MonthsLabel: 'Last 3 Months',
+  lastYearLabel: 'Last Year',
+  departmentLabel: 'Department',
+  allDepartmentsLabel: 'All Departments',
+  forPeriodLabel: 'For Period',
+  weeklyPerformanceLabel: 'Weekly Performance',
+  plannedVsCompletedLabel: 'Planned vs Completed',
+  departmentPerformanceLabel: 'Department Performance',
+  tasksAndEfficiencyLabel: 'Tasks and Efficiency',
+  awardsTitle: 'Awards Title',
+  motivationSystemDesc: 'Motivation System Description',
+  createAwardLabel: 'Create Award',
+  totalAchievementsLabel: 'Total Achievements',
+  issuesTitle: 'Issues Title',
+  issueTrackingDesc: 'Issue Tracking Description',
+  createIssueLabel: 'Create Issue',
+  searchIssuesPlaceholder: 'Search Issues Placeholder',
+  statusLabel: 'Status',
+  allStatusesLabel: 'All Statuses',
+  openStatus: 'Open',
+  inProgressStatus: 'In Progress',
+  resolvedStatus: 'Resolved',
+  closedStatus: 'Closed',
+  missionControlTitle: 'Mission Control Title',
+  missionControlDesc: 'Mission Control Description',
+  
+  // Additional missing keys for remaining errors
+  missionControlCenter: 'Mission Control Center',
+  incoming: 'Incoming',
+  mechanical: 'Mechanical',
+  electronics: 'Electronics',
+  assembly: 'Assembly',
+  testing: 'Testing',
+  packaging: 'Packaging',
+  urgent: 'Urgent',
+  normal: 'Normal',
+  productionKanban: 'Production Kanban',
+  progress: 'Progress',
+  assignedTo: 'Assigned To',
+  estimatedCompletion: 'Estimated Completion',
+  taskStatusUpdated: 'Task Status Updated',
+  taskStatusUpdateError: 'Task Status Update Error',
+  tasksTitle: 'Tasks Title',
+  taskStatus: 'Task Status',
+  allStatuses: 'All Statuses',
+  taskPriority: 'Task Priority',
+  allPriorities: 'All Priorities',
+  createdByMe: 'Created By Me',
+  noTasksFoundDesc: 'No Tasks Found Description',
+  noActiveTasks: 'No Active Tasks',
+  noActiveTasksDesc: 'No Active Tasks Description',
+  noCreatedTasks: 'No Created Tasks',
+  noCreatedTasksDesc: 'No Created Tasks Description',
+  away: 'Away',
+  offline: 'Offline',
+  unknown: 'Unknown',
+  administrator: 'Administrator',
+  intern: 'Intern',
+  teamManagementDesc: 'Team Management Description',
+  addEmployeeLabel: 'Add Employee',
+  loadingTeamLabel: 'Loading Team',
+  dataLoadErrorLabel: 'Data Load Error',
+  technicalStatus: 'Technical Status',
+};
+
+export const translations: Record<string, Translations> = {
+  en: baseTranslations,
+  
   ru: {
-    // Common
-    loading: 'Загрузка...',
-    error: 'Ошибка',
-    success: 'Успешно',
-    save: 'Сохранить',
-    cancel: 'Отмена',
-    delete: 'Удалить',
-    edit: 'Редактировать',
-    create: 'Создать',
-    search: 'Поиск',
-    filter: 'Фильтр',
-    send: 'Отправить',
-    sending: 'Отправка...',
-    uploading: 'Загрузка...',
-    edited: 'изменено',
-    joined: 'присоединился',
-    
-    // Main page
+    ...baseTranslations,
+    // Russian overrides for key terms
     title: 'ТИГР CRM',
-    subtitle: 'Система управления задачами и проектами',
     welcome: 'Добро пожаловать',
-    welcomeDescription: 'Ваша комплексная система управления задачами и проектами',
-    systemStatus: 'Статус системы',
-    online: 'Онлайн',
-    performance: 'Производительность',
-    activeTasks: 'Активные задачи',
-    teamMembers: 'Участники команды',
-    achievements: 'Достижения',
-    problems: 'Проблемы',
-    achievements_page: 'Награды',
-    lastUpdate: 'Последнее обновление',
-    aiAssistant: 'ИИ Ассистент',
-    
-    // Add missing keys with English fallbacks
-    notifications: 'Уведомления',
-    noNotifications: 'Нет уведомлений',
-    markAsRead: 'Отметить как прочитанное',
-    markAllAsRead: 'Отметить все как прочитанные',
-    login: 'Войти',
-    logout: 'Выйти',
-    email: 'Email',
-    password: 'Пароль',
-    dashboard: 'Панель управления',
     operationalCenter: 'Операционный центр',
     uavSystem: 'Система управления БПЛА',
     missionControl: 'Центр управления',
@@ -716,35 +884,23 @@ export const translations: Record<string, Translations> = {
     warningStatus: 'ПРЕДУПРЕЖДЕНИЕ',
     okStatus: 'ОК',
     attentionStatus: 'ВНИМАНИЕ',
-    
-    // Use English for remaining keys to prevent build errors
-    signup: 'Sign Up',
-    signupPrompt: 'Don\'t have an account? Sign up',
-    forgotPassword: 'Forgot password?',
-    resetPassword: 'Reset Password',
-    confirmPassword: 'Confirm Password',
-    fullName: 'Full Name',
-    position: 'Position',
-    department: 'Department',
-    comments: 'Comments',
-    writeComment: 'Write Comment',
-    pending: 'Pending',
-    cancelled: 'Cancelled',
-    onHold: 'On Hold',
+    dronesInFlight: 'Беспилотники в полете',
+    systemHealth: 'Исправность системы',
+    operatorsOnline: 'Операторов в сети',
+    unitsInProduction: 'Единиц в производстве',
+    increaseCapacity: 'Увеличение производственной мощности до 100 единиц/месяц',
+    productionUnit: 'Производство',
+    quality: 'Качество',
+    deadline: 'Дедлайн',
+    lastUpdateTime: 'Последнее обновление',
+    technicalStatus: 'Техническое состояние',
   },
   
   bg: {
-    ...translations.en,
-    // Bulgarian-specific overrides
+    ...baseTranslations,
+    // Bulgarian overrides for key terms
     title: 'TIGER CRM',
     welcome: 'Добре дошли',
-    systemStatus: 'Състояние на системата',
-    online: 'Онлайн',
-    activeTasks: 'Активни задачи',
-    teamMembers: 'Членове на екипа',
-    achievements: 'Постижения',
-    problems: 'Проблеми',
-    lastUpdate: 'Последна актуализация',
     operationalCenter: 'Операционен център',
     tasks: 'Задачи',
     team: 'Екип',
@@ -754,5 +910,3 @@ export const translations: Record<string, Translations> = {
     admin: 'Админ',
   }
 };
-
-export type { Translations };
