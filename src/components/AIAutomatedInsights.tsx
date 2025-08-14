@@ -1,270 +1,122 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Brain, 
   Zap, 
   Target, 
   TrendingUp, 
-  Activity, 
   AlertTriangle,
   CheckCircle,
+  Activity,
   Clock,
   BarChart3,
   Lightbulb,
   RefreshCw
 } from 'lucide-react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 
-interface AutomatedInsight {
+interface AIInsight {
   id: string;
-  type: 'efficiency' | 'safety' | 'maintenance' | 'cost' | 'performance';
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  type: 'performance' | 'security' | 'optimization' | 'prediction';
   title: string;
   description: string;
-  recommendation: string;
   confidence: number;
-  impact: string;
-  dataSource: string[];
-  generatedAt: string;
-  status: 'new' | 'reviewed' | 'implemented' | 'dismissed';
-  metrics: {
-    affectedDrones: number;
-    potentialSavings?: number;
-    riskReduction?: number;
-    efficiencyGain?: number;
-  };
-}
-
-interface LearningPattern {
-  id: string;
-  pattern: string;
-  frequency: number;
-  accuracy: number;
-  lastSeen: string;
-  applications: string[];
-  improvements: string[];
+  impact: 'low' | 'medium' | 'high' | 'critical';
+  recommendation: string;
+  automatable: boolean;
+  createdAt: string;
 }
 
 const AIAutomatedInsights: React.FC = () => {
-  const [insights, setInsights] = useState<AutomatedInsight[]>([]);
-  const [learningPatterns, setLearningPatterns] = useState<LearningPattern[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [autoMode, setAutoMode] = useState(true);
-
-  // Mock data for demonstration
-  const mockInsights: AutomatedInsight[] = [
+  // Mock insights data
+  const insights: AIInsight[] = [
     {
       id: '1',
-      type: 'efficiency',
-      severity: 'medium',
+      type: 'performance',
+      title: 'UAV Battery Efficiency Decline',
+      description: 'Detected 15% decrease in battery efficiency across Fleet Alpha over the past week',
+      confidence: 92,
+      impact: 'high',
+      recommendation: 'Schedule preventive maintenance for affected drones and review charging protocols',
+      automatable: true,
+      createdAt: new Date(Date.now() - 300000).toISOString()
+    },
+    {
+      id: '2',
+      type: 'optimization',
       title: 'Flight Path Optimization Opportunity',
-      description: 'Analysis of 200+ recent flights shows suboptimal routing in sector 7, resulting in 8% longer flight times.',
-      recommendation: 'Implement dynamic routing algorithm that considers real-time traffic and weather conditions.',
+      description: 'AI identified 12% potential fuel savings through route optimization in Sector 7',
+      confidence: 87,
+      impact: 'medium',
+      recommendation: 'Implement suggested flight path changes for routes R7-001 through R7-008',
+      automatable: true,
+      createdAt: new Date(Date.now() - 600000).toISOString()
+    },
+    {
+      id: '3',
+      type: 'security',
+      title: 'Unusual Communication Pattern',
+      description: 'Anomalous data transmission detected from UAV-15 at 14:32 UTC',
+      confidence: 78,
+      impact: 'critical',
+      recommendation: 'Investigate communication logs and perform security scan on affected unit',
+      automatable: false,
+      createdAt: new Date(Date.now() - 900000).toISOString()
+    },
+    {
+      id: '4',
+      type: 'prediction',
+      title: 'Weather Impact Forecast',
+      description: 'Storm system will affect operations in 6-8 hours, 65% chance of mission delays',
       confidence: 89,
-      impact: 'Reduce average flight time by 12 minutes and battery consumption by 8%',
-      dataSource: ['flight_logs', 'weather_data', 'traffic_patterns'],
-      generatedAt: new Date().toISOString(),
-      status: 'new',
-      metrics: {
-        affectedDrones: 6,
-        potentialSavings: 15000,
-        efficiencyGain: 8
-      }
-    },
-    {
-      id: '2',
-      type: 'maintenance',
-      severity: 'high',
-      title: 'Predictive Maintenance Alert',
-      description: 'Vibration patterns in Drone-003 propellers indicate bearing wear approaching failure threshold.',
-      recommendation: 'Schedule immediate inspection and replacement of propeller bearings within 48 hours.',
-      confidence: 94,
-      impact: 'Prevent potential failure and $5,000 emergency repair cost',
-      dataSource: ['vibration_sensors', 'flight_hours', 'maintenance_history'],
-      generatedAt: new Date(Date.now() - 3600000).toISOString(),
-      status: 'new',
-      metrics: {
-        affectedDrones: 1,
-        potentialSavings: 5000,
-        riskReduction: 85
-      }
-    },
-    {
-      id: '3',
-      type: 'safety',
-      severity: 'critical',
-      title: 'Weather Pattern Risk Assessment',
-      description: 'Recurring wind shear patterns detected in northern sector during afternoon hours increase collision risk by 23%.',
-      recommendation: 'Implement dynamic no-fly zones during high-risk periods and reroute missions to safer corridors.',
-      confidence: 91,
-      impact: 'Reduce weather-related incidents by 65% and improve mission success rate',
-      dataSource: ['weather_stations', 'incident_reports', 'flight_data'],
-      generatedAt: new Date(Date.now() - 7200000).toISOString(),
-      status: 'reviewed',
-      metrics: {
-        affectedDrones: 8,
-        riskReduction: 65
-      }
+      impact: 'medium',
+      recommendation: 'Preposition backup equipment and notify affected mission teams',
+      automatable: true,
+      createdAt: new Date(Date.now() - 1200000).toISOString()
     }
   ];
 
-  const mockPatterns: LearningPattern[] = [
-    {
-      id: '1',
-      pattern: 'Battery degradation correlation with temperature extremes',
-      frequency: 89,
-      accuracy: 94.2,
-      lastSeen: new Date().toISOString(),
-      applications: ['Predictive maintenance', 'Mission planning', 'Fleet optimization'],
-      improvements: ['Temperature-based charging schedules', 'Seasonal fleet rotation']
-    },
-    {
-      id: '2',
-      pattern: 'Mission success rate vs. pilot experience level',
-      frequency: 76,
-      accuracy: 87.5,
-      lastSeen: new Date(Date.now() - 3600000).toISOString(),
-      applications: ['Training programs', 'Mission assignment', 'Risk assessment'],
-      improvements: ['Adaptive training modules', 'Experience-based mission routing']
-    },
-    {
-      id: '3',
-      pattern: 'Communication signal strength and equipment failure correlation',
-      frequency: 67,
-      accuracy: 91.8,
-      lastSeen: new Date(Date.now() - 7200000).toISOString(),
-      applications: ['Equipment monitoring', 'Preventive maintenance', 'Signal optimization'],
-      improvements: ['Signal booster placement', 'Equipment replacement scheduling']
-    }
-  ];
-
-  useEffect(() => {
-    setInsights(mockInsights);
-    setLearningPatterns(mockPatterns);
-  }, []);
-
-  // Auto-generate insights periodically
-  useEffect(() => {
-    if (autoMode) {
-      const interval = setInterval(() => {
-        generateAutomaticInsights();
-      }, 30000); // Generate new insights every 30 seconds
-
-      return () => clearInterval(interval);
-    }
-  }, [autoMode]);
-
-  const generateInsightsMutation = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.functions.invoke('ai-processing-queue', {
-        body: {
-          type: 'analyze',
-          input: {
-            telemetry_data: 'Recent operational metrics',
-            maintenance_records: 'Equipment health data',
-            performance_metrics: 'Efficiency and safety indicators',
-            weather_data: 'Environmental conditions',
-            mission_history: 'Recent mission outcomes'
-          },
-          priority: 'medium'
-        }
-      });
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: (data) => {
-      generateAutomaticInsights();
-      toast.success('New AI insights generated');
-    },
-    onError: (error) => {
-      console.error('Insight generation error:', error);
-      generateAutomaticInsights(); // Fallback to mock data
-      toast.error('Using cached insights - AI service unavailable');
-    },
-    onSettled: () => {
-      setIsGenerating(false);
-    }
-  });
-
-  const generateAutomaticInsights = () => {
-    // Simulate new insight generation
-    const newInsight: AutomatedInsight = {
-      id: Date.now().toString(),
-      type: ['efficiency', 'safety', 'maintenance', 'cost', 'performance'][Math.floor(Math.random() * 5)] as any,
-      severity: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as any,
-      title: `Automated Analysis #${Date.now().toString().slice(-4)}`,
-      description: 'AI has detected a pattern in recent operational data that requires attention.',
-      recommendation: 'Implement suggested optimization to improve operational efficiency.',
-      confidence: Math.floor(Math.random() * 30) + 70,
-      impact: 'Estimated improvement in operational metrics',
-      dataSource: ['telemetry', 'sensors', 'logs'],
-      generatedAt: new Date().toISOString(),
-      status: 'new',
-      metrics: {
-        affectedDrones: Math.floor(Math.random() * 5) + 1,
-        potentialSavings: Math.floor(Math.random() * 10000) + 1000,
-        efficiencyGain: Math.floor(Math.random() * 15) + 5
-      }
-    };
-
-    setInsights(prev => [newInsight, ...prev.slice(0, 19)]); // Keep last 20 insights
-  };
-
-  const handleGenerateInsights = () => {
-    setIsGenerating(true);
-    generateInsightsMutation.mutate();
-  };
-
-  const handleInsightAction = (insightId: string, action: 'implement' | 'dismiss' | 'review') => {
-    setInsights(prev => prev.map(insight => 
-      insight.id === insightId 
-        ? { ...insight, status: action === 'implement' ? 'implemented' : action === 'dismiss' ? 'dismissed' : 'reviewed' }
-        : insight
-    ));
-    
-    toast.success(`Insight ${action}ed successfully`);
-  };
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'critical': return 'bg-red-500 text-white';
-      case 'high': return 'bg-orange-500 text-white';
-      case 'medium': return 'bg-yellow-500 text-white';
-      case 'low': return 'bg-blue-500 text-white';
+  const getInsightTypeColor = (type: string) => {
+    switch (type) {
+      case 'performance': return 'bg-blue-500 text-white';
+      case 'security': return 'bg-red-500 text-white';
+      case 'optimization': return 'bg-green-500 text-white';
+      case 'prediction': return 'bg-purple-500 text-white';
       default: return 'bg-muted text-muted-foreground';
     }
   };
 
-  const getTypeIcon = (type: string) => {
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case 'critical': return 'bg-red-500 text-white';
+      case 'high': return 'bg-orange-500 text-white';
+      case 'medium': return 'bg-yellow-500 text-white';
+      case 'low': return 'bg-green-500 text-white';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const getInsightIcon = (type: string) => {
     switch (type) {
-      case 'efficiency': return <TrendingUp className="h-4 w-4" />;
-      case 'safety': return <AlertTriangle className="h-4 w-4" />;
-      case 'maintenance': return <Zap className="h-4 w-4" />;
-      case 'cost': return <BarChart3 className="h-4 w-4" />;
-      case 'performance': return <Activity className="h-4 w-4" />;
+      case 'performance': return <BarChart3 className="h-4 w-4" />;
+      case 'security': return <AlertTriangle className="h-4 w-4" />;
+      case 'optimization': return <Target className="h-4 w-4" />;
+      case 'prediction': return <Brain className="h-4 w-4" />;
       default: return <Lightbulb className="h-4 w-4" />;
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'implemented': return 'bg-green-500 text-white';
-      case 'reviewed': return 'bg-blue-500 text-white';
-      case 'dismissed': return 'bg-gray-500 text-white';
-      case 'new': return 'bg-purple-500 text-white';
-      default: return 'bg-muted text-muted-foreground';
-    }
+  const formatTime = (timestamp: string) => {
+    const diff = Date.now() - new Date(timestamp).getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    
+    if (hours > 0) return `${hours}h ago`;
+    if (minutes > 0) return `${minutes}m ago`;
+    return 'Just now';
   };
-
-  const newInsightsCount = insights.filter(i => i.status === 'new').length;
 
   return (
     <div className="space-y-6">
@@ -272,323 +124,192 @@ const AIAutomatedInsights: React.FC = () => {
         <div>
           <h3 className="text-lg font-semibold">AI Automated Insights</h3>
           <p className="text-sm text-muted-foreground">
-            Continuous AI analysis and automated operational insights
+            Continuous AI analysis and automated operational intelligence
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant={autoMode ? "default" : "secondary"} className="gap-1">
-            <Brain className="h-3 w-3" />
-            Auto Mode {autoMode ? 'ON' : 'OFF'}
-          </Badge>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setAutoMode(!autoMode)}
-          >
-            {autoMode ? 'Disable' : 'Enable'} Auto
-          </Button>
-          <Button 
-            onClick={handleGenerateInsights}
-            disabled={isGenerating}
-            size="sm"
-            className="gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
-            {isGenerating ? 'Generating...' : 'Generate Insights'}
-          </Button>
-        </div>
+        <Button className="gap-2">
+          <RefreshCw className="h-4 w-4" />
+          Generate New Insights
+        </Button>
       </div>
 
-      {/* Quick Stats */}
+      {/* System Health Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">New Insights</span>
-              <Lightbulb className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <div className="text-2xl font-bold mt-2">{newInsightsCount}</div>
-            <div className="text-xs text-muted-foreground">Require attention</div>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-green-500 mb-2">94.2%</div>
+            <div className="text-sm text-muted-foreground">AI Accuracy</div>
           </CardContent>
         </Card>
-
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Avg Confidence</span>
-              <Target className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <div className="text-2xl font-bold mt-2">
-              {insights.length > 0 ? Math.round(insights.reduce((acc, i) => acc + i.confidence, 0) / insights.length) : 0}%
-            </div>
-            <div className="text-xs text-muted-foreground">AI certainty</div>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-blue-500 mb-2">47</div>
+            <div className="text-sm text-muted-foreground">Insights Today</div>
           </CardContent>
         </Card>
-
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Potential Savings</span>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <div className="text-2xl font-bold mt-2">
-              ${insights.reduce((acc, i) => acc + (i.metrics.potentialSavings || 0), 0).toLocaleString()}
-            </div>
-            <div className="text-xs text-muted-foreground">If implemented</div>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-orange-500 mb-2">23</div>
+            <div className="text-sm text-muted-foreground">Auto Actions</div>
           </CardContent>
         </Card>
-
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Learning Patterns</span>
-              <Brain className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <div className="text-2xl font-bold mt-2">{learningPatterns.length}</div>
-            <div className="text-xs text-muted-foreground">Active patterns</div>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-purple-500 mb-2">91.5%</div>
+            <div className="text-sm text-muted-foreground">Success Rate</div>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="insights" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="insights">Active Insights</TabsTrigger>
-          <TabsTrigger value="patterns">Learning Patterns</TabsTrigger>
-          <TabsTrigger value="automation">Automation Settings</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="insights" className="space-y-4">
-          {insights.length === 0 ? (
-            <Card>
-              <CardContent className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <Brain className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold mb-2">No Insights Available</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Generate AI insights to discover optimization opportunities
-                  </p>
-                  <Button onClick={handleGenerateInsights} disabled={isGenerating}>
-                    Generate Insights
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
+      {/* AI Insights */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Brain className="h-5 w-5" />
+            Live AI Insights
+          </CardTitle>
+          <CardDescription>
+            Real-time AI analysis and actionable recommendations
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-96">
             <div className="space-y-4">
               {insights.map((insight) => (
-                <Card key={insight.id} className={`border-l-4 ${
-                  insight.status === 'new' ? 'border-l-primary' : 
-                  insight.status === 'implemented' ? 'border-l-green-500' : 'border-l-muted'
-                }`}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
+                <Card key={insight.id} className="border-l-4 border-l-primary">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        {getTypeIcon(insight.type)}
-                        <CardTitle className="text-base">{insight.title}</CardTitle>
+                        {getInsightIcon(insight.type)}
+                        <h4 className="font-medium">{insight.title}</h4>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge className={getSeverityColor(insight.severity)}>
-                          {insight.severity}
+                        <Badge className={getInsightTypeColor(insight.type)} variant="secondary">
+                          {insight.type}
                         </Badge>
-                        <Badge className={getStatusColor(insight.status)} variant="secondary">
-                          {insight.status}
+                        <Badge className={getImpactColor(insight.impact)} variant="secondary">
+                          {insight.impact}
                         </Badge>
                       </div>
                     </div>
-                    <CardDescription>{insight.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="p-3 bg-muted/50 rounded-lg">
-                      <h4 className="font-medium text-sm mb-1">AI Recommendation:</h4>
-                      <p className="text-sm text-muted-foreground">{insight.recommendation}</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                    
+                    <p className="text-sm text-muted-foreground mb-3">{insight.description}</p>
+                    
+                    <div className="flex items-center gap-4 text-sm mb-3">
                       <div>
                         <span className="font-medium">Confidence:</span>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Progress value={insight.confidence} className="flex-1" />
-                          <span className="text-muted-foreground">{insight.confidence}%</span>
-                        </div>
-                      </div>
-                      <div>
-                        <span className="font-medium">Affected Drones:</span>
-                        <p className="text-muted-foreground mt-1">{insight.metrics.affectedDrones}</p>
-                      </div>
-                      <div>
-                        <span className="font-medium">Potential Savings:</span>
-                        <p className="text-muted-foreground mt-1">
-                          {insight.metrics.potentialSavings ? `$${insight.metrics.potentialSavings.toLocaleString()}` : 'N/A'}
-                        </p>
+                        <span className="ml-2">{insight.confidence}%</span>
                       </div>
                       <div>
                         <span className="font-medium">Generated:</span>
-                        <p className="text-muted-foreground mt-1">
-                          {new Date(insight.generatedAt).toLocaleString()}
-                        </p>
+                        <span className="ml-2">{formatTime(insight.createdAt)}</span>
                       </div>
+                      {insight.automatable && (
+                        <Badge variant="outline" className="gap-1">
+                          <Zap className="h-3 w-3" />
+                          Automatable
+                        </Badge>
+                      )}
                     </div>
 
-                    {insight.status === 'new' && (
-                      <div className="flex items-center gap-2 pt-2">
-                        <Button 
-                          variant="default" 
-                          size="sm" 
-                          className="gap-2"
-                          onClick={() => handleInsightAction(insight.id, 'implement')}
-                        >
-                          <CheckCircle className="h-4 w-4" />
-                          Implement
+                    <div className="p-3 bg-muted/50 rounded-lg mb-3">
+                      <span className="font-medium text-sm">Recommendation:</span>
+                      <p className="text-sm text-muted-foreground mt-1">{insight.recommendation}</p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button variant="default" size="sm" className="gap-2">
+                        <CheckCircle className="h-3 w-3" />
+                        Implement
+                      </Button>
+                      {insight.automatable && (
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <Zap className="h-3 w-3" />
+                          Automate
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="gap-2"
-                          onClick={() => handleInsightAction(insight.id, 'review')}
-                        >
-                          <Clock className="h-4 w-4" />
-                          Review Later
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => handleInsightAction(insight.id, 'dismiss')}
-                        >
-                          Dismiss
-                        </Button>
-                      </div>
-                    )}
+                      )}
+                      <Button variant="ghost" size="sm">
+                        Details
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
-          )}
-        </TabsContent>
+          </ScrollArea>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="patterns" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Machine Learning Patterns</CardTitle>
-              <CardDescription>
-                Patterns discovered and learned by the AI system
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {learningPatterns.map((pattern) => (
-                  <Card key={pattern.id}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <h4 className="font-medium">{pattern.pattern}</h4>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            {pattern.accuracy}% accurate
-                          </Badge>
-                          <Badge variant="secondary" className="text-xs">
-                            Freq: {pattern.frequency}
-                          </Badge>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="font-medium">Applications:</span>
-                          <ul className="mt-1 space-y-1">
-                            {pattern.applications.map((app, index) => (
-                              <li key={index} className="text-muted-foreground">• {app}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <span className="font-medium">Improvements:</span>
-                          <ul className="mt-1 space-y-1">
-                            {pattern.improvements.map((imp, index) => (
-                              <li key={index} className="text-muted-foreground">• {imp}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                      
-                      <div className="mt-3 text-xs text-muted-foreground">
-                        Last seen: {new Date(pattern.lastSeen).toLocaleString()}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="automation" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Automation Configuration</CardTitle>
-              <CardDescription>
-                Configure automatic insight generation and processing
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Auto-Generate Insights</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Automatically generate insights every 30 seconds
-                      </p>
-                    </div>
-                    <Button 
-                      variant={autoMode ? "default" : "outline"}
-                      onClick={() => setAutoMode(!autoMode)}
-                    >
-                      {autoMode ? 'Enabled' : 'Disabled'}
-                    </Button>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Critical Alert Notifications</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Send immediate notifications for critical insights
-                      </p>
-                    </div>
-                    <Button variant="default">Enabled</Button>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Learning Pattern Updates</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Continuously update machine learning patterns
-                      </p>
-                    </div>
-                    <Button variant="default">Enabled</Button>
-                  </div>
+      {/* Automation Status */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5" />
+              Active Automations
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-2 border rounded">
+                <div>
+                  <p className="text-sm font-medium">Battery Alert System</p>
+                  <p className="text-xs text-muted-foreground">Auto-trigger when &lt; 15%</p>
                 </div>
+                <Badge variant="default">Active</Badge>
+              </div>
+              <div className="flex items-center justify-between p-2 border rounded">
+                <div>
+                  <p className="text-sm font-medium">Weather Hold Protocol</p>
+                  <p className="text-xs text-muted-foreground">Ground flights in storms</p>
+                </div>
+                <Badge variant="default">Active</Badge>
+              </div>
+              <div className="flex items-center justify-between p-2 border rounded">
+                <div>
+                  <p className="text-sm font-medium">Maintenance Scheduler</p>
+                  <p className="text-xs text-muted-foreground">Schedule based on hours</p>
+                </div>
+                <Badge variant="secondary">Paused</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-                <div className="p-4 bg-muted/50 rounded-lg">
-                  <h4 className="font-medium mb-2">System Performance</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium">Processing Speed:</span>
-                      <p className="text-muted-foreground">2.3 insights/min</p>
-                    </div>
-                    <div>
-                      <span className="font-medium">Pattern Recognition:</span>
-                      <p className="text-muted-foreground">94.2% accuracy</p>
-                    </div>
-                    <div>
-                      <span className="font-medium">Resource Usage:</span>
-                      <p className="text-muted-foreground">67% capacity</p>
-                    </div>
-                  </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              Performance Trends
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Prediction Accuracy</span>
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-green-500" />
+                  <span className="text-sm font-medium">+5.2%</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Response Time</span>
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-red-500 rotate-180" />
+                  <span className="text-sm font-medium">-0.8s</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Automation Success</span>
+                <div className="flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Stable</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
