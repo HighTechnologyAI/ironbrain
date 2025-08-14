@@ -128,7 +128,7 @@ const UAVDashboard = () => {
               </div>
             </div>
           </div>
-          <Button variant="mission" size="lg" className="hover-scale" onClick={() => navigate('/missions')}>
+          <Button variant="mission" size="lg" className="hover-scale transition-all duration-300 hover:shadow-lg hover:shadow-primary/25" onClick={() => navigate('/missions')}>
             <Plane className="h-4 w-4 mr-2" />
             {t.launchMission}
           </Button>
@@ -136,7 +136,7 @@ const UAVDashboard = () => {
 
         {/* OKR Block - Large Strategic Focus */}
         <Card 
-          className="bg-surface-1 border-border cursor-pointer hover:shadow-medium transition-all duration-300"
+          className="bg-surface-1 border-border cursor-pointer hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.01] transition-all duration-300"
           onClick={() => navigate('/tasks')}
         >
           <CardHeader>
@@ -181,7 +181,7 @@ const UAVDashboard = () => {
           {kpiCards.map((kpi, index) => (
             <Card 
               key={index} 
-              className={`bg-surface-1 border-border transition-all duration-300 hover:shadow-medium hover-scale ${
+              className={`bg-surface-1 border-border transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:scale-105 ${
                 kpi.onClick ? 'cursor-pointer' : ''
               }`}
               onClick={kpi.onClick}
@@ -215,7 +215,7 @@ const UAVDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Button 
             variant="outline" 
-            className="h-16 flex-col gap-2 relative hover-scale transition-all duration-300"
+            className="h-16 flex-col gap-2 relative hover:scale-105 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
             onClick={() => navigate('/tasks')}
           >
             <CheckSquare className="h-5 w-5" />
@@ -229,7 +229,7 @@ const UAVDashboard = () => {
           
           <Button 
             variant="outline" 
-            className="h-16 flex-col gap-2 hover-scale transition-all duration-300"
+            className="h-16 flex-col gap-2 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
             onClick={() => navigate('/analytics')}
           >
             <Activity className="h-5 w-5" />
@@ -238,7 +238,7 @@ const UAVDashboard = () => {
           
           <Button 
             variant="outline" 
-            className="h-16 flex-col gap-2 relative hover-scale transition-all duration-300"
+            className="h-16 flex-col gap-2 relative hover:scale-105 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
             onClick={() => navigate('/issues')}
           >
             <AlertTriangle className="h-5 w-5" />
