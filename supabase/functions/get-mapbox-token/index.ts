@@ -22,12 +22,14 @@ serve(async (req) => {
     console.log('🔢 Token length:', mapboxToken?.length || 0)
     
     if (!mapboxToken) {
-      console.error('❌ Mapbox token not found in environment variables')
+      console.error('❌ CRITICAL: Mapbox token not found in environment variables')
+      console.error('📋 Available env vars:', Object.keys(Deno.env.toObject()).filter(k => k.includes('MAPBOX')))
       return new Response(
         JSON.stringify({ 
-          error: 'MAPBOX_PUBLIC_TOKEN not configured in Supabase Edge Function Secrets',
-          details: 'Please add MAPBOX_PUBLIC_TOKEN to your Supabase project secrets',
-          hint: 'Go to Supabase Dashboard > Settings > Edge Functions > Secrets'
+          error: 'MAPBOX_PUBLIC_TOKEN not configured',
+          details: 'Token missing from environment variables',
+          available_env: Object.keys(Deno.env.toObject()).filter(k => k.includes('MAPBOX')),
+          hint: 'Check Supabase project secrets'
         }),
         { 
           status: 500, 
@@ -36,13 +38,16 @@ serve(async (req) => {
       )
     }
 
+    console.log('🔍 Token prefix check:', mapboxToken.substring(0, 3))
     if (!mapboxToken.startsWith('pk.')) {
-      console.error('❌ Invalid Mapbox token format')
+      console.error('❌ CRITICAL: Invalid Mapbox token format')
+      console.error('🔍 Received prefix:', mapboxToken.substring(0, 10))
       return new Response(
         JSON.stringify({ 
           error: 'Invalid MAPBOX_PUBLIC_TOKEN format',
           details: 'Token should start with "pk."',
-          received_prefix: mapboxToken.substring(0, 3)
+          received_prefix: mapboxToken.substring(0, 10),
+          token_length: mapboxToken.length
         }),
         { 
           status: 500, 
