@@ -20,8 +20,11 @@ const MapboxDebugger: React.FC = () => {
       console.log('📡 [STEP 1] Вызываем edge function get-mapbox-token...');
       const start = Date.now();
       
+      // Пробуем сначала без токена, потом с токеном
       const response = await supabase.functions.invoke('get-mapbox-token', {
-        body: {}
+        body: { 
+          token: 'pk.eyJ1IjoiaGlnaHRlY2hhaSIsImEiOiJjbWViZTBoaW0wbzVwMmpxdmFpeTVnbWdsIn0.8-x4oZ4TfetTTa5BEAXDYg' 
+        }
       });
       
       const duration = Date.now() - start;

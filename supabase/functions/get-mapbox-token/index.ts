@@ -17,18 +17,52 @@ serve(async (req) => {
   try {
     console.log('🔍 [STEP 1] Reading MAPBOX_PUBLIC_TOKEN from environment...')
     
+    // Получаем все переменные окружения для отладки
+    const allEnvVars = Deno.env.toObject()
+    const mapboxVars = Object.keys(allEnvVars).filter(k => k.toLowerCase().includes('mapbox'))
+    console.log('📋 [DEBUG] Available Mapbox env vars:', mapboxVars)
+    console.log('📋 [DEBUG] All env var keys count:', Object.keys(allEnvVars).length)
+    
     const mapboxToken = Deno.env.get('MAPBOX_PUBLIC_TOKEN')
     
-    console.log('✅ [STEP 1] Token retrieved successfully')
+    console.log('✅ [STEP 1] Token retrieval completed')
     console.log('📊 [DEBUG] Token exists:', !!mapboxToken)
     console.log('📊 [DEBUG] Token length:', mapboxToken?.length || 0)
+    console.log('📊 [DEBUG] Available mapbox vars:', mapboxVars)
     
+    // Если токен не найден, используем токен из тела запроса как fallback
     if (!mapboxToken || mapboxToken.trim() === '') {
-      console.error('❌ [ERROR] Token is missing or empty')
+      console.log('⚠️ [FALLBACK] Token not found in env, checking request body...')
+      
+      try {
+        const body = await req.json()
+        if (body.token && body.token.startsWith('pk.')) {
+          console.log('✅ [FALLBACK] Using token from request body')
+          const fallbackToken = body.token.trim()
+          
+          return new Response(
+            JSON.stringify({ 
+              token: fallbackToken,
+              success: true,
+              source: 'request_body',
+              timestamp: new Date().toISOString()
+            }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          )
+        }
+      } catch (e) {
+        console.log('📋 [INFO] No valid token in request body, continuing with error')
+      }
+      
+      console.error('❌ [ERROR] Token is missing from both environment and request')
       return new Response(
         JSON.stringify({ 
           error: 'MAPBOX_PUBLIC_TOKEN not found',
-          details: 'Please add MAPBOX_PUBLIC_TOKEN to Supabase secrets',
+          details: 'Token not found in environment variables or request body',
+          available_mapbox_vars: mapboxVars,
+          env_var_count: Object.keys(allEnvVars).length,
           success: false
         }),
         { 
