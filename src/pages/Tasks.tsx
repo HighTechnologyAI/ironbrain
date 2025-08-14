@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
@@ -91,6 +91,9 @@ const Tasks = () => {
   const [collaboratedTasks, setCollaboratedTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showAISidebar, setShowAISidebar] = useState(true);
+  const [activeTab, setActiveTab] = useState('my');
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const [indicatorStyle, setIndicatorStyle] = useState({ width: 0, left: 0 });
 
   const loadCommentCounts = async (taskIds: string[]) => {
     if (!taskIds || taskIds.length === 0) { setCommentCounts({}); return; }
@@ -204,6 +207,37 @@ const Tasks = () => {
   useEffect(() => {
     loadCollaboratedTasks();
   }, [currentProfileId]);
+
+  // Update indicator position when active tab changes
+  useEffect(() => {
+    const updateIndicator = () => {
+      if (!tabsRef.current) return;
+      
+      const activeButton = tabsRef.current.querySelector(`[data-state="active"]`) as HTMLElement;
+      if (activeButton) {
+        const tabsList = tabsRef.current;
+        const tabsListRect = tabsList.getBoundingClientRect();
+        const activeButtonRect = activeButton.getBoundingClientRect();
+        
+        setIndicatorStyle({
+          width: activeButtonRect.width,
+          left: activeButtonRect.left - tabsListRect.left
+        });
+      }
+    };
+    
+    // Small delay to ensure DOM is updated
+    const timeoutId = setTimeout(updateIndicator, 50);
+    
+    // Also update on window resize
+    window.addEventListener('resize', updateIndicator);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', updateIndicator);
+    };
+  }, [activeTab, isAdmin]);
+
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
     try {
       const updateData: any = { status: newStatus };
@@ -679,41 +713,55 @@ const Tasks = () => {
                 </div>
               </div>
 
-              <Tabs defaultValue="my" className="w-full">
-                <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'} cyber-border bg-surface-1/30 backdrop-blur-sm p-1 gap-1 h-auto`}>
-                  {isAdmin && (
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <div className="relative">
+                  <TabsList 
+                    ref={tabsRef}
+                    className={`grid w-full ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'} cyber-border bg-surface-1/30 backdrop-blur-sm p-1 gap-1 h-auto relative overflow-hidden`}
+                  >
+                    {/* Animated indicator */}
+                    <div
+                      className="absolute top-1 bottom-1 bg-primary/20 border-2 border-primary rounded-md transition-all duration-300 ease-out z-0"
+                      style={{
+                        width: `${indicatorStyle.width}px`,
+                        transform: `translateX(${indicatorStyle.left}px)`
+                      }}
+                    />
+                    
+                    {isAdmin && (
+                      <TabsTrigger 
+                        value="all" 
+                        className="relative z-10 data-[state=active]:bg-transparent data-[state=active]:border-transparent data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
+                      >
+                        {t.allTasks} ({filteredTasks.length})
+                      </TabsTrigger>
+                    )}
                     <TabsTrigger 
-                      value="all" 
-                      className="data-[state=active]:bg-primary/20 data-[state=active]:border-primary data-[state=active]:border-2 data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
+                      value="my"
+                      className="relative z-10 data-[state=active]:bg-transparent data-[state=active]:border-transparent data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
                     >
-                      {t.allTasks} ({filteredTasks.length})
+                      {t.myTasks} ({getMyTasks().length})
                     </TabsTrigger>
-                  )}
-                  <TabsTrigger 
-                    value="my"
-                    className="data-[state=active]:bg-primary/20 data-[state=active]:border-primary data-[state=active]:border-2 data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
-                  >
-                    {t.myTasks} ({getMyTasks().length})
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="created"
-                    className="data-[state=active]:bg-primary/20 data-[state=active]:border-primary data-[state=active]:border-2 data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
-                  >
-                    {t.createdByMe} ({getCreatedTasks().length})
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="collab"
-                    className="data-[state=active]:bg-primary/20 data-[state=active]:border-primary data-[state=active]:border-2 data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
-                  >
-                    Совместно ({getCollaboratedTasks().length})
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="completed"
-                    className="data-[state=active]:bg-primary/20 data-[state=active]:border-primary data-[state=active]:border-2 data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
-                  >
-                    {t.completed} ({getCompletedTasks().length})
-                  </TabsTrigger>
-                </TabsList>
+                    <TabsTrigger 
+                      value="created"
+                      className="relative z-10 data-[state=active]:bg-transparent data-[state=active]:border-transparent data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
+                    >
+                      {t.createdByMe} ({getCreatedTasks().length})
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="collab"
+                      className="relative z-10 data-[state=active]:bg-transparent data-[state=active]:border-transparent data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
+                    >
+                      Совместно ({getCollaboratedTasks().length})
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="completed"
+                      className="relative z-10 data-[state=active]:bg-transparent data-[state=active]:border-transparent data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
+                    >
+                      {t.completed} ({getCompletedTasks().length})
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
 
                 {isAdmin && (
                   <TabsContent value="all" className="mt-6">
