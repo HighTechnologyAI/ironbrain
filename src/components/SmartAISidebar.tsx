@@ -185,7 +185,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
     
     setIsGeneratingSummary(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-task-assistant', {
+      const { data, error } = await supabase.functions.invoke('task-ai-assistant', {
         body: {
           action: 'analyze_task',
           taskContext: {
@@ -235,7 +235,7 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
     
     setIsGeneratingSubtasks(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-task-assistant', {
+      const { data, error } = await supabase.functions.invoke('task-ai-assistant', {
         body: {
           action: 'suggest_optimization',
           taskContext: {
