@@ -650,6 +650,7 @@ export type Database = {
           hire_date: string | null
           id: string
           is_active: boolean | null
+          locale: string | null
           phone: string | null
           position: string | null
           role: Database["public"]["Enums"]["employee_role"] | null
@@ -666,6 +667,7 @@ export type Database = {
           hire_date?: string | null
           id?: string
           is_active?: boolean | null
+          locale?: string | null
           phone?: string | null
           position?: string | null
           role?: Database["public"]["Enums"]["employee_role"] | null
@@ -682,6 +684,7 @@ export type Database = {
           hire_date?: string | null
           id?: string
           is_active?: boolean | null
+          locale?: string | null
           phone?: string | null
           position?: string | null
           role?: Database["public"]["Enums"]["employee_role"] | null
@@ -1182,6 +1185,257 @@ export type Database = {
         }
         Relationships: []
       }
+      uav_commands: {
+        Row: {
+          command_type: string
+          confirmation_required: boolean | null
+          confirmed_at: string | null
+          created_at: string | null
+          drone_id: string | null
+          error_message: string | null
+          executed_at: string | null
+          id: string
+          parameters: Json | null
+          result: Json | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          command_type: string
+          confirmation_required?: boolean | null
+          confirmed_at?: string | null
+          created_at?: string | null
+          drone_id?: string | null
+          error_message?: string | null
+          executed_at?: string | null
+          id?: string
+          parameters?: Json | null
+          result?: Json | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          command_type?: string
+          confirmation_required?: boolean | null
+          confirmed_at?: string | null
+          created_at?: string | null
+          drone_id?: string | null
+          error_message?: string | null
+          executed_at?: string | null
+          id?: string
+          parameters?: Json | null
+          result?: Json | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uav_commands_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "uav_drones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uav_drones: {
+        Row: {
+          battery_level: number | null
+          created_at: string | null
+          created_by: string | null
+          firmware: string | null
+          id: string
+          last_contact: string | null
+          location_lat: number | null
+          location_lon: number | null
+          model: string | null
+          name: string
+          serial: string | null
+          status: string | null
+        }
+        Insert: {
+          battery_level?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          firmware?: string | null
+          id?: string
+          last_contact?: string | null
+          location_lat?: number | null
+          location_lon?: number | null
+          model?: string | null
+          name: string
+          serial?: string | null
+          status?: string | null
+        }
+        Update: {
+          battery_level?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          firmware?: string | null
+          id?: string
+          last_contact?: string | null
+          location_lat?: number | null
+          location_lon?: number | null
+          model?: string | null
+          name?: string
+          serial?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      uav_events: {
+        Row: {
+          acknowledged: boolean | null
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          data: Json | null
+          drone_id: string | null
+          event_type: string
+          id: number
+          message: string | null
+          mission_id: string | null
+          severity: string | null
+          ts: string | null
+        }
+        Insert: {
+          acknowledged?: boolean | null
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          data?: Json | null
+          drone_id?: string | null
+          event_type: string
+          id?: number
+          message?: string | null
+          mission_id?: string | null
+          severity?: string | null
+          ts?: string | null
+        }
+        Update: {
+          acknowledged?: boolean | null
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          data?: Json | null
+          drone_id?: string | null
+          event_type?: string
+          id?: number
+          message?: string | null
+          mission_id?: string | null
+          severity?: string | null
+          ts?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uav_events_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "uav_missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uav_missions: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          drone_id: string | null
+          ended_at: string | null
+          flight_path: Json | null
+          id: string
+          started_at: string | null
+          status: string | null
+          title: string
+          waypoints: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          drone_id?: string | null
+          ended_at?: string | null
+          flight_path?: Json | null
+          id?: string
+          started_at?: string | null
+          status?: string | null
+          title: string
+          waypoints?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          drone_id?: string | null
+          ended_at?: string | null
+          flight_path?: Json | null
+          id?: string
+          started_at?: string | null
+          status?: string | null
+          title?: string
+          waypoints?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uav_missions_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "uav_drones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uav_telemetry: {
+        Row: {
+          alt: number | null
+          battery_v: number | null
+          drone_id: string
+          esc_temp_c: number | null
+          id: number
+          lat: number | null
+          lon: number | null
+          mission_id: string | null
+          payload: Json | null
+          speed_ms: number | null
+          ts: string | null
+          wind_ms: number | null
+        }
+        Insert: {
+          alt?: number | null
+          battery_v?: number | null
+          drone_id: string
+          esc_temp_c?: number | null
+          id?: number
+          lat?: number | null
+          lon?: number | null
+          mission_id?: string | null
+          payload?: Json | null
+          speed_ms?: number | null
+          ts?: string | null
+          wind_ms?: number | null
+        }
+        Update: {
+          alt?: number | null
+          battery_v?: number | null
+          drone_id?: string
+          esc_temp_c?: number | null
+          id?: number
+          lat?: number | null
+          lon?: number | null
+          mission_id?: string | null
+          payload?: Json | null
+          speed_ms?: number | null
+          ts?: string | null
+          wind_ms?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uav_telemetry_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "uav_missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vip_guests: {
         Row: {
           contact: string | null
@@ -1287,6 +1541,7 @@ export type Database = {
           hire_date: string | null
           id: string
           is_active: boolean | null
+          locale: string | null
           phone: string | null
           position: string | null
           role: Database["public"]["Enums"]["employee_role"] | null
