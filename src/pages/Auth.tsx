@@ -161,7 +161,7 @@ const Auth = () => {
       <div className="w-full max-w-md relative z-10">
         {/* Header */}
         {/* Language Switcher */}
-        <div className="absolute top-6 right-6 z-20">
+        <div className="fixed top-4 right-4 z-50">
           <LanguageSwitcher />
         </div>
 
