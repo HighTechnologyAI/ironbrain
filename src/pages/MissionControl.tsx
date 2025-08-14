@@ -5,6 +5,7 @@ import { useMissions } from '@/hooks/use-missions';
 import { useDrones } from '@/hooks/use-drones';
 import { useWeather } from '@/hooks/use-weather';
 import TacticalMapModal from '@/components/TacticalMapModal';
+import MapboxDebugger from '@/components/MapboxDebugger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusChip } from '@/components/neon/StatusChip';
@@ -354,6 +355,9 @@ const MissionControl = () => {
             </div>
           )}
         </div>
+
+        {/* API Debugger */}
+        <MapboxDebugger />
 
         {/* Tactical Map */}
         <Card className="bg-surface-1 border-border">
