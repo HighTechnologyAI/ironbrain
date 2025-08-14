@@ -6,6 +6,7 @@ import { Button } from '@/components/neon/Button';
 import SystemHealth from '@/components/SystemHealth';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
+import { AISystemStatus } from '@/components/AISystemStatus';
 import { 
   Activity, 
   Users, 
@@ -143,8 +144,8 @@ const Dashboard: React.FC = () => {
         })}
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Quick Actions & System Status */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -180,13 +181,20 @@ const Dashboard: React.FC = () => {
         {/* System Health */}
         <SystemHealth />
         
-        {/* Recent UAV Events - Only show if UAV features are enabled */}
-        {(import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' || 
-          import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' ||
-          import.meta.env.VITE_FEATURE_FLEET === 'true') && (
-          <RecentEventsWidget />
-        )}
+        {/* AI System Status */}
+        <AISystemStatus />
       </div>
+
+      {/* Recent UAV Events - Only show if UAV features are enabled */}
+      {(import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' || 
+        import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' ||
+        import.meta.env.VITE_FEATURE_FLEET === 'true') && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="lg:col-span-2">
+            <RecentEventsWidget />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
