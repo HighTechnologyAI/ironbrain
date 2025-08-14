@@ -85,8 +85,15 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         // Получаем токен через edge function
         const { data, error } = await supabase.functions.invoke('get-mapbox-token');
         
-        if (error || !data?.token) {
-          setError('Ошибка получения Mapbox токена');
+        if (error) {
+          console.error('Edge function error:', error);
+          setError('Ошибка получения Mapbox токена: ' + error.message);
+          setLoading(false);
+          return;
+        }
+
+        if (!data?.token) {
+          setError('Mapbox токен не настроен в системе');
           setLoading(false);
           return;
         }
@@ -99,8 +106,8 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/dark-v11', // Темная тема
-          center: [26.8855, 43.3889], // Timarevo Airfield
-          zoom: 10,
+          center: [26.8855, 43.3889], // Timarevo Airfield, Bulgaria
+          zoom: 8,
           pitch: 45,
           bearing: 0,
           antialias: true
@@ -118,31 +125,47 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         map.current.on('style.load', () => {
           if (!map.current) return;
           
-          // Добавляем туман для кибер-эффекта
-          map.current.setFog({
-            color: 'rgb(20, 20, 40)',
-            'high-color': 'rgb(0, 255, 255)',
-            'horizon-blend': 0.1,
-            'space-color': 'rgb(0, 0, 20)',
-            'star-intensity': 0.8
-          });
+          try {
+            // Добавляем туман для кибер-эффекта
+            map.current.setFog({
+              color: 'rgb(20, 20, 40)',
+              'high-color': 'rgb(0, 255, 255)',
+              'horizon-blend': 0.1,
+              'space-color': 'rgb(0, 0, 20)',
+              'star-intensity': 0.8
+            });
 
-          // Меняем цвета на кибер-палитру
-          map.current.setPaintProperty('water', 'fill-color', '#001122');
-          map.current.setPaintProperty('land', 'fill-color', '#0a0a0f');
+            // Меняем цвета на кибер-палитру
+            if (map.current.getLayer('water')) {
+              map.current.setPaintProperty('water', 'fill-color', '#001122');
+            }
+            if (map.current.getLayer('land')) {
+              map.current.setPaintProperty('land', 'fill-color', '#0a0a0f');
+            }
+          } catch (err) {
+            console.warn('Style customization error:', err);
+          }
           
           setLoading(false);
         });
 
         map.current.on('error', (e) => {
           console.error('Mapbox error:', e);
-          setError('Ошибка загрузки карты. Проверьте токен Mapbox.');
+          if (e.error?.message?.includes('401')) {
+            setError('Неверный Mapbox токен. Проверьте настройки.');
+          } else {
+            setError('Ошибка загрузки карты: ' + (e.error?.message || 'неизвестная ошибка'));
+          }
+          setLoading(false);
+        });
+
+        map.current.on('load', () => {
           setLoading(false);
         });
 
       } catch (err) {
         console.error('Map initialization error:', err);
-        setError('Ошибка инициализации карты');
+        setError('Ошибка инициализации карты: ' + (err instanceof Error ? err.message : 'неизвестная ошибка'));
         setLoading(false);
       }
     };
@@ -223,10 +246,12 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
   if (error) {
     return (
       <div className={`h-64 bg-surface-2 rounded-lg flex items-center justify-center border border-border ${className}`}>
-        <div className="text-center">
+        <div className="text-center max-w-md">
           <AlertTriangle className="h-12 w-12 mx-auto text-destructive mb-2" />
-          <p className="text-destructive font-ui mb-2">{error}</p>
-          <p className="text-sm text-muted-foreground">Проверьте настройку Mapbox токена в Supabase</p>
+          <p className="text-destructive font-ui mb-2 text-sm">{error}</p>
+          <p className="text-xs text-muted-foreground">
+            Проверьте настройку MAPBOX_PUBLIC_TOKEN в Supabase Edge Function Secrets
+          </p>
         </div>
       </div>
     );
