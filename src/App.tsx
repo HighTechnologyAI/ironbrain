@@ -1,109 +1,59 @@
 import React from 'react';
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AuthProvider } from "@/hooks/use-auth";
-import { LanguageProvider } from "@/hooks/use-language";
-import { OfflineProvider } from "@/hooks/use-offline";
-import SafeAreaContainer from "@/components/SafeAreaContainer";
-import ConnectionStatus from "@/components/ConnectionStatus";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
-import RealTimeAlerts from "@/components/RealTimeAlerts";
 
-// Core pages (eagerly loaded)
-import Index from "./pages/Index";
-import AIAssistant from "./pages/AIAssistant";
-import Auth from "./pages/Auth";
-import Tasks from "./pages/Tasks";
-import Team from "./pages/Team";
-import Projects from "./pages/Projects";
-import Issues from "./pages/Issues";
-import Awards from "./pages/Awards";
-import CreateDemoUsers from "./pages/CreateDemoUsers";
-import Integrations from "./pages/Integrations";
-import NotFound from "./pages/NotFound";
-
-// Operations Center pages (core)
-import OpsCenter from "./pages/OpsCenter";
-import CommandCenterPage from "./pages/CommandCenter";
-import SystemLogsPage from "./pages/SystemLogs";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: (failureCount, error: any) => {
-        if (!navigator.onLine) return false;
-        if (error?.status >= 400 && error?.status < 500) return false;
-        return failureCount < 3;
-      },
-      staleTime: 5 * 60 * 1000,
-      gcTime: 10 * 60 * 1000,
-    },
-    mutations: {
-      retry: 1,
-    },
-  },
-});
-
-const AppShell = () => {
-  const location = useLocation();
-  const hideSidebar = location.pathname === '/auth';
-  
-  return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        {!hideSidebar && <AppSidebar />}
-        <main className="flex-1">
-          <ConnectionStatus />
-          <RealTimeAlerts />
-          <Toaster />
-          <Sonner />
-          <Routes>
-            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
-            <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
-            <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
-            <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
-            <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
-            <Route path="/awards" element={<ProtectedRoute><Awards /></ProtectedRoute>} />
-            <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
-            <Route path="/ops-center" element={<ProtectedRoute><OpsCenter /></ProtectedRoute>} />
-            <Route path="/command-center" element={<ProtectedRoute><CommandCenterPage /></ProtectedRoute>} />
-            <Route path="/logs" element={<ProtectedRoute><SystemLogsPage /></ProtectedRoute>} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/create-demo-users" element={<CreateDemoUsers />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-      </div>
-    </SidebarProvider>
-  );
-};
+console.log('App: Starting minimal debug version...');
 
 const App = () => {
-  console.log('App: Rendering core version...');
+  console.log('App: Component rendering...');
   
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <LanguageProvider>
-          <OfflineProvider>
-            <SafeAreaContainer>
-              <TooltipProvider>
-                <BrowserRouter>
-                  <AppShell />
-                </BrowserRouter>
-              </TooltipProvider>
-            </SafeAreaContainer>
-          </OfflineProvider>
-        </LanguageProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  );
+  try {
+    return (
+      <div 
+        style={{ 
+          minHeight: '100vh',
+          backgroundColor: '#0B0F14',
+          color: '#D6E2F3',
+          padding: '20px',
+          fontFamily: 'Arial, sans-serif'
+        }}
+      >
+        <h1 style={{ color: '#16C172', marginBottom: '20px' }}>
+          🔧 Tiger CRM - Debug Mode
+        </h1>
+        <div style={{ fontSize: '18px', lineHeight: '1.6' }}>
+          <p>✅ React компонент загружен</p>
+          <p>✅ Базовые стили применены</p>
+          <p>✅ JavaScript выполняется</p>
+          <p>⏰ Время: {new Date().toLocaleString('ru-RU')}</p>
+        </div>
+        
+        <div style={{ 
+          marginTop: '30px',
+          padding: '15px',
+          border: '2px solid #16C172',
+          borderRadius: '8px',
+          backgroundColor: '#0F141A'
+        }}>
+          <h2 style={{ color: '#16C172', marginBottom: '10px' }}>Диагностика:</h2>
+          <p>• Убраны все сложные компоненты</p>
+          <p>• Минимальная версия без провайдеров</p>
+          <p>• Inline стили для гарантии отображения</p>
+          <p>• Консольное логирование включено</p>
+        </div>
+      </div>
+    );
+  } catch (error) {
+    console.error('App: Render error:', error);
+    return (
+      <div style={{ 
+        padding: '20px', 
+        backgroundColor: '#FF5A5A', 
+        color: 'white' 
+      }}>
+        <h1>Критическая ошибка:</h1>
+        <p>{error instanceof Error ? error.message : 'Unknown error'}</p>
+      </div>
+    );
+  }
 };
 
 export default App;
