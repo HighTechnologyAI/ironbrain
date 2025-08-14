@@ -505,3 +505,5 @@ export const AISystemStatus: React.FC = () => {
     </div>
   );
 };
+
+export default AISystemStatus;

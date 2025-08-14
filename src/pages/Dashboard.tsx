@@ -6,7 +6,7 @@ import { Button } from '@/components/neon/Button';
 import SystemHealth from '@/components/SystemHealth';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
-import { AISystemStatus } from '@/components/AISystemStatus';
+import AISystemStatus from '@/components/AISystemStatus';
 import { 
   Activity, 
   Users, 

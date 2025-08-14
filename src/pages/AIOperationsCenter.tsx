@@ -17,7 +17,7 @@ import AIAutomatedInsights from '@/components/AIAutomatedInsights';
 import AIVoiceAssistant from '@/components/AIVoiceAssistant';
 import AIEnhancedVoice from '@/components/AIEnhancedVoice';
 import AIPlatformMonitoring from '@/components/AIPlatformMonitoring';
-import { AISystemStatus } from '@/components/AISystemStatus';
+import AISystemStatus from '@/components/AISystemStatus';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
 import { 
