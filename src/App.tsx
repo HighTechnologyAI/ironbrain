@@ -1,36 +1,37 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Toaster } from "@/components/ui/toaster";
-import SimpleIndex from "./pages/SimpleIndex";
-import Auth from "./pages/Auth";
-import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
-
-console.log('App: Starting minimal version...');
+console.log('Ultra-simple App: Loading...');
 
 const App = () => {
-  console.log('App: Rendering...');
+  console.log('Ultra-simple App: Rendering...');
   
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <BrowserRouter>
-            <div className="p-4">
-              <h1 className="text-2xl font-bold mb-4">Tiger CRM - Minimal Mode</h1>
-              <Routes>
-                <Route path="/" element={<SimpleIndex />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-            <Toaster />
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
+    <div style={{ 
+      padding: '20px', 
+      fontFamily: 'Arial, sans-serif',
+      backgroundColor: '#0B0F14',
+      color: '#D6E2F3',
+      minHeight: '100vh'
+    }}>
+      <h1 style={{ color: '#16C172', fontSize: '2rem', marginBottom: '1rem' }}>
+        🚁 Tiger CRM - Система работает!
+      </h1>
+      <div style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>
+        <p>✅ React загружен</p>
+        <p>✅ JavaScript работает</p>
+        <p>✅ Компонент отрендерен</p>
+        <p>✅ Стили применены</p>
+      </div>
+      <div style={{ 
+        marginTop: '2rem', 
+        padding: '1rem', 
+        border: '1px solid #16C172',
+        borderRadius: '8px',
+        backgroundColor: '#0F141A'
+      }}>
+        <p><strong>Статус:</strong> Минимальная версия работает корректно</p>
+        <p><strong>Время:</strong> {new Date().toLocaleString('ru-RU')}</p>
+      </div>
     </div>
   );
 };
