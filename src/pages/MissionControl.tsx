@@ -356,9 +356,6 @@ const MissionControl = () => {
           )}
         </div>
 
-        {/* API Debugger */}
-        <MapboxDebugger />
-
         {/* Tactical Map */}
         <Card className="bg-surface-1 border-border">
           <CardHeader>
@@ -370,8 +367,13 @@ const MissionControl = () => {
               Нажмите для открытия полноэкранной интерактивной карты с позициями дронов
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <TacticalMapModal drones={drones} />
+            
+            {/* API Debugger */}
+            <div className="pt-4 border-t border-border">
+              <MapboxDebugger />
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -14,58 +14,88 @@ const MapboxDebugger: React.FC = () => {
     setResult(null);
     setError(null);
     
-    console.log('🧪 Начинаем тестирование Mapbox API...');
+    console.log('🧪 [MAPBOX DEBUG] Начинаем тестирование API...');
     
     try {
-      console.log('📡 Вызываем edge function get-mapbox-token...');
+      console.log('📡 [STEP 1] Вызываем edge function get-mapbox-token...');
       const start = Date.now();
       
-      const { data, error: funcError } = await supabase.functions.invoke('get-mapbox-token');
+      const response = await supabase.functions.invoke('get-mapbox-token', {
+        body: {}
+      });
       
       const duration = Date.now() - start;
-      console.log(`⏱️ Edge function ответил за ${duration}ms`);
-      console.log('📦 Данные:', data);
-      console.log('❌ Ошибка:', funcError);
+      console.log(`⏱️ [STEP 1] Edge function ответил за ${duration}ms`);
+      console.log('📦 [STEP 1] Response data:', response.data);
+      console.log('❌ [STEP 1] Response error:', response.error);
       
-      if (funcError) {
-        setError(`Edge function ошибка: ${JSON.stringify(funcError)}`);
+      if (response.error) {
+        console.error('🚨 [ERROR] Edge function error:', response.error);
+        setError(`Edge function error: ${JSON.stringify(response.error, null, 2)}`);
         setTesting(false);
         return;
       }
       
-      if (!data?.token) {
-        setError(`Токен не найден в ответе: ${JSON.stringify(data)}`);
+      if (!response.data?.token) {
+        console.error('🚨 [ERROR] No token in response:', response.data);
+        setError(`Токен не найден в ответе: ${JSON.stringify(response.data, null, 2)}`);
         setTesting(false);
         return;
       }
       
-      // Проверяем что токен действительно работает с Mapbox API
-      console.log('🌍 Тестируем токен с реальным API Mapbox...');
-      const mapboxResponse = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/bulgaria.json?access_token=${data.token}`);
+      const token = response.data.token;
+      console.log(`✅ [STEP 1] Токен получен: ${token.substring(0, 20)}...`);
+      
+      // Проверяем формат токена
+      if (!token.startsWith('pk.')) {
+        console.error('🚨 [ERROR] Invalid token format:', token.substring(0, 10));
+        setError(`Неверный формат токена. Ожидается 'pk.', получен: ${token.substring(0, 10)}`);
+        setTesting(false);
+        return;
+      }
+      
+      // Тестируем токен с реальным Mapbox API
+      console.log('🌍 [STEP 2] Тестируем токен с реальным API Mapbox...');
+      const mapboxUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/bulgaria.json?access_token=${token}`;
+      
+      console.log('🔗 [STEP 2] URL:', mapboxUrl.replace(token, 'TOKEN_HIDDEN'));
+      
+      const mapboxResponse = await fetch(mapboxUrl);
+      console.log(`📊 [STEP 2] Mapbox API status: ${mapboxResponse.status}`);
       
       if (!mapboxResponse.ok) {
         const errorText = await mapboxResponse.text();
+        console.error('🚨 [ERROR] Mapbox API error:', errorText);
         setError(`Mapbox API ошибка ${mapboxResponse.status}: ${errorText}`);
         setTesting(false);
         return;
       }
       
       const geocodingResult = await mapboxResponse.json();
-      console.log('✅ Mapbox API работает!', geocodingResult);
+      console.log('✅ [STEP 2] Mapbox API работает!', geocodingResult);
       
       setResult({
+        success: true,
         token_received: true,
-        token_length: data.token.length,
-        token_preview: data.token.substring(0, 15) + '...',
+        token_length: token.length,
+        token_prefix: token.substring(0, 3),
+        token_preview: token.substring(0, 20) + '...',
         edge_function_duration: duration,
-        mapbox_api_test: 'success',
+        mapbox_api_status: mapboxResponse.status,
+        mapbox_api_test: 'SUCCESS',
         geocoding_results: geocodingResult.features?.length || 0,
-        status: 'ALL_SYSTEMS_OPERATIONAL'
+        bulgaria_found: geocodingResult.features?.some((f: any) => 
+          f.place_name?.toLowerCase().includes('bulgaria')
+        ) || false,
+        timestamp: new Date().toISOString(),
+        status: '🟢 ALL_SYSTEMS_OPERATIONAL'
       });
       
+      console.log('🎉 [SUCCESS] Все тесты пройдены успешно!');
+      
     } catch (err) {
-      console.error('💥 Ошибка тестирования:', err);
-      setError(`Общая ошибка: ${err instanceof Error ? err.message : JSON.stringify(err)}`);
+      console.error('💥 [ERROR] Критическая ошибка:', err);
+      setError(`Критическая ошибка: ${err instanceof Error ? err.message : JSON.stringify(err)}`);
     }
     
     setTesting(false);
