@@ -116,18 +116,7 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
       return;
     }
 
-    // Простая одноразовая задержка для рендеринга DOM
-    setTimeout(() => {
-      if (mapContainer.current) {
-        console.log('✅ [INIT] DOM готов, инициализируем карту');
-        initializeMap();
-      } else {
-        console.error('❌ [INIT] mapContainer недоступен, возможно модальное окно закрыто');
-        setError('Контейнер карты недоступен');
-        setLoading(false);
-      }
-    }, 200); // Одна проверка через 200ms
-
+    // ОБЪЯВЛЯЕМ ФУНКЦИЮ СНАЧАЛА
     const initializeMap = () => {
       console.log('🗺️ [INIT] Начинаем инициализацию карты');
       console.log('🗺️ [INIT] mapContainer.current есть:', !!mapContainer.current);
@@ -136,19 +125,20 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
       
       if (!mapContainer.current) {
         console.log('❌ [INIT] mapContainer.current не доступен');
+        setError('Контейнер карты недоступен');
+        setLoading(false);
         return;
       }
 
       if (!mapboxToken) {
         console.log('❌ [INIT] mapboxToken не доступен');
+        setError('Токен Mapbox недоступен');
+        setLoading(false);
         return;
       }
 
       console.log('🗺️ [INIT] Устанавливаем токен доступа');
-      
-      // Используем токен из state
       mapboxgl.accessToken = mapboxToken;
-        
       try {
         console.log('🗺️ [CREATE] Создаем карту...');
         console.log('🗺️ [CONTAINER] Контейнер готов:', !!mapContainer.current);
@@ -272,7 +262,17 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
       }
     };
 
-    initializeMap();
+    // ТЕПЕРЬ ВЫЗЫВАЕМ ФУНКЦИЮ
+    setTimeout(() => {
+      if (mapContainer.current) {
+        console.log('✅ [INIT] DOM готов, инициализируем карту');
+        initializeMap();
+      } else {
+        console.error('❌ [INIT] mapContainer недоступен, возможно модальное окно закрыто');
+        setError('Контейнер карты недоступен');
+        setLoading(false);
+      }
+    }, 200);
 
     return () => {
       console.log('🧹 [CLEANUP] Очистка карты...');
