@@ -17,6 +17,7 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
   const [mapboxToken, setMapboxToken] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showTokenInput, setShowTokenInput] = useState(false);
   const markers = useRef<mapboxgl.Marker[]>([]);
 
   // Создание HTML-элемента маркера для дрона
@@ -131,7 +132,7 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         const { data, error } = await Promise.race([
           supabase.functions.invoke('get-mapbox-token'),
           new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), 10000)
+            setTimeout(() => reject(new Error('Timeout')), 5000)
           )
         ]) as any;
         
@@ -139,14 +140,14 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         
         if (error) {
           console.error('❌ Ошибка edge function:', error);
-          setError('Ошибка получения Mapbox токена: ' + error.message);
+          setShowTokenInput(true);
           setLoading(false);
           return;
         }
 
         if (!data?.token) {
           console.error('❌ Токен не найден в ответе:', data);
-          setError('Mapbox токен не найден в ответе сервера');
+          setShowTokenInput(true);
           setLoading(false);
           return;
         }
@@ -237,7 +238,7 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
       } catch (err) {
         console.error('❌ Ошибка инициализации карты:', err);
         if (err instanceof Error && err.message === 'Timeout') {
-          setError('Таймаут получения токена. Проверьте подключение к интернету.');
+          setShowTokenInput(true);
         } else {
           setError('Ошибка инициализации карты: ' + (err instanceof Error ? err.message : 'неизвестная ошибка'));
         }
@@ -326,6 +327,63 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
           <p className="text-destructive font-ui mb-2 text-sm">{error}</p>
           <p className="text-xs text-muted-foreground">
             Проверьте настройку MAPBOX_PUBLIC_TOKEN в Supabase Edge Function Secrets
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (showTokenInput) {
+    return (
+      <div className={`h-64 bg-surface-2 rounded-lg flex items-center justify-center border border-border ${className}`}>
+        <div className="text-center max-w-md">
+          <AlertTriangle className="h-12 w-12 mx-auto text-warning mb-4" />
+          <p className="text-foreground font-ui mb-4">Введите Mapbox токен для загрузки карты</p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="pk.ey..."
+              className="flex-1 px-3 py-2 bg-background border border-border rounded text-sm"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const token = (e.target as HTMLInputElement).value;
+                  if (token.startsWith('pk.')) {
+                    setMapboxToken(token);
+                    setShowTokenInput(false);
+                    setLoading(true);
+                    
+                    // Инициализируем карту с введенным токеном
+                    mapboxgl.accessToken = token;
+                    
+                    if (mapContainer.current && !map.current) {
+                      map.current = new mapboxgl.Map({
+                        container: mapContainer.current,
+                        style: 'mapbox://styles/mapbox/dark-v11',
+                        center: [26.8855, 43.3889],
+                        zoom: 8,
+                        pitch: 45,
+                        bearing: 0,
+                        antialias: true
+                      });
+                      
+                      map.current.addControl(
+                        new mapboxgl.NavigationControl({ visualizePitch: true }),
+                        'top-right'
+                      );
+                      
+                      map.current.on('load', () => setLoading(false));
+                      map.current.on('error', (e) => {
+                        setError('Ошибка карты: ' + (e.error?.message || 'неизвестная'));
+                        setLoading(false);
+                      });
+                    }
+                  }
+                }
+              }}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Получите токен на <a href="https://mapbox.com" target="_blank" className="text-primary hover:underline">mapbox.com</a>
           </p>
         </div>
       </div>
