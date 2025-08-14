@@ -41,31 +41,72 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     
     el.innerHTML = `
       <div class="relative group cursor-pointer">
-        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center relative transition-all duration-300 hover:scale-110"
-             style="background: ${color}20; border-color: ${color}; box-shadow: 0 0 15px ${color}50;">
-          <div class="w-3 h-3 rounded-full transition-all duration-300"
-               style="background: ${color}; box-shadow: 0 0 8px ${color};">
+        <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center relative transition-all duration-300 hover:scale-125 hover:shadow-lg"
+             style="background: ${color}15; border-color: ${color}; box-shadow: 0 0 20px ${color}40;">
+          
+          <!-- Основной маркер дрона -->
+          <div class="w-4 h-4 rounded-full transition-all duration-300 relative"
+               style="background: ${color}; box-shadow: 0 0 12px ${color};">
+            <!-- Пульсирующий эффект для онлайн дронов -->
+            ${isOnline ? `
+              <div class="absolute inset-0 w-4 h-4 rounded-full animate-ping"
+                   style="background: ${color}80;">
+              </div>
+            ` : ''}
           </div>
+          
+          <!-- Индикатор статуса -->
           ${isOnline ? `
-            <div class="absolute -top-1 -right-1 w-3 h-3 rounded-full animate-pulse"
-                 style="background: ${color}; box-shadow: 0 0 6px ${color};">
+            <div class="absolute -top-1 -right-1 w-3 h-3 rounded-full border border-background"
+                 style="background: ${color}; box-shadow: 0 0 8px ${color};">
+            </div>
+          ` : `
+            <div class="absolute -top-1 -right-1 w-3 h-3 rounded-full border border-background bg-gray-500">
+            </div>
+          `}
+          
+          <!-- Батарея индикатор -->
+          ${drone.battery_level ? `
+            <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-xs font-bold text-white bg-black/80 px-1 rounded"
+                 style="color: ${drone.battery_level > 30 ? '#00ff41' : drone.battery_level > 15 ? '#ffff00' : '#ff0000'}">
+              ${Math.round(drone.battery_level)}%
             </div>
           ` : ''}
         </div>
         
-        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-50">
-          <div class="font-bold text-cyan-400">${drone.name}</div>
-          <div class="text-gray-300">${drone.model}</div>
-          <div class="flex items-center gap-2 mt-1">
-            <span class="text-xs" style="color: ${color}">●</span>
-            <span class="capitalize">${drone.status}</span>
-          </div>
-          ${drone.battery_level ? `
-            <div class="flex items-center gap-1 text-xs">
-              🔋 ${Math.round(drone.battery_level)}%
+        <!-- Расширенный tooltip -->
+        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-4 py-3 bg-black/95 backdrop-blur-sm text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-50 border border-cyan-400/30">
+          <div class="space-y-2">
+            <div class="font-bold text-cyan-400 text-lg">${drone.name}</div>
+            <div class="text-gray-300">${drone.model || 'Неизвестная модель'}</div>
+            
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full" style="background: ${color}"></span>
+              <span class="capitalize font-medium">${drone.status}</span>
             </div>
-          ` : ''}
-          <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black/90"></div>
+            
+            ${drone.battery_level ? `
+              <div class="flex items-center gap-2 text-sm">
+                <span class="text-cyan-400">🔋</span>
+                <span style="color: ${drone.battery_level > 30 ? '#00ff41' : drone.battery_level > 15 ? '#ffff00' : '#ff0000'}">
+                  ${Math.round(drone.battery_level)}%
+                </span>
+              </div>
+            ` : ''}
+            
+            ${drone.last_contact ? `
+              <div class="text-xs text-gray-400 border-t border-gray-600 pt-2">
+                Последний контакт: ${new Date(drone.last_contact).toLocaleString('ru-RU')}
+              </div>
+            ` : ''}
+            
+            ${drone.serial ? `
+              <div class="text-xs text-gray-500">S/N: ${drone.serial}</div>
+            ` : ''}
+          </div>
+          
+          <!-- Стрелка tooltip -->
+          <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black/95"></div>
         </div>
       </div>
     `;
@@ -285,23 +326,66 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         </Badge>
       </div>
 
-      {/* Кнопка сброса вида */}
-      <div className="absolute top-4 right-4 z-10">
+      {/* Кнопки управления картой */}
+      <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
         <button
           onClick={resetView}
-          className="px-3 py-1 bg-black/80 text-cyan-400 border border-cyan-400/50 rounded text-sm hover:bg-cyan-400/20 transition-colors"
+          className="px-3 py-2 bg-black/80 text-cyan-400 border border-cyan-400/50 rounded text-sm hover:bg-cyan-400/20 transition-colors backdrop-blur-sm"
         >
-          Базовый вид
+          🎯 Базовый вид
+        </button>
+        
+        <button
+          onClick={() => {
+            if (map.current) {
+              map.current.flyTo({
+                zoom: map.current.getZoom() + 1,
+                duration: 1000
+              });
+            }
+          }}
+          className="px-3 py-2 bg-black/80 text-cyan-400 border border-cyan-400/50 rounded text-sm hover:bg-cyan-400/20 transition-colors backdrop-blur-sm"
+        >
+          🔍 Приблизить
+        </button>
+        
+        <button
+          onClick={() => {
+            if (map.current) {
+              map.current.flyTo({
+                zoom: Math.max(map.current.getZoom() - 1, 1),
+                duration: 1000
+              });
+            }
+          }}
+          className="px-3 py-2 bg-black/80 text-cyan-400 border border-cyan-400/50 rounded text-sm hover:bg-cyan-400/20 transition-colors backdrop-blur-sm"
+        >
+          🔍 Отдалить
         </button>
       </div>
 
       {/* Контейнер карты */}
-      <div ref={mapContainer} className="h-64 rounded-lg" />
+      <div ref={mapContainer} className="h-64 rounded-lg border border-border" />
       
       <style>{`
         .drone-marker {
           user-select: none;
           -webkit-user-select: none;
+        }
+        
+        .drone-marker:hover {
+          z-index: 1000;
+        }
+        
+        /* Анимация для пульсирующих маркеров */
+        @keyframes drone-pulse {
+          0% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.2); opacity: 0.7; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .drone-marker .animate-ping {
+          animation: drone-pulse 2s ease-in-out infinite;
         }
       `}</style>
     </div>
