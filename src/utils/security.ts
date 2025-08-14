@@ -62,6 +62,29 @@ export const validateSqlQuery = (query: string): { isValid: boolean; error?: str
 };
 
 /**
+ * Email validation using RFC 5322 regex pattern
+ */
+export const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  return emailRegex.test(email);
+};
+
+/**
+ * Strong password validation
+ * Requirements: min 8 chars, uppercase, lowercase, number, special char
+ */
+export const isStrongPassword = (password: string): boolean => {
+  if (password.length < 8) return false;
+  
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumbers = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  
+  return hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
+};
+
+/**
  * Валидация admin ключа
  */
 export const validateAdminKey = (key: string): { isValid: boolean; error?: string } => {
