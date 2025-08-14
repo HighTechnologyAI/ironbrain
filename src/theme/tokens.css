@@ -1,0 +1,130 @@
+/* Tiger Neon UI v2 Design Tokens */
+:root {
+  /* Background colors */
+  --neon-bg: hsl(216, 30%, 5%);
+  --neon-surface-1: hsl(215, 25%, 8%);
+  --neon-surface-2: hsl(214, 20%, 11%);
+  --neon-border: hsl(214, 15%, 18%);
+  
+  /* Text colors */
+  --neon-text: hsl(215, 30%, 87%);
+  --neon-text-muted: hsl(215, 20%, 65%);
+  
+  /* Accent colors - configurable via CSS custom property */
+  --neon-accent: var(--neon-accent-override, hsl(153, 85%, 41%));
+  --neon-accent-600: var(--neon-accent-600-override, hsl(153, 85%, 35%));
+  --neon-accent-glow: 0 0 24px hsl(153, 85%, 41%, 0.35);
+  
+  /* Status colors */
+  --neon-warning: hsl(45, 90%, 63%);
+  --neon-danger: hsl(0, 100%, 67%);
+  --neon-info: hsl(210, 100%, 63%);
+  --neon-success: hsl(153, 85%, 55%);
+  
+  /* Border radius */
+  --neon-radius-sm: 10px;
+  --neon-radius-md: 14px;
+  --neon-radius-lg: 20px;
+  
+  /* Shadows */
+  --neon-shadow-subtle: 0 2px 8px hsl(216, 30%, 5%, 0.4);
+  --neon-shadow-medium: 0 4px 16px hsl(216, 30%, 5%, 0.6);
+  --neon-shadow-glow: var(--neon-accent-glow);
+  
+  /* Typography */
+  --neon-font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --neon-font-mono: "JetBrains Mono", "Fira Code", monospace;
+  
+  /* Transitions */
+  --neon-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --neon-transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark mode enforcement for Tiger Neon UI */
+html.dark body {
+  background: var(--neon-bg);
+  color: var(--neon-text);
+}
+
+/* Utility classes for Tiger Neon UI v2 */
+.neon-bg { background: var(--neon-bg); }
+.neon-surface-1 { background: var(--neon-surface-1); }
+.neon-surface-2 { background: var(--neon-surface-2); }
+.neon-border { border-color: var(--neon-border); }
+.neon-text { color: var(--neon-text); }
+.neon-text-muted { color: var(--neon-text-muted); }
+.neon-accent { color: var(--neon-accent); }
+.neon-accent-bg { background: var(--neon-accent); }
+.neon-glow { box-shadow: var(--neon-shadow-glow); }
+.neon-transition { transition: var(--neon-transition); }
+
+/* Component-specific tokens */
+.neon-button {
+  border-radius: var(--neon-radius-sm);
+  transition: var(--neon-transition);
+  font-weight: 500;
+}
+
+.neon-card {
+  background: var(--neon-surface-1);
+  border: 1px solid var(--neon-border);
+  border-radius: var(--neon-radius-md);
+  box-shadow: var(--neon-shadow-subtle);
+  transition: var(--neon-transition-slow);
+}
+
+.neon-card:hover {
+  box-shadow: var(--neon-shadow-medium);
+}
+
+.neon-input {
+  background: var(--neon-surface-2);
+  border: 1px solid var(--neon-border);
+  border-radius: var(--neon-radius-sm);
+  color: var(--neon-text);
+  transition: var(--neon-transition);
+}
+
+.neon-input:focus {
+  border-color: var(--neon-accent);
+  box-shadow: 0 0 0 2px hsl(153, 85%, 41%, 0.2);
+}
+
+/* Status chip variants */
+.neon-status-armed {
+  background: hsl(153, 85%, 41%, 0.2);
+  color: var(--neon-accent);
+  border: 1px solid hsl(153, 85%, 41%, 0.3);
+}
+
+.neon-status-warning {
+  background: hsl(45, 90%, 63%, 0.2);
+  color: var(--neon-warning);
+  border: 1px solid hsl(45, 90%, 63%, 0.3);
+}
+
+.neon-status-danger {
+  background: hsl(0, 100%, 67%, 0.2);
+  color: var(--neon-danger);
+  border: 1px solid hsl(0, 100%, 67%, 0.3);
+}
+
+.neon-status-info {
+  background: hsl(210, 100%, 63%, 0.2);
+  color: var(--neon-info);
+  border: 1px solid hsl(210, 100%, 63%, 0.3);
+}
+
+/* Animation keyframes */
+@keyframes neon-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes neon-glow {
+  0%, 100% { box-shadow: var(--neon-shadow-glow); }
+  50% { box-shadow: 0 0 36px hsl(153, 85%, 41%, 0.5); }
+}
+
+.neon-pulse { animation: neon-pulse 2s ease-in-out infinite; }
+.neon-glow-animate { animation: neon-glow 3s ease-in-out infinite; }
