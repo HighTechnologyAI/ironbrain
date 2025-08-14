@@ -230,13 +230,19 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     );
   }
 
-  // Состояние загрузки
+  // Состояние загрузки - НО с контейнером для ref
   if (loading) {
     return (
-      <div className={`flex flex-col items-center justify-center h-full ${className}`}>
-        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-        <p className="text-sm text-muted-foreground">Загрузка тактической карты...</p>
-        <p className="text-xs text-muted-foreground mt-1">Инициализация Mapbox...</p>
+      <div className={`relative w-full h-full ${className}`}>
+        {/* ВАЖНО: Контейнер карты ВСЕГДА должен быть в DOM для ref */}
+        <div ref={mapContainer} className="absolute inset-0 rounded-lg" />
+        
+        {/* Загрузчик поверх контейнера */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-surface-1 rounded-lg">
+          <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+          <p className="text-sm text-muted-foreground">Загрузка тактической карты...</p>
+          <p className="text-xs text-muted-foreground mt-1">Инициализация Mapbox...</p>
+        </div>
       </div>
     );
   }
