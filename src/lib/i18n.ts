@@ -584,6 +584,36 @@ export interface Translations {
     roleLabel: string;
     cancelLabel: string;
     saveLabel: string;
+    
+    // UAV Dashboard
+    strategicGoal: string;
+    completionPercentage: string;
+    monthlyGrowth: string;
+    activeMissions: string;
+    productionLine: string;
+    technicalStatus: string;
+    onlineTeam: string;
+    systemStatus: string;
+    lastUpdateTime: string;
+    armedStatus: string;
+    readyStatus: string;
+    infoStatus: string;
+    warningStatus: string;
+    okStatus: string;
+    attentionStatus: string;
+    onTrackStatus: string;
+    dronesInFlight: string;
+    unitsInProduction: string;
+    systemHealth: string;
+    operatorsOnline: string;
+    production: string;
+    quality: string;
+    deadline: string;
+    tasks: string;
+    team: string;
+    analytics: string;
+    issues: string;
+    capacityIncrease: string;
   }
 
 export const translations: Record<string, Translations> = {
@@ -648,6 +678,36 @@ export const translations: Record<string, Translations> = {
     aiPriority: 'Priority',
     aiTime: 'Time',
     smartAITags: 'Tags:',
+    
+    // UAV Dashboard
+    strategicGoal: 'Strategic Goal',
+    completionPercentage: 'completion',
+    monthlyGrowth: 'monthly growth',
+    activeMissions: 'Active Missions',
+    productionLine: 'Production Line',
+    technicalStatus: 'Technical Status',
+    onlineTeam: 'Online Team',
+    systemStatus: 'System Status',
+    lastUpdateTime: 'Last update',
+    armedStatus: 'ARMED',
+    readyStatus: 'READY',
+    infoStatus: 'INFO',
+    warningStatus: 'WARNING',
+    okStatus: 'OK',
+    attentionStatus: 'ATTENTION',
+    onTrackStatus: 'ON TRACK',
+    dronesInFlight: 'Drones in flight',
+    unitsInProduction: 'Units in production',
+    systemHealth: 'System health',
+    operatorsOnline: 'Operators online',
+    production: 'Production',
+    quality: 'Quality',
+    deadline: 'Deadline',
+    tasks: 'Tasks',
+    team: 'Team',
+    analytics: 'Analytics',
+    issues: 'Issues',
+    capacityIncrease: 'Increase production capacity to 100 units/month',
     aiRecommendations: 'Recommendations:',
     aiWorkloadStatus: 'Workload status:',
     aiAnalysis: 'Analysis:',
@@ -1222,6 +1282,36 @@ export const translations: Record<string, Translations> = {
     aiPriority: 'Приоритет',
     aiTime: 'Время',
     smartAITags: 'Теги:',
+    
+    // UAV Dashboard
+    strategicGoal: 'Стратегическая цель',
+    completionPercentage: 'выполнения',
+    monthlyGrowth: 'за месяц',
+    activeMissions: 'Активные миссии',
+    productionLine: 'Производственный конвейер',
+    technicalStatus: 'Техническое состояние',
+    onlineTeam: 'Команда онлайн',
+    systemStatus: 'Системный статус',
+    lastUpdateTime: 'Последнее обновление',
+    armedStatus: 'ВООРУЖЕН',
+    readyStatus: 'ГОТОВ',
+    infoStatus: 'ИНФО',
+    warningStatus: 'ПРЕДУПРЕЖДЕНИЕ',
+    okStatus: 'ОК',
+    attentionStatus: 'ВНИМАНИЕ',
+    onTrackStatus: 'НА ПУТИ',
+    dronesInFlight: 'Беспилотники в полете',
+    unitsInProduction: 'Единиц в производстве',
+    systemHealth: 'Исправность системы',
+    operatorsOnline: 'Операторов в сети',
+    production: 'Производство',
+    quality: 'Качество',
+    deadline: 'Дедлайн',
+    tasks: 'Задачи',
+    team: 'Команда',
+    analytics: 'Аналитика',
+    issues: 'Проблемы',
+    capacityIncrease: 'Увеличение производственной мощности до 100 единиц/месяц',
     aiRecommendations: 'Рекомендации:',
     aiWorkloadStatus: 'Статус нагрузки:',
     aiAnalysis: 'Анализ:',

@@ -50,36 +50,36 @@ const UAVDashboard = () => {
   // KPI Cards Data
   const kpiCards = [
     {
-      title: "Активные миссии",
+      title: t.activeMissionsLabel || "Активные миссии",
       value: "12",
       change: "+3",
       icon: Plane,
       status: "armed" as const,
-      description: "Беспилотники в полете"
+      description: t.dronesInFlight || "Беспилотники в полете"
     },
     {
-      title: "Производственный конвейер", 
+      title: t.productionConveyor || "Производственный конвейер", 
       value: "47",
       change: "+8",
       icon: Target,
       status: "ready" as const,
-      description: "Единиц в производстве"
+      description: t.unitsInProduction || "Единиц в производстве"
     },
     {
-      title: "Техническое состояние",
+      title: t.technicalStatus || "Техническое состояние",
       value: "98.2%",
       change: "+0.5%",
       icon: ShieldCheck,
       status: "ready" as const,
-      description: "Исправность системы"
+      description: t.systemHealth || "Исправность системы"
     },
     {
-      title: "Команда онлайн",
+      title: t.teamMembers || "Команда онлайн",
       value: onlineUserCount.toString(),
       change: `+${performanceData.weeklyGrowth.team}`,
       icon: Users,
       status: "info" as const,
-      description: "Операторов в сети"
+      description: t.operatorsOnline || "Операторов в сети"
     }
   ];
 
@@ -136,12 +136,12 @@ const UAVDashboard = () => {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-xl font-ui">Стратегическая цель {currentQuarter}</CardTitle>
+                <CardTitle className="text-xl font-ui">{t.strategicGoal || "Стратегическая цель"} {currentQuarter}</CardTitle>
                 <CardDescription className="font-mono text-sm">
-                  Увеличение производственной мощности до 100 единиц/месяц
+                  {t.increaseCapacity || "Увеличение производственной мощности до 100 единиц/месяц"}
                 </CardDescription>
               </div>
-              <StatusChip variant="ready">НА ПУТИ</StatusChip>
+              <StatusChip variant="ready">{t.onTrackStatus || "НА ПУТИ"}</StatusChip>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -155,7 +155,7 @@ const UAVDashboard = () => {
             <Progress value={objectiveProgress} className="h-3" />
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
-                <span className="text-muted-foreground">Производство:</span>
+                <span className="text-muted-foreground">{t.productionUnit || "Производство"}:</span>
                 <div className="font-mono font-semibold">78 ед/мес</div>
               </div>
               <div>
@@ -188,9 +188,9 @@ const UAVDashboard = () => {
                     <span className="text-success font-semibold">{kpi.change}</span>
                   </div>
                   <StatusChip variant={kpi.status} className="text-xs">
-                    {kpi.status === "armed" ? "ВООРУЖЕН" : 
-                     kpi.status === "ready" ? "ГОТОВ" : 
-                     kpi.status === "info" ? "ИНФО" : "ПРЕДУПРЕЖДЕНИЕ"}
+                    {kpi.status === "armed" ? t.armedStatus || "ВООРУЖЕН" : 
+                     kpi.status === "ready" ? t.readyStatus || "ГОТОВ" : 
+                     kpi.status === "info" ? "ИНФО" : t.warningStatus || "ПРЕДУПРЕЖДЕНИЕ"}
                   </StatusChip>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">{kpi.description}</p>
@@ -204,7 +204,7 @@ const UAVDashboard = () => {
           <CardHeader>
             <CardTitle className="text-lg font-ui flex items-center gap-2">
               <Activity className="h-5 w-5 text-primary" />
-              Системный статус
+              {t.systemStatusLabel || "Системный статус"}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -237,7 +237,7 @@ const UAVDashboard = () => {
             onClick={() => navigate('/tasks')}
           >
             <CheckSquare className="h-5 w-5" />
-            <span className="text-sm">Задачи</span>
+            <span className="text-sm">{t.tasks}</span>
             {performanceData.pendingTasks > 0 && (
               <Badge variant="default" className="text-xs">
                 {performanceData.pendingTasks}
@@ -251,7 +251,7 @@ const UAVDashboard = () => {
             onClick={() => navigate('/team')}
           >
             <Users className="h-5 w-5" />
-            <span className="text-sm">Команда</span>
+            <span className="text-sm">{t.team}</span>
           </Button>
           
           <Button 
@@ -260,7 +260,7 @@ const UAVDashboard = () => {
             onClick={() => navigate('/analytics')}
           >
             <Activity className="h-5 w-5" />
-            <span className="text-sm">Аналитика</span>
+            <span className="text-sm">{t.analytics}</span>
           </Button>
           
           <Button 
@@ -269,7 +269,7 @@ const UAVDashboard = () => {
             onClick={() => navigate('/issues')}
           >
             <AlertTriangle className="h-5 w-5" />
-            <span className="text-sm">Проблемы</span>
+            <span className="text-sm">{t.issues}</span>
             {performanceData.overdueTasks > 0 && (
               <Badge variant="critical" className="text-xs">
                 {performanceData.overdueTasks}
