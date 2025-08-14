@@ -264,7 +264,19 @@ export const SimpleVoiceButton: React.FC = () => {
   // }
 
   const button = (
-    <div className="fixed bottom-6 right-6 z-[9999]">
+    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2">
+      {/* Тестовая кнопка TTS */}
+      <Button
+        onClick={() => {
+          console.log('🧪 Тестируем TTS напрямую');
+          speak('Тест голосового воспроизведения');
+        }}
+        className="w-16 h-16 rounded-full shadow-lg bg-yellow-500 hover:bg-yellow-600"
+      >
+        <Volume2 className="h-8 w-8 text-white" />
+      </Button>
+      
+      {/* Основная кнопка голосового помощника */}
       <Button
         onClick={toggleListening}
         className={`
