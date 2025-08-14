@@ -53,7 +53,7 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     };
     
     fetchToken();
-  }, []);
+  }, []); // Токен получаем только при монтировании
 
   // Отслеживание изменений loading
   useEffect(() => {
@@ -98,9 +98,13 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     return el;
   };
 
+  // Основной useEffect для инициализации карты
   useEffect(() => {
-    console.log('🔄 [EFFECT] useEffect запущен, mapContainer.current:', !!mapContainer.current);
-    console.log('🔄 [EFFECT] Карта уже существует:', !!map.current);
+    console.log('🔄 [EFFECT] useEffect запущен');
+    console.log('🔄 [EFFECT] mapContainer.current:', !!mapContainer.current);
+    console.log('🔄 [EFFECT] mapboxToken:', !!mapboxToken);
+    console.log('🔄 [EFFECT] map.current:', !!map.current);
+    console.log('🔄 [EFFECT] loading:', loading);
     
     if (map.current) {
       console.log('🔄 [EFFECT] Карта уже инициализирована, пропускаем');
@@ -108,22 +112,37 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     }
 
     if (!mapContainer.current) {
-      console.log('⏳ [EFFECT] mapContainer.current отсутствует, ждем...');
+      console.log('⏳ [EFFECT] mapContainer.current отсутствует, компонент может быть не в DOM');
       return;
     }
 
+    if (!mapboxToken) {
+      console.log('⏳ [EFFECT] mapboxToken отсутствует, ждем получения токена');
+      return;
+    }
+
+    console.log('✅ [EFFECT] Все условия выполнены, запускаем инициализацию карты');
+
     const initializeMap = () => {
+      console.log('🗺️ [INIT] Начинаем инициализацию карты');
+      console.log('🗺️ [INIT] mapContainer.current есть:', !!mapContainer.current);
+      console.log('🗺️ [INIT] mapboxToken есть:', !!mapboxToken);
+      console.log('🗺️ [INIT] mapboxToken значение:', mapboxToken?.substring(0, 20) + '...');
+      
       if (!mapContainer.current) {
         console.log('❌ [INIT] mapContainer.current не доступен');
         return;
       }
 
-      console.log('🗺️ [INIT] Начинаем инициализацию карты');
+      if (!mapboxToken) {
+        console.log('❌ [INIT] mapboxToken не доступен');
+        return;
+      }
+
       console.log('🗺️ [INIT] Устанавливаем токен доступа');
       
-      // Используем fallback токен если нет токена из Edge Function
-      const token = mapboxToken || 'pk.eyJ1IjoiaGlnaHRlY2hhaSIsImEiOiJjbWViZTBoaW0wbzVwMmpxdmFpeTVnbWdsIn0.8-x4oZ4TfetTTa5BEAXDYg';
-      mapboxgl.accessToken = token;
+      // Используем токен из state
+      mapboxgl.accessToken = mapboxToken;
         
       try {
         console.log('🗺️ [CREATE] Создаем карту...');
@@ -258,7 +277,7 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         map.current = null;
       }
     };
-  }, []);
+  }, [mapboxToken]); // Инициализируем когда получим токен
 
   // Обновление маркеров при изменении дронов
   useEffect(() => {
