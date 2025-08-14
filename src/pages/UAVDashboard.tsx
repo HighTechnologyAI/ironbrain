@@ -50,36 +50,43 @@ const UAVDashboard = () => {
   // KPI Cards Data
   const kpiCards = [
     {
-      title: t.activeMissionsLabel || "Активные миссии",
+      title: "Active Missions",
       value: "12",
       change: "+3",
       icon: Plane,
       status: "armed" as const,
-      description: t.dronesInFlight || "Беспилотники в полете"
+      description: "Drones in flight",
+      onClick: () => navigate('/mission-control'),
+      showButton: true
     },
     {
-      title: t.productionConveyor || "Производственный конвейер", 
+      title: "Production Line", 
       value: "47",
       change: "+8",
       icon: Target,
       status: "ready" as const,
-      description: t.unitsInProduction || "Единиц в производстве"
+      description: "Units in production",
+      onClick: () => navigate('/production-kanban'),
+      showButton: true
     },
     {
-      title: t.technicalStatus || "Техническое состояние",
+      title: "Technical Status",
       value: "98.2%",
       change: "+0.5%",
       icon: ShieldCheck,
       status: "ready" as const,
-      description: t.systemHealth || "Исправность системы"
+      description: "System health",
+      showButton: false
     },
     {
-      title: t.teamMembers || "Команда онлайн",
+      title: "Team Members",
       value: onlineUserCount.toString(),
-      change: `+${performanceData.weeklyGrowth.team}`,
+      change: "+5",
       icon: Users,
       status: "info" as const,
-      description: t.operatorsOnline || "Операторов в сети"
+      description: "Operators online",
+      onClick: () => navigate('/team'),
+      showButton: false
     }
   ];
 
@@ -132,16 +139,19 @@ const UAVDashboard = () => {
         </div>
 
         {/* OKR Block - Large Strategic Focus */}
-        <Card className="bg-surface-1 border-border">
+        <Card 
+          className="bg-surface-1 border-border cursor-pointer hover:shadow-medium transition-all duration-300"
+          onClick={() => navigate('/tasks')}
+        >
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-xl font-ui">{t.strategicGoal || "Стратегическая цель"} {currentQuarter}</CardTitle>
+                <CardTitle className="text-xl font-ui">Strategic Goal Q3 2025</CardTitle>
                 <CardDescription className="font-mono text-sm">
-                  {t.increaseCapacity || "Увеличение производственной мощности до 100 единиц/месяц"}
+                  Increase production capacity to 100 units/month
                 </CardDescription>
               </div>
-              <StatusChip variant="ready">{t.onTrackStatus || "НА ПУТИ"}</StatusChip>
+              <StatusChip variant="ready">НА ПУТИ</StatusChip>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -155,7 +165,7 @@ const UAVDashboard = () => {
             <Progress value={objectiveProgress} className="h-3" />
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
-                <span className="text-muted-foreground">{t.productionUnit || "Производство"}:</span>
+                <span className="text-muted-foreground">Производство:</span>
                 <div className="font-mono font-semibold">78 ед/мес</div>
               </div>
               <div>
@@ -173,7 +183,13 @@ const UAVDashboard = () => {
         {/* KPI Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {kpiCards.map((kpi, index) => (
-            <Card key={index} className="bg-surface-1 border-border hover:shadow-medium transition-all duration-300">
+            <Card 
+              key={index} 
+              className={`bg-surface-1 border-border hover:shadow-medium transition-all duration-300 ${
+                kpi.onClick && !kpi.showButton ? 'cursor-pointer' : ''
+              }`}
+              onClick={kpi.onClick && !kpi.showButton ? kpi.onClick : undefined}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
                   {kpi.title}
@@ -188,19 +204,32 @@ const UAVDashboard = () => {
                     <span className="text-success font-semibold">{kpi.change}</span>
                   </div>
                   <StatusChip variant={kpi.status} className="text-xs">
-                    {kpi.status === "armed" ? t.armedStatus || "ВООРУЖЕН" : 
-                     kpi.status === "ready" ? t.readyStatus || "ГОТОВ" : 
-                     kpi.status === "info" ? "ИНФО" : t.warningStatus || "ПРЕДУПРЕЖДЕНИЕ"}
+                    {kpi.status === "armed" ? "ВООРУЖЕН" : 
+                     kpi.status === "ready" ? "ГОТОВ" : 
+                     kpi.status === "info" ? "ИНФО" : "ПРЕДУПРЕЖДЕНИЕ"}
                   </StatusChip>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">{kpi.description}</p>
+                <p className="text-xs text-muted-foreground mt-1 mb-3">{kpi.description}</p>
+                {kpi.showButton && kpi.onClick && (
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      kpi.onClick();
+                    }}
+                  >
+                    Перейти
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))}
         </div>
 
         {/* Quick Actions Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Button 
             variant="outline" 
             className="h-16 flex-col gap-2 relative"
@@ -213,15 +242,6 @@ const UAVDashboard = () => {
                 {performanceData.pendingTasks}
               </Badge>
             )}
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            className="h-16 flex-col gap-2"
-            onClick={() => navigate('/team')}
-          >
-            <Users className="h-5 w-5" />
-            <span className="text-sm">{t.team}</span>
           </Button>
           
           <Button 
