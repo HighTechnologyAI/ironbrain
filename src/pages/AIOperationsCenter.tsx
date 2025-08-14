@@ -14,6 +14,7 @@ import AIRealtimeDashboard from '@/components/AIRealtimeDashboard';
 import AIDecisionSupport from '@/components/AIDecisionSupport';
 import AIRealtimeStreaming from '@/components/AIRealtimeStreaming';
 import AIAutomatedInsights from '@/components/AIAutomatedInsights';
+import AIVoiceAssistant from '@/components/AIVoiceAssistant';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
 import { 
@@ -29,7 +30,8 @@ import {
   Image,
   Target,
   Wifi,
-  Sparkles as SparklesIcon
+  Sparkles as SparklesIcon,
+  Mic
 } from 'lucide-react';
 
 const AIAssistantPage: React.FC = () => {
@@ -63,7 +65,7 @@ const AIAssistantPage: React.FC = () => {
 
       {/* AI Tools */}
       <Tabs defaultValue="enhanced" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-12">
+        <TabsList className="grid w-full grid-cols-13">
           <TabsTrigger value="enhanced" className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             Enhanced AI
@@ -107,6 +109,10 @@ const AIAssistantPage: React.FC = () => {
           <TabsTrigger value="automated" className="flex items-center gap-2">
             <SparklesIcon className="h-4 w-4" />
             Automated
+          </TabsTrigger>
+          <TabsTrigger value="voice" className="flex items-center gap-2">
+            <Mic className="h-4 w-4" />
+            Voice
           </TabsTrigger>
           <TabsTrigger value="metrics" className="flex items-center gap-2">
             <Monitor className="h-4 w-4" />
@@ -156,6 +162,10 @@ const AIAssistantPage: React.FC = () => {
 
         <TabsContent value="automated" className="space-y-6">
           <AIAutomatedInsights />
+        </TabsContent>
+
+        <TabsContent value="voice" className="space-y-6">
+          <AIVoiceAssistant />
         </TabsContent>
 
         <TabsContent value="metrics" className="space-y-6">
