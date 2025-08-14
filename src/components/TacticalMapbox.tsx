@@ -87,9 +87,14 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         
         // Устанавливаем токен напрямую
         console.log('🔑 [TOKEN] Устанавливаем токен напрямую...');
+        console.log('🔑 [TOKEN] Токен:', MAPBOX_TOKEN.substring(0, 20) + '...');
         mapboxgl.accessToken = MAPBOX_TOKEN;
         
         console.log('🗺️ [CREATE] Создаем карту...');
+        console.log('🗺️ [CONTAINER] Контейнер готов:', !!mapContainer.current);
+        console.log('🗺️ [MAPBOX] mapboxgl доступен:', !!mapboxgl);
+        console.log('🗺️ [ACCESS_TOKEN] accessToken установлен:', !!mapboxgl.accessToken);
+        
         const mapInstance = new mapboxgl.Map({
           container: mapContainer.current!,
           style: 'mapbox://styles/mapbox/dark-v11',
@@ -97,6 +102,8 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
           zoom: 8,
           projection: 'mercator'
         });
+
+        console.log('🗺️ [INSTANCE] Экземпляр карты создан:', !!mapInstance);
 
         // Добавляем контролы навигации
         mapInstance.addControl(new mapboxgl.NavigationControl(), 'top-right');
@@ -120,11 +127,30 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
           }, 200);
         });
         
+        
         mapInstance.on('error', (e) => {
           console.error('❌ [ERROR] Ошибка карты:', e);
-          setError(`Ошибка загрузки карты: ${e.error?.message || 'Неизвестная ошибка'}`);
+          console.error('❌ [ERROR] Детали ошибки:', e.error);
+          console.error('❌ [ERROR] Тип ошибки:', typeof e.error);
+          setError(`Ошибка загрузки карты: ${e.error?.message || JSON.stringify(e.error) || 'Неизвестная ошибка'}`);
           setLoading(false);
         });
+
+        // Дополнительные события для отладки
+        mapInstance.on('styleload', () => {
+          console.log('🎨 [STYLE] Стиль карты загружен');
+        });
+
+        mapInstance.on('idle', () => {
+          console.log('💤 [IDLE] Карта в состоянии idle');
+        });
+
+        const renderHandler = () => {
+          console.log('🖼️ [RENDER] Карта отрендерена (только первый раз)');
+          mapInstance.off('render', renderHandler);
+        };
+        
+        mapInstance.on('render', renderHandler);
         
       } catch (err) {
         console.error('💥 [CRITICAL] Критическая ошибка инициализации:', err);
