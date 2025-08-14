@@ -45,6 +45,7 @@ const MissionControlPage = lazy(() => import("./pages/MissionControlOps"));
 const FleetPage = lazy(() => import("./pages/FleetManagement"));
 const AIOperationsCenter = lazy(() => import("./pages/AIOperationsCenter"));
 const UAVDashboard = lazy(() => import("./pages/UAVDashboard"));
+const TestingCenter = lazy(() => import("./pages/TestingCenter"));
 
 // Components
 import { usePushNotifications } from "@/hooks/use-push-notifications";
@@ -179,7 +180,23 @@ const AppShell = () => {
                         </LazyComponentWrapper>
                       </ProtectedRoute>
                     } />
-                  </FeatureGate>
+                   </FeatureGate>
+
+                  <Route path="/uav-dashboard" element={
+                    <ProtectedRoute>
+                      <LazyComponentWrapper>
+                        <UAVDashboard />
+                      </LazyComponentWrapper>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/testing" element={
+                    <ProtectedRoute>
+                      <LazyComponentWrapper>
+                        <TestingCenter />
+                      </LazyComponentWrapper>
+                    </ProtectedRoute>
+                  } />
 
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/admin" element={
