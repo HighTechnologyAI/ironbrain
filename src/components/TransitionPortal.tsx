@@ -94,16 +94,16 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
       } else if (phase === 'consume') {
         drawConsumption(ctx, w, h, phaseProgress);
         if (phaseProgress >= 1) {
-          console.log('Animation complete, waiting before navigation...');
+          console.log('Animation complete, waiting for full consumption...');
           setPhase('complete');
-          // Даем время для полного завершения анимации перед переходом
+          // Даем полное время для завершения эффекта поглощения
           setTimeout(() => {
             console.log('Navigating to dashboard...');
             navigate('/');
             setTimeout(() => {
               onComplete();
             }, 1000);
-          }, 1500);
+          }, 3500); // Увеличена задержка для полного поглощения
           return;
         }
       }
