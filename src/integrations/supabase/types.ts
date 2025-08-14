@@ -651,6 +651,69 @@ export type Database = {
           },
         ]
       }
+      missions: {
+        Row: {
+          altitude_meters: number | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          drone_id: string | null
+          end_time: string | null
+          id: string
+          name: string
+          progress: number | null
+          start_time: string | null
+          status: string
+          updated_at: string
+          waypoints: number | null
+        }
+        Insert: {
+          altitude_meters?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          drone_id?: string | null
+          end_time?: string | null
+          id?: string
+          name: string
+          progress?: number | null
+          start_time?: string | null
+          status?: string
+          updated_at?: string
+          waypoints?: number | null
+        }
+        Update: {
+          altitude_meters?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          drone_id?: string | null
+          end_time?: string | null
+          id?: string
+          name?: string
+          progress?: number | null
+          start_time?: string | null
+          status?: string
+          updated_at?: string
+          waypoints?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missions_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "uav_drones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string | null
