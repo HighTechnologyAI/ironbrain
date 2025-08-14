@@ -470,6 +470,55 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
 
               <Separator />
 
+              {/* AI Results Display - Moved up for better visibility */}
+              {aiResults && (
+                <div>
+                  <h4 className="font-medium font-ui mb-3 flex items-center gap-2">
+                    <Brain className="h-4 w-4 text-primary animate-pulse" />
+                    AI Результат
+                    <Badge variant="default" className="text-xs bg-primary text-primary-foreground">
+                      {aiResults.type === 'analysis' ? 'Анализ' : 
+                       aiResults.type === 'subtasks' ? 'Подзадачи' : 'Эксперты'}
+                    </Badge>
+                  </h4>
+                  <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-3 cyber-border shadow-glow">
+                    <div className="text-xs text-muted-foreground flex items-center gap-2">
+                      <Clock className="h-3 w-3" />
+                      {aiResults.timestamp.toLocaleTimeString('ru-RU')}
+                    </div>
+                    <div className="text-sm leading-relaxed whitespace-pre-wrap text-foreground max-h-48 overflow-y-auto">
+                      {aiResults.content}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => setAiResults(null)}
+                        className="text-xs"
+                      >
+                        Закрыть
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => {
+                          navigator.clipboard.writeText(aiResults.content);
+                          toast({
+                            title: "Скопировано",
+                            description: "Результат скопирован в буфер обмена",
+                          });
+                        }}
+                        className="text-xs"
+                      >
+                        Копировать
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <Separator />
+
               {/* Task Intelligence */}
               <div>
                 <h4 className="font-medium font-ui mb-3 flex items-center gap-2">
@@ -508,52 +557,6 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
             </>
           )}
 
-          {/* AI Results Display */}
-          {aiResults && (
-            <div>
-              <h4 className="font-medium font-ui mb-3 flex items-center gap-2">
-                <Brain className="h-4 w-4 text-primary" />
-                AI Результат
-                <Badge variant="outline" className="text-xs">
-                  {aiResults.type === 'analysis' ? 'Анализ' : 
-                   aiResults.type === 'subtasks' ? 'Подзадачи' : 'Эксперты'}
-                </Badge>
-              </h4>
-              <div className="p-4 bg-surface-2 rounded-lg border border-border space-y-3">
-                <div className="text-xs text-muted-foreground flex items-center gap-2">
-                  <Clock className="h-3 w-3" />
-                  {aiResults.timestamp.toLocaleTimeString('ru-RU')}
-                </div>
-                <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                  {aiResults.content}
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={() => setAiResults(null)}
-                    className="text-xs"
-                  >
-                    Закрыть
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={() => {
-                      navigator.clipboard.writeText(aiResults.content);
-                      toast({
-                        title: "Скопировано",
-                        description: "Результат скопирован в буфер обмена",
-                      });
-                    }}
-                    className="text-xs"
-                  >
-                    Копировать
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
 
           {!selectedTask && (
             <div className="text-center py-8">
