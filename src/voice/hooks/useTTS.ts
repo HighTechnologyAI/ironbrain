@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 interface TTSOptions {
   language: string;
@@ -13,6 +13,27 @@ export const useTTS = (options: TTSOptions) => {
   
   const [isSpeaking, setIsSpeaking] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  const fallbackSpeak = useCallback((text: string) => {
+    console.log('Using fallback browser TTS');
+    
+    if (speechSynthesis.speaking) {
+      speechSynthesis.cancel();
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = language;
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    utteranceRef.current = utterance;
+    speechSynthesis.speak(utterance);
+  }, [language]);
 
   const speak = useCallback(async (text: string) => {
     if (!text.trim()) return;
@@ -67,28 +88,7 @@ export const useTTS = (options: TTSOptions) => {
     
     // Fallback to browser speech synthesis
     fallbackSpeak(text);
-  }, [language]);
-
-  const fallbackSpeak = useCallback((text: string) => {
-    console.log('Using fallback browser TTS');
-    
-    if (speechSynthesis.speaking) {
-      speechSynthesis.cancel();
-    }
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = language;
-    utterance.rate = 0.9;
-    utterance.pitch = 1.0;
-    utterance.volume = 1.0;
-
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-
-    utteranceRef.current = utterance;
-    speechSynthesis.speak(utterance);
-  }, [language]);
+  }, [language, fallbackSpeak]);
 
   const stop = useCallback(() => {
     setIsSpeaking(false);

@@ -40,6 +40,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import RealTimeAlerts from "@/components/RealTimeAlerts";
 // Simple Voice Button
+import { VoiceManager } from "@/voice/VoiceManager";
 import { SimpleVoiceButton } from "@/voice/SimpleVoiceButton";
 
 const queryClient = new QueryClient({
@@ -65,58 +66,60 @@ const AppShell = () => {
   const location = useLocation();
   const hideSidebar = location.pathname === '/auth';
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        {!hideSidebar && <AppSidebar />}
-        <main className="flex-1">
-          <ConnectionStatus />
-          <NotificationsBoot />
-          <RealTimeAlerts />
-          <SimpleVoiceButton />
-          <Toaster />
-          <Sonner />
-          <Routes>
-            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
-            <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
-            <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
-            <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
-            <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-            <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
-            <Route path="/awards" element={<ProtectedRoute><Awards /></ProtectedRoute>} />
-            <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
-            {/* UAV-specific routes */}
-            <Route path="/missions" element={<ProtectedRoute><MissionControl /></ProtectedRoute>} />
-            <Route path="/production" element={<ProtectedRoute><ProductionKanban /></ProtectedRoute>} />
-            <Route path="/maintenance" element={<ProtectedRoute><MaintenanceCenter /></ProtectedRoute>} />
-            <Route path="/documents" element={<ProtectedRoute><DocumentCenter /></ProtectedRoute>} />
-            {/* Operations Center Routes - Feature Flag Protected */}
-            {import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' && (
-              <Route path="/ops-center" element={<ProtectedRoute><OpsCenter /></ProtectedRoute>} />
-            )}
-            {import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' && (
-              <Route path="/mission-control" element={<ProtectedRoute><MissionControlPage /></ProtectedRoute>} />
-            )}
-            {import.meta.env.VITE_FEATURE_FLEET === 'true' && (
-              <Route path="/fleet" element={<ProtectedRoute><FleetPage /></ProtectedRoute>} />
-            )}
-            {import.meta.env.VITE_FEATURE_COMMAND_CENTER === 'true' && (
-              <Route path="/command-center" element={<ProtectedRoute><CommandCenterPage /></ProtectedRoute>} />
-            )}
-            {import.meta.env.VITE_FEATURE_LOGS === 'true' && (
-              <Route path="/logs" element={<ProtectedRoute><SystemLogsPage /></ProtectedRoute>} />
-            )}
-            {import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' && (
-              <Route path="/ai-operations" element={<ProtectedRoute><AIOperationsCenter /></ProtectedRoute>} />
-            )}
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/create-demo-users" element={<CreateDemoUsers />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-      </div>
-    </SidebarProvider>
+    <VoiceManager defaultConfig={{ provider: 'openai', mode: 'simple-button' }}>
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full">
+          {!hideSidebar && <AppSidebar />}
+          <main className="flex-1">
+            <ConnectionStatus />
+            <NotificationsBoot />
+            <RealTimeAlerts />
+            <SimpleVoiceButton />
+            <Toaster />
+            <Sonner />
+            <Routes>
+              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
+              <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
+              <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
+              <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+              <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+              <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
+              <Route path="/awards" element={<ProtectedRoute><Awards /></ProtectedRoute>} />
+              <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
+              {/* UAV-specific routes */}
+              <Route path="/missions" element={<ProtectedRoute><MissionControl /></ProtectedRoute>} />
+              <Route path="/production" element={<ProtectedRoute><ProductionKanban /></ProtectedRoute>} />
+              <Route path="/maintenance" element={<ProtectedRoute><MaintenanceCenter /></ProtectedRoute>} />
+              <Route path="/documents" element={<ProtectedRoute><DocumentCenter /></ProtectedRoute>} />
+              {/* Operations Center Routes - Feature Flag Protected */}
+              {import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' && (
+                <Route path="/ops-center" element={<ProtectedRoute><OpsCenter /></ProtectedRoute>} />
+              )}
+              {import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' && (
+                <Route path="/mission-control" element={<ProtectedRoute><MissionControlPage /></ProtectedRoute>} />
+              )}
+              {import.meta.env.VITE_FEATURE_FLEET === 'true' && (
+                <Route path="/fleet" element={<ProtectedRoute><FleetPage /></ProtectedRoute>} />
+              )}
+              {import.meta.env.VITE_FEATURE_COMMAND_CENTER === 'true' && (
+                <Route path="/command-center" element={<ProtectedRoute><CommandCenterPage /></ProtectedRoute>} />
+              )}
+              {import.meta.env.VITE_FEATURE_LOGS === 'true' && (
+                <Route path="/logs" element={<ProtectedRoute><SystemLogsPage /></ProtectedRoute>} />
+              )}
+              {import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' && (
+                <Route path="/ai-operations" element={<ProtectedRoute><AIOperationsCenter /></ProtectedRoute>} />
+              )}
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/create-demo-users" element={<CreateDemoUsers />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+        </div>
+      </SidebarProvider>
+    </VoiceManager>
   );
 };
 
