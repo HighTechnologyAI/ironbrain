@@ -19,8 +19,39 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
   const markers = useRef<mapboxgl.Marker[]>([]);
   const loadingRef = useRef(true);
 
-  // Жестко зашитый токен для тестирования
-  const MAPBOX_TOKEN = 'pk.eyJ1IjoiaGlnaHRlY2hhaSIsImEiOiJjbWViZTBoaW0wbzVwMmpxdmFpeTVnbWdsIn0.8-x4oZ4TfetTTa5BEAXDYg';
+  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
+  
+  // Получение токена Mapbox из Edge Function
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        console.log('🔑 [TOKEN] Получаем токен Mapbox...');
+        const response = await fetch('/functions/v1/get-mapbox-token', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.token) {
+          console.log('✅ [TOKEN] Токен получен успешно');
+          setMapboxToken(data.token);
+        } else {
+          console.error('❌ [TOKEN] Ошибка получения токена:', data.error);
+          setError(`Не удалось получить токен Mapbox: ${data.error || 'Неизвестная ошибка'}`);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('❌ [TOKEN] Ошибка запроса токена:', err);
+        setError('Ошибка подключения к серверу для получения токена Mapbox');
+        setLoading(false);
+      }
+    };
+    
+    fetchToken();
+  }, []);
 
   // Отслеживание изменений loading
   useEffect(() => {
@@ -74,42 +105,25 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
       return;
     }
 
-    // Ждем пока ref будет установлен
     if (!mapContainer.current) {
       console.log('⏳ [EFFECT] mapContainer.current отсутствует, ждем...');
-      const checkContainer = () => {
-        if (mapContainer.current && !map.current) {
-          console.log('✅ [EFFECT] mapContainer.current найден, инициализируем карту');
-          initializeMap();
-        }
-      };
-      
-      // Проверяем через небольшой интервал
-      const intervalId = setInterval(checkContainer, 100);
-      const timeoutId = setTimeout(() => {
-        clearInterval(intervalId);
-        console.log('❌ [EFFECT] Таймаут ожидания mapContainer.current');
-        setError('Не удалось инициализировать контейнер карты');
-        setLoading(false);
-      }, 5000);
-      
-      return () => {
-        clearInterval(intervalId);
-        clearTimeout(timeoutId);
-      };
+      return;
     }
 
     const initializeMap = () => {
+      if (!mapContainer.current) {
+        console.log('❌ [INIT] mapContainer.current не доступен');
+        return;
+      }
+
+      console.log('🗺️ [INIT] Начинаем инициализацию карты');
+      console.log('🗺️ [INIT] Устанавливаем токен доступа');
+      
+      // Используем fallback токен если нет токена из Edge Function
+      const token = mapboxToken || 'pk.eyJ1IjoiaGlnaHRlY2hhaSIsImEiOiJjbWViZTBoaW0wbzVwMmpxdmFpeTVnbWdsIn0.8-x4oZ4TfetTTa5BEAXDYg';
+      mapboxgl.accessToken = token;
+        
       try {
-        console.log('🗺️ [SIMPLE INIT] Начинаем простую инициализацию карты...');
-        setLoading(true);
-        setError(null);
-        
-        // Устанавливаем токен напрямую
-        console.log('🔑 [TOKEN] Устанавливаем токен напрямую...');
-        console.log('🔑 [TOKEN] Токен:', MAPBOX_TOKEN.substring(0, 20) + '...');
-        mapboxgl.accessToken = MAPBOX_TOKEN;
-        
         console.log('🗺️ [CREATE] Создаем карту...');
         console.log('🗺️ [CONTAINER] Контейнер готов:', !!mapContainer.current);
         console.log('🗺️ [MAPBOX] mapboxgl доступен:', !!mapboxgl);
@@ -232,7 +246,6 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
       }
     };
 
-    // Запускаем инициализацию
     initializeMap();
 
     return () => {
