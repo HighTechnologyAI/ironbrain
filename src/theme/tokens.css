@@ -1,130 +1,102 @@
-/* Tiger Neon UI v2 Design Tokens */
+/* Tiger Neon UI v2 - Token system for Operations Center */
+
 :root {
-  /* Background colors */
-  --neon-bg: hsl(216, 30%, 5%);
-  --neon-surface-1: hsl(215, 25%, 8%);
-  --neon-surface-2: hsl(214, 20%, 11%);
-  --neon-border: hsl(214, 15%, 18%);
+  /* Core tokens - dark SaaS minimalism */
+  --bg: 216 100% 7%; /* #0B0F14 */
+  --s1: 220 24% 10%; /* #0F141A surface1 */
+  --s2: 216 33% 12%; /* #121922 surface2 */
+  --bd: 219 33% 16%; /* #1D2633 border */
+  --txt: 210 29% 85%; /* #D6E2F3 */
+  --muted: 211 24% 70%; /* #9BB0C9 */
   
-  /* Text colors */
-  --neon-text: hsl(215, 30%, 87%);
-  --neon-text-muted: hsl(215, 20%, 65%);
+  /* Dynamic accent - runtime configurable */
+  --acc: var(--acc-prop, 154 86% 42%); /* Default: #16C172 Tiger Neon */
+  --acc-600: var(--acc-600-prop, 154 74% 36%); /* #13A765 */
+  --acc-glow: 0 0 24px hsl(var(--acc) / 0.35);
   
-  /* Accent colors - configurable via CSS custom property */
-  --neon-accent: var(--neon-accent-override, hsl(153, 85%, 41%));
-  --neon-accent-600: var(--neon-accent-600-override, hsl(153, 85%, 35%));
-  --neon-accent-glow: 0 0 24px hsl(153, 85%, 41%, 0.35);
+  /* Semantic status colors */
+  --warn: 44 96% 63%; /* #F6C945 */
+  --danger: 0 100% 67%; /* #FF5A5A */
+  --info: 207 100% 62%; /* #3FA7FF */
+  --ok: 154 90% 47%; /* #1FD38A */
   
-  /* Status colors */
-  --neon-warning: hsl(45, 90%, 63%);
-  --neon-danger: hsl(0, 100%, 67%);
-  --neon-info: hsl(210, 100%, 63%);
-  --neon-success: hsl(153, 85%, 55%);
+  /* Radius tokens */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
   
-  /* Border radius */
-  --neon-radius-sm: 10px;
-  --neon-radius-md: 14px;
-  --neon-radius-lg: 20px;
+  /* Shadow tokens */
+  --shadow-subtle: 0 2px 8px hsl(var(--bg) / 0.3);
+  --shadow-medium: 0 4px 16px hsl(var(--bg) / 0.4);
+  --shadow-strong: 0 8px 32px hsl(var(--bg) / 0.5);
+  --shadow-glow: 0 0 24px hsl(var(--acc) / 0.35);
+  --shadow-glow-hover: 0 0 32px hsl(var(--acc) / 0.5);
   
-  /* Shadows */
-  --neon-shadow-subtle: 0 2px 8px hsl(216, 30%, 5%, 0.4);
-  --neon-shadow-medium: 0 4px 16px hsl(216, 30%, 5%, 0.6);
-  --neon-shadow-glow: var(--neon-accent-glow);
-  
-  /* Typography */
-  --neon-font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  --neon-font-mono: "JetBrains Mono", "Fira Code", monospace;
-  
-  /* Transitions */
-  --neon-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --neon-transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Animation tokens */
+  --transition-fast: 0.15s ease-out;
+  --transition-normal: 0.3s ease-out;
+  --transition-slow: 0.5s ease-out;
 }
 
-/* Dark mode enforcement for Tiger Neon UI */
-html.dark body {
-  background: var(--neon-bg);
-  color: var(--neon-text);
+/* Apply theme only when UI v2 is enabled */
+html.neon-ui-v2 body {
+  background: hsl(var(--bg));
+  color: hsl(var(--txt));
 }
 
-/* Utility classes for Tiger Neon UI v2 */
-.neon-bg { background: var(--neon-bg); }
-.neon-surface-1 { background: var(--neon-surface-1); }
-.neon-surface-2 { background: var(--neon-surface-2); }
-.neon-border { border-color: var(--neon-border); }
-.neon-text { color: var(--neon-text); }
-.neon-text-muted { color: var(--neon-text-muted); }
-.neon-accent { color: var(--neon-accent); }
-.neon-accent-bg { background: var(--neon-accent); }
-.neon-glow { box-shadow: var(--neon-shadow-glow); }
-.neon-transition { transition: var(--neon-transition); }
-
-/* Component-specific tokens */
-.neon-button {
-  border-radius: var(--neon-radius-sm);
-  transition: var(--neon-transition);
-  font-weight: 500;
+/* Base component classes */
+.neon-surface {
+  background: hsl(var(--s1));
+  border: 1px solid hsl(var(--bd));
+  border-radius: var(--r-md);
 }
 
 .neon-card {
-  background: var(--neon-surface-1);
-  border: 1px solid var(--neon-border);
-  border-radius: var(--neon-radius-md);
-  box-shadow: var(--neon-shadow-subtle);
-  transition: var(--neon-transition-slow);
+  background: hsl(var(--s1));
+  border: 1px solid hsl(var(--bd));
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-subtle);
 }
 
-.neon-card:hover {
-  box-shadow: var(--neon-shadow-medium);
+.neon-button {
+  background: hsl(var(--acc));
+  color: hsl(var(--bg));
+  border: none;
+  border-radius: var(--r-md);
+  transition: all var(--transition-normal);
 }
 
-.neon-input {
-  background: var(--neon-surface-2);
-  border: 1px solid var(--neon-border);
-  border-radius: var(--neon-radius-sm);
-  color: var(--neon-text);
-  transition: var(--neon-transition);
+.neon-button:hover {
+  background: hsl(var(--acc-600));
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-1px);
 }
 
-.neon-input:focus {
-  border-color: var(--neon-accent);
-  box-shadow: 0 0 0 2px hsl(153, 85%, 41%, 0.2);
+.neon-text-primary {
+  color: hsl(var(--txt));
 }
 
-/* Status chip variants */
-.neon-status-armed {
-  background: hsl(153, 85%, 41%, 0.2);
-  color: var(--neon-accent);
-  border: 1px solid hsl(153, 85%, 41%, 0.3);
+.neon-text-muted {
+  color: hsl(var(--muted));
 }
 
-.neon-status-warning {
-  background: hsl(45, 90%, 63%, 0.2);
-  color: var(--neon-warning);
-  border: 1px solid hsl(45, 90%, 63%, 0.3);
+.neon-text-accent {
+  color: hsl(var(--acc));
+}
+
+/* Status variants */
+.neon-status-ok {
+  color: hsl(var(--ok));
+}
+
+.neon-status-warn {
+  color: hsl(var(--warn));
 }
 
 .neon-status-danger {
-  background: hsl(0, 100%, 67%, 0.2);
-  color: var(--neon-danger);
-  border: 1px solid hsl(0, 100%, 67%, 0.3);
+  color: hsl(var(--danger));
 }
 
 .neon-status-info {
-  background: hsl(210, 100%, 63%, 0.2);
-  color: var(--neon-info);
-  border: 1px solid hsl(210, 100%, 63%, 0.3);
+  color: hsl(var(--info));
 }
-
-/* Animation keyframes */
-@keyframes neon-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-@keyframes neon-glow {
-  0%, 100% { box-shadow: var(--neon-shadow-glow); }
-  50% { box-shadow: 0 0 36px hsl(153, 85%, 41%, 0.5); }
-}
-
-.neon-pulse { animation: neon-pulse 2s ease-in-out infinite; }
-.neon-glow-animate { animation: neon-glow 3s ease-in-out infinite; }

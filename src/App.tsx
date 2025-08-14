@@ -28,6 +28,12 @@ import MissionControl from "./pages/MissionControl";
 import ProductionKanban from "./pages/ProductionKanban";
 import MaintenanceCenter from "./pages/MaintenanceCenter";
 import DocumentCenter from "./pages/DocumentCenter";
+// Operations Center pages
+import OpsCenter from "./pages/ops-center";
+import MissionControlPage from "./pages/mission-control";
+import FleetPage from "./pages/fleet";
+import CommandCenterPage from "./pages/command-center";
+import LogsPage from "./pages/logs";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -78,6 +84,22 @@ const AppShell = () => {
             <Route path="/production" element={<ProtectedRoute><ProductionKanban /></ProtectedRoute>} />
             <Route path="/maintenance" element={<ProtectedRoute><MaintenanceCenter /></ProtectedRoute>} />
             <Route path="/documents" element={<ProtectedRoute><DocumentCenter /></ProtectedRoute>} />
+            {/* Operations Center Routes - Feature Flag Protected */}
+            {import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' && (
+              <Route path="/ops-center" element={<ProtectedRoute><OpsCenter /></ProtectedRoute>} />
+            )}
+            {import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' && (
+              <Route path="/mission-control" element={<ProtectedRoute><MissionControlPage /></ProtectedRoute>} />
+            )}
+            {import.meta.env.VITE_FEATURE_FLEET === 'true' && (
+              <Route path="/fleet" element={<ProtectedRoute><FleetPage /></ProtectedRoute>} />
+            )}
+            {import.meta.env.VITE_FEATURE_COMMAND_CENTER === 'true' && (
+              <Route path="/command-center" element={<ProtectedRoute><CommandCenterPage /></ProtectedRoute>} />
+            )}
+            {import.meta.env.VITE_FEATURE_LOGS === 'true' && (
+              <Route path="/logs" element={<ProtectedRoute><LogsPage /></ProtectedRoute>} />
+            )}
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/create-demo-users" element={<CreateDemoUsers />} />

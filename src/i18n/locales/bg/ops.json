@@ -1,0 +1,84 @@
+{
+  "opsCenter": {
+    "title": "Операционен център",
+    "subtitle": "Командване и управление на мисии",
+    "wallboard": "Наблюдение",
+    "systemStatus": "Състояние на системата",
+    "alerts": "Предупреждения",
+    "kpis": "Ключови показатели"
+  },
+  "missionControl": {
+    "title": "Управление на мисии",
+    "subtitle": "Управление на полети на БЛА",
+    "map": "Карта на полетите",
+    "telemetry": "Телеметрия в реално време",
+    "waypoints": "Навигационни точки",
+    "flightPath": "Траектория на полета",
+    "mission": "Мисия",
+    "status": "Статус"
+  },
+  "fleet": {
+    "title": "Управление на флота",
+    "subtitle": "Регистър и статус на дронове",
+    "drone": "Дрон",
+    "drones": "Дронове",
+    "serial": "Сериен номер",
+    "model": "Модел",
+    "firmware": "Фърмуер",
+    "lastContact": "Последен контакт",
+    "batteryLevel": "Ниво на батерията",
+    "location": "Местоположение"
+  },
+  "commandCenter": {
+    "title": "Команден център",
+    "subtitle": "Безопасно управление на БЛА",
+    "armDrone": "Активиране на дрон",
+    "disarmDrone": "Деактивиране на дрон",
+    "startMission": "Започване на мисия",
+    "abortMission": "Прекратяване на мисия",
+    "confirmAction": "Потвърждаване на действие",
+    "dryRun": "Тестово изпълнение",
+    "execute": "Изпълнение"
+  },
+  "logs": {
+    "title": "Системни логове",
+    "subtitle": "Одит и събития",
+    "timestamp": "Време",
+    "severity": "Критичност",
+    "source": "Източник",
+    "message": "Съобщение",
+    "filter": "Филтър",
+    "search": "Търсене в логове..."
+  },
+  "telemetry": {
+    "latitude": "Ширина",
+    "longitude": "Дължина",
+    "altitude": "Височина",
+    "speed": "Скорост",
+    "batteryVoltage": "Напрежение на батерията",
+    "escTemperature": "Температура на ESC",
+    "windSpeed": "Скорост на вятъра",
+    "heading": "Курс"
+  },
+  "status": {
+    "online": "Онлайн",
+    "offline": "Офлайн",
+    "armed": "Активиран",
+    "disarmed": "Деактивиран",
+    "flying": "В полет",
+    "landed": "На земята",
+    "warning": "Предупреждение",
+    "critical": "Критично",
+    "ready": "Готов",
+    "pending": "Изчакване",
+    "error": "Грешка"
+  },
+  "units": {
+    "meters": "м",
+    "metersPerSecond": "м/с",
+    "celsius": "°C",
+    "volts": "В",
+    "degrees": "°",
+    "percent": "%"
+  }
+}

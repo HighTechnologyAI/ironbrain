@@ -1,0 +1,84 @@
+{
+  "opsCenter": {
+    "title": "Операционный центр",
+    "subtitle": "Командование и управление миссиями",
+    "wallboard": "Мониторинг",
+    "systemStatus": "Состояние системы",
+    "alerts": "Оповещения",
+    "kpis": "Ключевые показатели"
+  },
+  "missionControl": {
+    "title": "Управление миссиями",
+    "subtitle": "Управление полетами БПЛА",
+    "map": "Карта полетов",
+    "telemetry": "Телеметрия в реальном времени",
+    "waypoints": "Маршрутные точки",
+    "flightPath": "Траектория полета",
+    "mission": "Миссия",
+    "status": "Статус"
+  },
+  "fleet": {
+    "title": "Управление флотом",
+    "subtitle": "Реестр и статус дронов",
+    "drone": "Дрон",
+    "drones": "Дроны",
+    "serial": "Серийный номер",
+    "model": "Модель",
+    "firmware": "Прошивка",
+    "lastContact": "Последний контакт",
+    "batteryLevel": "Уровень батареи",
+    "location": "Местоположение"
+  },
+  "commandCenter": {
+    "title": "Командный центр",
+    "subtitle": "Безопасное управление БПЛА",
+    "armDrone": "Активировать дрон",
+    "disarmDrone": "Деактивировать дрон",
+    "startMission": "Начать миссию",
+    "abortMission": "Прервать миссию",
+    "confirmAction": "Подтвердить действие",
+    "dryRun": "Тестовый запуск",
+    "execute": "Выполнить"
+  },
+  "logs": {
+    "title": "Системные логи",
+    "subtitle": "Аудит и события",
+    "timestamp": "Время",
+    "severity": "Критичность",
+    "source": "Источник",
+    "message": "Сообщение",
+    "filter": "Фильтр",
+    "search": "Поиск в логах..."
+  },
+  "telemetry": {
+    "latitude": "Широта",
+    "longitude": "Долгота",
+    "altitude": "Высота",
+    "speed": "Скорость",
+    "batteryVoltage": "Напряжение батареи",
+    "escTemperature": "Температура ESC",
+    "windSpeed": "Скорость ветра",
+    "heading": "Курс"
+  },
+  "status": {
+    "online": "В сети",
+    "offline": "Не в сети",
+    "armed": "Активирован",
+    "disarmed": "Деактивирован",
+    "flying": "В полете",
+    "landed": "На земле",
+    "warning": "Предупреждение",
+    "critical": "Критическое",
+    "ready": "Готов",
+    "pending": "Ожидание",
+    "error": "Ошибка"
+  },
+  "units": {
+    "meters": "м",
+    "metersPerSecond": "м/с",
+    "celsius": "°C",
+    "volts": "В",
+    "degrees": "°",
+    "percent": "%"
+  }
+}

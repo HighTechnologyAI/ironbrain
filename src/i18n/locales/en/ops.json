@@ -1,0 +1,84 @@
+{
+  "opsCenter": {
+    "title": "Operations Center",
+    "subtitle": "Mission command and control",
+    "wallboard": "Wallboard",
+    "systemStatus": "System Status",
+    "alerts": "Alerts",
+    "kpis": "Key Performance Indicators"
+  },
+  "missionControl": {
+    "title": "Mission Control",
+    "subtitle": "UAV flight management",
+    "map": "Flight Map",
+    "telemetry": "Live Telemetry",
+    "waypoints": "Waypoints",
+    "flightPath": "Flight Path",
+    "mission": "Mission",
+    "status": "Status"
+  },
+  "fleet": {
+    "title": "Fleet Management",
+    "subtitle": "Drone registry and status",
+    "drone": "Drone",
+    "drones": "Drones",
+    "serial": "Serial",
+    "model": "Model",
+    "firmware": "Firmware",
+    "lastContact": "Last Contact",
+    "batteryLevel": "Battery Level",
+    "location": "Location"
+  },
+  "commandCenter": {
+    "title": "Command Center",
+    "subtitle": "Safe UAV control",
+    "armDrone": "Arm Drone",
+    "disarmDrone": "Disarm Drone",
+    "startMission": "Start Mission",
+    "abortMission": "Abort Mission",
+    "confirmAction": "Confirm Action",
+    "dryRun": "Dry Run",
+    "execute": "Execute"
+  },
+  "logs": {
+    "title": "System Logs",
+    "subtitle": "Audit trail and events",
+    "timestamp": "Timestamp",
+    "severity": "Severity",
+    "source": "Source",
+    "message": "Message",
+    "filter": "Filter",
+    "search": "Search logs..."
+  },
+  "telemetry": {
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "altitude": "Altitude",
+    "speed": "Speed",
+    "batteryVoltage": "Battery Voltage",
+    "escTemperature": "ESC Temperature",
+    "windSpeed": "Wind Speed",
+    "heading": "Heading"
+  },
+  "status": {
+    "online": "Online",
+    "offline": "Offline",
+    "armed": "Armed",
+    "disarmed": "Disarmed",
+    "flying": "Flying",
+    "landed": "Landed",
+    "warning": "Warning",
+    "critical": "Critical",
+    "ready": "Ready",
+    "pending": "Pending",
+    "error": "Error"
+  },
+  "units": {
+    "meters": "m",
+    "metersPerSecond": "m/s",
+    "celsius": "°C",
+    "volts": "V",
+    "degrees": "°",
+    "percent": "%"
+  }
+}
