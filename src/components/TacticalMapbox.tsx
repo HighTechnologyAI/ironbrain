@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Drone } from '@/hooks/use-drones';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
+import { Loader2, AlertTriangle, Wifi, RotateCcw } from 'lucide-react';
 
 interface TacticalMapboxProps {
   drones: Drone[];
@@ -17,12 +17,15 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
   const [error, setError] = useState<string | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
 
-  // Простая инициализация карты БЕЗ токена - используем OpenStreetMap
+  // Инициализация карты
   useEffect(() => {
     // Если карта уже создана, не создаваем заново
     if (map.current) return;
 
-    // Ждем готовности DOM
+    // Устанавливаем валидный токен Mapbox
+    mapboxgl.accessToken = 'pk.eyJ1IjoiaGlnaHRlY2hhaSIsImEiOiJjbWViZTBoaW0wbzVwMmpxdmFpeTVnbWdsIn0.8-x4oZ4TfetTTa5BEAXDYg';
+
+    // Небольшая задержка для готовности DOM
     const timer = setTimeout(() => {
       if (!mapContainer.current) {
         setError('Контейнер карты недоступен');
@@ -31,58 +34,60 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
       }
 
       try {
-        // Используем Leaflet вместо Mapbox для простоты
-        const L = (window as any).L;
-        if (!L) {
-          // Если Leaflet недоступен, создаем простую заглушку карты
-          mapContainer.current.innerHTML = `
-            <div class="flex items-center justify-center h-full bg-surface-2 rounded-lg">
-              <div class="text-center p-8">
-                <div class="w-24 h-24 mx-auto mb-4 bg-primary/20 rounded-full flex items-center justify-center">
-                  <svg class="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                  </svg>
-                </div>
-                <h3 class="text-lg font-semibold text-foreground mb-2">Тактическая карта</h3>
-                <p class="text-sm text-muted-foreground mb-4">Показывает позиции ${drones.length} дронов</p>
-                <div class="space-y-2">
-                  ${drones.slice(0, 6).map(drone => `
-                    <div class="flex items-center justify-between p-2 bg-surface-3 rounded">
-                      <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                        <span class="text-sm font-medium">${drone.name}</span>
-                      </div>
-                      <div class="text-xs text-muted-foreground">
-                        ${drone.status} • ${drone.battery_level || 0}%
-                      </div>
-                    </div>
-                  `).join('')}
-                  ${drones.length > 6 ? `<div class="text-xs text-muted-foreground">+${drones.length - 6} дронов</div>` : ''}
-                </div>
-              </div>
-            </div>
-          `;
+        console.log('🗺️ Инициализация Mapbox карты...');
+        
+        // Создаем карту Mapbox
+        const mapInstance = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/dark-v11',
+          center: [26.8916, 43.3968], // Центр Болгарии
+          zoom: 8,
+          projection: 'mercator'
+        });
+
+        // Добавляем контролы навигации
+        mapInstance.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+        // Обработчик загрузки карты
+        mapInstance.on('load', () => {
+          console.log('✅ Mapbox карта загружена успешно');
           setLoading(false);
           setError(null);
-          return;
-        }
+          
+          // Добавляем маркеры дронов
+          addDroneMarkers();
+        });
 
-        setLoading(false);
-        setError(null);
+        // Обработчик ошибок карты
+        mapInstance.on('error', (e) => {
+          console.error('❌ Ошибка Mapbox карты:', e);
+          setError('Ошибка загрузки карты Mapbox');
+          setLoading(false);
+        });
+
+        // Сохраняем ссылку на карту
+        map.current = mapInstance;
 
       } catch (err) {
-        console.error('❌ Ошибка создания карты:', err);
+        console.error('❌ Ошибка создания Mapbox карты:', err);
         setError('Не удалось создать карту');
         setLoading(false);
       }
-    }, 100);
+    }, 200); // Увеличил задержку для надежности
 
+    // Cleanup функция
     return () => {
       clearTimeout(timer);
+      // Очищаем маркеры
+      markers.current.forEach(marker => marker.remove());
       markers.current = [];
-      map.current = null;
+      // Удаляем карту
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
     };
-  }, []); // Только при монтировании
+  }, []); // Выполняется только при монтировании
 
   // Функция создания маркера дрона
   const createDroneMarker = (drone: Drone) => {
@@ -103,14 +108,17 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     
     el.innerHTML = `
       <div class="relative group cursor-pointer">
-        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center"
+        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center shadow-lg"
              style="background-color: ${color}20; border-color: ${color};">
           <div class="w-3 h-3 rounded-full animate-pulse" style="background-color: ${color};"></div>
         </div>
-        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-          <div class="font-medium">${drone.name}</div>
-          <div>Статус: ${drone.status || 'unknown'}</div>
-          <div>Батарея: ${drone.battery_level || 0}%</div>
+        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 shadow-xl">
+          <div class="font-bold text-white">${drone.name}</div>
+          <div class="text-gray-300">Статус: ${drone.status || 'unknown'}</div>
+          <div class="text-gray-300">Батарея: ${drone.battery_level || 0}%</div>
+          <div class="text-gray-400 text-xs">
+            ${drone.location_lat?.toFixed(4)}, ${drone.location_lon?.toFixed(4)}
+          </div>
         </div>
       </div>
     `;
@@ -118,14 +126,20 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     return el;
   };
 
-  // Добавление маркеров дронов
+  // Функция добавления маркеров дронов на карту
   const addDroneMarkers = () => {
-    if (!map.current) return;
+    if (!map.current) {
+      console.log('⚠️ Карта не готова для добавления маркеров');
+      return;
+    }
 
-    // Очищаем старые маркеры
+    console.log('📍 Добавляем маркеры дронов...');
+
+    // Очищаем существующие маркеры
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
 
+    // Фильтруем дронов с валидными координатами
     const validDrones = drones.filter(drone => 
       drone.location_lat && 
       drone.location_lon && 
@@ -133,67 +147,72 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
       !isNaN(drone.location_lon)
     );
 
+    console.log(`📊 Найдено ${validDrones.length} дронов с валидными координатами`);
+
     if (validDrones.length === 0) {
-      console.log('Нет дронов с валидными координатами');
+      console.log('⚠️ Нет дронов с валидными координатами для отображения');
       return;
     }
 
-    // Создаем маркеры
+    // Создаем маркеры для каждого дрона
     validDrones.forEach(drone => {
-      const marker = new mapboxgl.Marker({
-        element: createDroneMarker(drone),
-        anchor: 'center'
-      })
-      .setLngLat([drone.location_lon!, drone.location_lat!])
-      .addTo(map.current!);
+      try {
+        const marker = new mapboxgl.Marker({
+          element: createDroneMarker(drone),
+          anchor: 'center'
+        })
+        .setLngLat([drone.location_lon!, drone.location_lat!])
+        .addTo(map.current!);
 
-      markers.current.push(marker);
+        markers.current.push(marker);
+        console.log(`✅ Добавлен маркер для ${drone.name}`);
+      } catch (err) {
+        console.error(`❌ Ошибка создания маркера для ${drone.name}:`, err);
+      }
     });
 
-    // Подгоняем границы карты под все маркеры
-    if (validDrones.length > 1) {
-      const bounds = new mapboxgl.LngLatBounds();
-      validDrones.forEach(drone => {
-        bounds.extend([drone.location_lon!, drone.location_lat!]);
-      });
-      map.current.fitBounds(bounds, { padding: 50 });
-    } else if (validDrones.length === 1) {
-      map.current.flyTo({
-        center: [validDrones[0].location_lon!, validDrones[0].location_lat!],
-        zoom: 10
-      });
+    // Подгоняем вид карты под все маркеры
+    try {
+      if (validDrones.length > 1) {
+        const bounds = new mapboxgl.LngLatBounds();
+        validDrones.forEach(drone => {
+          bounds.extend([drone.location_lon!, drone.location_lat!]);
+        });
+        map.current.fitBounds(bounds, { 
+          padding: 80,
+          maxZoom: 15
+        });
+        console.log('🎯 Карта подогнана под все маркеры');
+      } else if (validDrones.length === 1) {
+        map.current.flyTo({
+          center: [validDrones[0].location_lon!, validDrones[0].location_lat!],
+          zoom: 12,
+          duration: 1000
+        });
+        console.log('🎯 Карта сосредоточена на единственном дроне');
+      }
+    } catch (err) {
+      console.error('❌ Ошибка подгонки границ карты:', err);
     }
   };
 
-  // Обновление при изменении дронов - простое обновление
+  // Функция сброса вида карты
+  const resetMapView = () => {
+    if (!map.current) return;
+    
+    console.log('🔄 Сброс вида карты...');
+    addDroneMarkers();
+  };
+
+  // Обновление маркеров при изменении дронов
   useEffect(() => {
-    // Если используем простую заглушку, обновляем содержимое
-    if (!loading && !error && mapContainer.current && !map.current) {
-      const container = mapContainer.current;
-      if (container.innerHTML.includes('Тактическая карта')) {
-        // Обновляем список дронов в заглушке
-        const dronesListHTML = drones.slice(0, 6).map(drone => `
-          <div class="flex items-center justify-between p-2 bg-surface-3 rounded">
-            <div class="flex items-center gap-2">
-              <div class="w-3 h-3 rounded-full bg-green-500"></div>
-              <span class="text-sm font-medium">${drone.name}</span>
-            </div>
-            <div class="text-xs text-muted-foreground">
-              ${drone.status} • ${drone.battery_level || 0}%
-            </div>
-          </div>
-        `).join('');
-        
-        const extraDrones = drones.length > 6 ? `<div class="text-xs text-muted-foreground">+${drones.length - 6} дронов</div>` : '';
-        
-        container.innerHTML = container.innerHTML.replace(
-          /<div class="space-y-2">[\s\S]*?<\/div>/,
-          `<div class="space-y-2">${dronesListHTML}${extraDrones}</div>`
-        );
-      }
+    if (map.current && !loading && !error) {
+      console.log('🔄 Обновление маркеров дронов...');
+      addDroneMarkers();
     }
   }, [drones, loading, error]);
 
+  // Состояние ошибки
   if (error) {
     return (
       <div className={`flex flex-col items-center justify-center h-full ${className}`}>
@@ -210,6 +229,7 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     );
   }
 
+  // Состояние загрузки
   if (loading) {
     return (
       <div className={`flex flex-col items-center justify-center h-full ${className}`}>
@@ -220,25 +240,34 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     );
   }
 
+  // Основной рендер карты
   return (
     <div className={`relative w-full h-full ${className}`}>
       {/* Контейнер карты */}
       <div ref={mapContainer} className="absolute inset-0 rounded-lg" />
       
-      {/* Статус онлайн/офлайн */}
+      {/* Статус онлайн */}
       <div className="absolute top-4 left-4 z-10">
-        <Badge variant="secondary" className="bg-green-600/90 text-white">
+        <Badge variant="secondary" className="bg-green-600/90 text-white shadow-lg">
           <Wifi className="w-3 h-3 mr-1" />
           Онлайн
+        </Badge>
+      </div>
+
+      {/* Информация о дронах */}
+      <div className="absolute top-4 left-4 mt-10 z-10">
+        <Badge variant="outline" className="bg-surface-1/90 text-foreground shadow-lg">
+          📍 {drones.length} дронов
         </Badge>
       </div>
 
       {/* Кнопка сброса вида */}
       <div className="absolute top-4 right-4 z-10">
         <button
-          onClick={addDroneMarkers}
-          className="px-3 py-2 bg-surface-2/90 hover:bg-surface-3 text-foreground border border-border rounded-md transition-colors text-sm"
+          onClick={resetMapView}
+          className="px-3 py-2 bg-surface-2/90 hover:bg-surface-3 text-foreground border border-border rounded-md transition-colors text-sm shadow-lg flex items-center gap-2"
         >
+          <RotateCcw className="w-4 h-4" />
           Сбросить вид
         </button>
       </div>
@@ -248,6 +277,10 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         __html: `
           .drone-marker {
             cursor: pointer;
+            z-index: 10;
+          }
+          .drone-marker:hover {
+            z-index: 50;
           }
           .mapboxgl-popup-content {
             background: rgb(17, 24, 39);
@@ -257,6 +290,10 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
           }
           .mapboxgl-popup-tip {
             border-top-color: rgb(17, 24, 39);
+          }
+          .mapboxgl-ctrl-group {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
           }
         `
       }} />
