@@ -39,9 +39,9 @@ export function AppSidebar() {
   ];
 
   const productionItems: Item[] = [
-    { title: 'Производство', url: '/production', icon: Factory },
+    { title: t.production || 'Производство', url: '/production', icon: Factory },
     { title: t.projects || 'Проекты', url: '/projects', icon: Target },
-    { title: 'Техобслуживание', url: '/maintenance', icon: Wrench, badge: '3', variant: 'warning' }
+    { title: t.maintenance || 'Техобслуживание', url: '/maintenance', icon: Wrench, badge: '3', variant: 'warning' }
   ];
 
   const systemItems: Item[] = [
@@ -52,8 +52,8 @@ export function AppSidebar() {
   ];
 
   const adminItems: Item[] = [
-    { title: 'Документооборот', url: '/documents', icon: FileText },
-    { title: language === 'en' ? 'Integrations' : 'Интеграции', url: '/integrations', icon: ExternalLink },
+    { title: t.documents || 'Документооборот', url: '/documents', icon: FileText },
+    { title: t.integrations || 'Интеграции', url: '/integrations', icon: ExternalLink },
     ...(isAdmin ? [{ title: t.admin || 'Админ', url: '/admin', icon: Settings, badge: 'SYS' } as Item] : [])
   ];
 
