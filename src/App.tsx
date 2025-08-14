@@ -126,15 +126,15 @@ const App = () => (
     <AuthProvider>
       <LanguageProvider>
         <OfflineProvider>
-          <VoiceAssistantProvider>
-            <SafeAreaContainer>
-              <TooltipProvider>
-                <BrowserRouter>
+          <SafeAreaContainer>
+            <TooltipProvider>
+              <BrowserRouter>
+                <VoiceAssistantProvider>
                   <AppShell />
-                </BrowserRouter>
-              </TooltipProvider>
-            </SafeAreaContainer>
-          </VoiceAssistantProvider>
+                </VoiceAssistantProvider>
+              </BrowserRouter>
+            </TooltipProvider>
+          </SafeAreaContainer>
         </OfflineProvider>
       </LanguageProvider>
     </AuthProvider>
