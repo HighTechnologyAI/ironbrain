@@ -170,7 +170,10 @@ export const SimpleVoiceButton: React.FC = () => {
   };
 
   const startListening = () => {
+    console.log('🎯 Начинаю процесс прослушивания...');
+    
     if (!isSupported) {
+      console.log('❌ Speech recognition не поддерживается');
       toast({
         title: "Не поддерживается",
         description: "Голосовое управление не поддерживается в этом браузере",
@@ -180,6 +183,7 @@ export const SimpleVoiceButton: React.FC = () => {
     }
 
     try {
+      console.log('🔧 Создаю SpeechRecognition...');
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
       
@@ -189,40 +193,48 @@ export const SimpleVoiceButton: React.FC = () => {
       recognition.continuous = false;
 
       recognition.onstart = () => {
+        console.log('✅ Speech recognition запущен, слушаю...');
         setIsListening(true);
-        console.log('Слушаю...');
       };
 
       recognition.onresult = (event: any) => {
+        console.log('📝 Получен результат распознавания:', event);
         const transcript = event.results[0][0].transcript.trim();
+        console.log('🎙️ Финальный transcript:', transcript);
         if (transcript) {
           handleTranscript(transcript);
+        } else {
+          console.log('⚠️ Пустой transcript');
         }
       };
 
       recognition.onerror = (event: any) => {
-        console.error('Recognition error:', event.error);
+        console.error('❌ Recognition error:', event.error, event);
         setIsListening(false);
         
         if (event.error === 'not-allowed') {
+          console.log('🚫 Доступ к микрофону запрещен');
           toast({
             title: "Доступ запрещен",
             description: "Разрешите доступ к микрофону для голосового управления",
             variant: "destructive"
           });
+        } else {
+          console.log('⚠️ Другая ошибка распознавания:', event.error);
         }
       };
 
       recognition.onend = () => {
+        console.log('🏁 Speech recognition завершен');
         setIsListening(false);
-        console.log('Закончил слушать');
       };
 
       recognitionRef.current = recognition;
+      console.log('🚀 Запускаю recognition.start()');
       recognition.start();
 
     } catch (error) {
-      console.error('Failed to start recognition:', error);
+      console.error('💥 Не удалось запустить распознавание:', error);
       setIsListening(false);
     }
   };
@@ -235,9 +247,12 @@ export const SimpleVoiceButton: React.FC = () => {
   };
 
   const toggleListening = () => {
+    console.log('🎛️ Переключение прослушивания, текущее состояние:', isListening);
     if (isListening) {
+      console.log('⏹️ Останавливаю прослушивание');
       stopListening();
     } else {
+      console.log('▶️ Начинаю прослушивание');
       startListening();
     }
   };
