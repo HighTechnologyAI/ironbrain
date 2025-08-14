@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/hooks/use-language';
 import { useMissions } from '@/hooks/use-missions';
 import { useDrones } from '@/hooks/use-drones';
+import { useWeather } from '@/hooks/use-weather';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusChip } from '@/components/neon/StatusChip';
@@ -31,8 +32,9 @@ const MissionControl = () => {
   
   const { missions, loading: missionsLoading, error: missionsError } = useMissions();
   const { drones, loading: dronesLoading, error: dronesError } = useDrones();
+  const { weather, loading: weatherLoading, getWindDirection } = useWeather();
 
-  if (missionsLoading || dronesLoading) {
+  if (missionsLoading || dronesLoading || weatherLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex items-center gap-3 text-muted-foreground">
@@ -139,36 +141,63 @@ const MissionControl = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-ui">
               <Wind className="h-5 w-5 text-primary" />
-              Погодные условия
+              Погодные условия - {weather?.location || 'Timarevo Airfield'}
             </CardTitle>
+            <CardDescription className="text-xs text-muted-foreground">
+              Координаты: 43°23'20.2"N 26°53'07.6"E | Обновлено: {new Date().toLocaleTimeString('ru-RU')}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <Wind className="h-4 w-4 text-primary" />
                 <span className="text-muted-foreground">Ветер:</span>
-                <span className="font-mono font-semibold">7 м/с СВ</span>
-                <StatusChip status="ready" size="sm">ОК</StatusChip>
+                <span className="font-mono font-semibold">
+                  {weather?.wind_speed || 0} м/с {getWindDirection(weather?.wind_direction || 0)}
+                </span>
+                <StatusChip status={
+                  !weather?.wind_speed ? 'offline' :
+                  weather.wind_speed <= 10 ? 'ready' : 
+                  weather.wind_speed <= 15 ? 'warning' : 'critical'
+                } size="sm">
+                  {!weather?.wind_speed ? 'N/A' :
+                   weather.wind_speed <= 10 ? 'ОК' : 
+                   weather.wind_speed <= 15 ? 'УМЕР' : 'ОПАСНО'}
+                </StatusChip>
               </div>
               <div className="flex items-center gap-2">
                 <Thermometer className="h-4 w-4 text-primary" />
                 <span className="text-muted-foreground">Температура:</span>
-                <span className="font-mono font-semibold">+12°C</span>
+                <span className="font-mono font-semibold">{weather?.temperature || 0}°C</span>
                 <StatusChip status="ready" size="sm">ОК</StatusChip>
               </div>
               <div className="flex items-center gap-2">
                 <Activity className="h-4 w-4 text-primary" />
                 <span className="text-muted-foreground">Видимость:</span>
-                <span className="font-mono font-semibold">8.5 км</span>
-                <StatusChip status="ready" size="sm">ОК</StatusChip>
+                <span className="font-mono font-semibold">{weather?.visibility || 0} км</span>
+                <StatusChip status={
+                  !weather?.visibility ? 'offline' :
+                  weather.visibility >= 5 ? 'ready' : 
+                  weather.visibility >= 3 ? 'warning' : 'critical'
+                } size="sm">
+                  {!weather?.visibility ? 'N/A' :
+                   weather.visibility >= 5 ? 'ОК' : 
+                   weather.visibility >= 3 ? 'СНИЖ' : 'ПЛОХО'}
+                </StatusChip>
               </div>
               <div className="flex items-center gap-2">
                 <Satellite className="h-4 w-4 text-primary" />
-                <span className="text-muted-foreground">GPS сигнал:</span>
-                <span className="font-mono font-semibold">Отличный</span>
+                <span className="text-muted-foreground">Давление:</span>
+                <span className="font-mono font-semibold">{weather?.pressure || 1013} гПа</span>
                 <StatusChip status="ready" size="sm">ОК</StatusChip>
               </div>
             </div>
+            {weather?.weather_condition && (
+              <div className="mt-3 pt-3 border-t border-border">
+                <span className="text-sm text-muted-foreground">Условия: </span>
+                <span className="text-sm font-medium capitalize">{weather.weather_condition}</span>
+              </div>
+            )}
           </CardContent>
         </Card>
 
