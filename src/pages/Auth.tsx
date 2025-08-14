@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Zap, Shield, Lock, Mail, User, Eye, EyeOff, Building, Briefcase, Phone, MessageCircle } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
+import AnimatedStarfield from "@/components/AnimatedStarfield";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -154,8 +155,9 @@ const Auth = () => {
 
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-6">
+      <AnimatedStarfield />
+      <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -163,28 +165,38 @@ const Auth = () => {
               <Zap className="text-primary h-12 w-12 cyber-glow animate-pulse" />
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-full blur-xl"></div>
             </div>
-            <h1 className="text-4xl font-bold cyber-text">TIGER CRM</h1>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-yellow-400 bg-clip-text text-transparent">TIGER CRM</h1>
           </div>
-          <p className="text-muted-foreground font-mono text-sm tracking-wider">
+          <p className="text-foreground/80 font-mono text-sm tracking-wider">
             Система достижения результатов компании
           </p>
         </div>
 
-        <Card className="border-border cyber-glow hover:border-primary/50 transition-all duration-500">
+        <Card className="bg-black/80 backdrop-blur-md border-primary/30 cyber-glow hover:border-primary/50 transition-all duration-500 shadow-2xl">
           <CardHeader>
-            <CardTitle className="text-center flex items-center justify-center gap-2">
+            <CardTitle className="text-center flex items-center justify-center gap-2 text-foreground">
               <Shield className="h-5 w-5 text-primary" />
               Авторизация
             </CardTitle>
-            <CardDescription className="text-center">
+            <CardDescription className="text-center text-foreground/70">
               Войдите в систему или создайте новый аккаунт
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Вход</TabsTrigger>
-                <TabsTrigger value="signup">Регистрация</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 bg-black/60 border border-primary/20">
+                <TabsTrigger 
+                  value="signin"
+                  className="text-foreground/70 data-[state=active]:bg-primary data-[state=active]:text-black data-[state=active]:font-semibold transition-all"
+                >
+                  Вход
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="signup"
+                  className="text-foreground/70 data-[state=active]:bg-primary data-[state=active]:text-black data-[state=active]:font-semibold transition-all"
+                >
+                  Регистрация
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="signin" className="space-y-4 mt-4">
@@ -234,7 +246,7 @@ const Auth = () => {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full"
+                    className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold transition-all duration-200"
                     disabled={isLoading}
                   >
                     {isLoading ? "Вход..." : "Войти"}
@@ -374,7 +386,7 @@ const Auth = () => {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full"
+                    className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold transition-all duration-200"
                     disabled={isLoading}
                   >
                     {isLoading ? "Регистрация..." : "Зарегистрироваться"}
