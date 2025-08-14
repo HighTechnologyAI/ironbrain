@@ -17,7 +17,7 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
   const [error, setError] = useState<string | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
 
-  // Инициализация карты
+  // Инициализация карты с надежной проверкой готовности DOM
   useEffect(() => {
     // Если карта уже создана, не создаваем заново
     if (map.current) return;
@@ -25,12 +25,36 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     // Устанавливаем валидный токен Mapbox
     mapboxgl.accessToken = 'pk.eyJ1IjoiaGlnaHRlY2hhaSIsImEiOiJjbWViZTBoaW0wbzVwMmpxdmFpeTVnbWdsIn0.8-x4oZ4TfetTTa5BEAXDYg';
 
-    // Небольшая задержка для готовности DOM
-    const timer = setTimeout(() => {
-      if (!mapContainer.current) {
-        setError('Контейнер карты недоступен');
-        setLoading(false);
-        return;
+    // Функция проверки готовности контейнера
+    const checkContainerReady = () => {
+      const container = mapContainer.current;
+      if (!container) {
+        console.log('❌ mapContainer.current отсутствует');
+        return false;
+      }
+      
+      // Проверяем что элемент действительно в DOM
+      const isInDOM = document.contains(container);
+      if (!isInDOM) {
+        console.log('❌ Контейнер не в DOM');
+        return false;
+      }
+      
+      // Проверяем что элемент имеет размеры
+      const rect = container.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) {
+        console.log('❌ Контейнер имеет нулевые размеры:', rect);
+        return false;
+      }
+      
+      console.log('✅ Контейнер готов:', rect);
+      return true;
+    };
+
+    // Функция инициализации карты
+    const initializeMap = () => {
+      if (!checkContainerReady()) {
+        return false;
       }
 
       try {
@@ -38,7 +62,7 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         
         // Создаем карту Mapbox
         const mapInstance = new mapboxgl.Map({
-          container: mapContainer.current,
+          container: mapContainer.current!,
           style: 'mapbox://styles/mapbox/dark-v11',
           center: [26.8916, 43.3968], // Центр Болгарии
           zoom: 8,
@@ -67,17 +91,51 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
 
         // Сохраняем ссылку на карту
         map.current = mapInstance;
+        return true;
 
       } catch (err) {
         console.error('❌ Ошибка создания Mapbox карты:', err);
         setError('Не удалось создать карту');
         setLoading(false);
+        return false;
       }
-    }, 200); // Увеличил задержку для надежности
+    };
+
+    // Попытки инициализации с возрастающими интервалами
+    let attempts = 0;
+    const maxAttempts = 20;
+    const intervals = [100, 200, 300, 500, 1000]; // Возрастающие задержки
+
+    const tryInitialize = () => {
+      attempts++;
+      console.log(`🔄 Попытка инициализации ${attempts}/${maxAttempts}`);
+      
+      if (initializeMap()) {
+        console.log('✅ Карта успешно инициализирована');
+        return;
+      }
+      
+      if (attempts >= maxAttempts) {
+        console.error('❌ Превышено максимальное количество попыток');
+        setError('Контейнер карты недоступен');
+        setLoading(false);
+        return;
+      }
+      
+      // Вычисляем задержку для следующей попытки
+      const delayIndex = Math.min(attempts - 1, intervals.length - 1);
+      const delay = intervals[delayIndex];
+      
+      console.log(`⏳ Следующая попытка через ${delay}ms`);
+      setTimeout(tryInitialize, delay);
+    };
+
+    // Начинаем попытки инициализации
+    const initialTimer = setTimeout(tryInitialize, 200);
 
     // Cleanup функция
     return () => {
-      clearTimeout(timer);
+      clearTimeout(initialTimer);
       // Очищаем маркеры
       markers.current.forEach(marker => marker.remove());
       markers.current = [];
