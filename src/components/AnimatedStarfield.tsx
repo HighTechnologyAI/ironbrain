@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 
 interface Node {
@@ -8,10 +9,11 @@ interface Node {
 }
 
 interface Tentacle {
-  baseAngle: number;
+  angle0: number;
   len: number;
   phase: number;
-  width: number;
+  r: number;
+  side: 'back' | 'front';
 }
 
 interface Drop {
@@ -30,19 +32,51 @@ const CyberBackground = () => {
   const nodesRef = useRef<Node[]>([]);
   const tentaclesRef = useRef<Tentacle[]>([]);
   const dropsRef = useRef<Drop[]>([]);
-  const krakenRef = useRef({ x: -400, y: 0, speed: 0.18 });
+  const krakenRef = useRef({ x: -400, y: 0, speed: 0.09, roll: 0, blinkTimer: 0 });
   const matrixRef = useRef({ fontSize: 16, cols: 0 });
 
   const COLORS = {
     RICH_BLACK: '#0D0D0D',
     VIVAD_YELLOW: '#FFD300',
-    Y_GHOST_08: 'rgba(255,211,0,0.08)',
-    Y_GHOST_12: 'rgba(255,211,0,0.12)',
-    Y_GHOST_20: 'rgba(255,211,0,0.20)',
-    Y_GHOST_30: 'rgba(255,211,0,0.30)',
-    BLACK_85: 'rgba(13,13,13,0.85)',
-    WHITE_05: 'rgba(255,255,255,0.05)'
+    Y06: 'rgba(255,211,0,0.06)',
+    Y08: 'rgba(255,211,0,0.08)',
+    Y12: 'rgba(255,211,0,0.12)',
+    Y18: 'rgba(255,211,0,0.18)',
+    Y25: 'rgba(255,211,0,0.25)',
+    Y35: 'rgba(255,211,0,0.35)',
+    W07: 'rgba(255,255,255,0.07)',
+    W12: 'rgba(255,255,255,0.12)',
+    B12: 'rgba(13,13,13,0.12)',
+    B18: 'rgba(13,13,13,0.18)'
   };
+
+  // Ultra-realistic kraken configuration
+  const KR_CFG = {
+    TENTACLES: 8,
+    SEGMENTS: 26,
+    R_BASE: 28,
+    LEN_BASE: 440,
+    SPEED: 0.09,
+    BODY_ALPHA: 0.42,
+    FOG_NEAR: 0.2,
+    FOG_FAR: 0.85,
+    LIGHT_DIR: { x: -0.6, y: -0.8 },
+    GLOW: true
+  };
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // RNG for stable appearance
+  const rng = (seed: number) => {
+    return function() {
+      seed |= 0;
+      seed = seed + 0x6D2B79F5 | 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t ^= t + Math.imul(t ^ t >>> 7, 61 | t);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  };
+  const RAND = rng(0xC0DEC0DE);
 
   const createCtx = (canvas: HTMLCanvasElement) => {
     const ctx = canvas.getContext('2d');
@@ -62,11 +96,14 @@ const CyberBackground = () => {
   };
 
   const getGlyph = () => {
-    const r = Math.random();
-    if (r < 0.7) return Math.random() > 0.5 ? '0' : '1';
-    if (r < 0.95) return '0123456789ABCDEF'[Math.floor(Math.random() * 16)];
+    const brands = ["PRO MEGA SPOT LLC", "HIGH TECHNOLOGY AI"];
     const tokens = ['UAV', 'IMU', 'RTK', 'AI', 'VIO', 'LIDAR', 'EMS', 'FIRE', 'POL', 'RESC', 'AGRO', 'STAR'];
-    return tokens[Math.floor(Math.random() * tokens.length)];
+    
+    const r = Math.random();
+    if (r < 0.62) return Math.random() > 0.5 ? '0' : '1';
+    if (r < 0.90) return '0123456789ABCDEF'[Math.floor(Math.random() * 16)];
+    if (r < 0.965) return tokens[Math.floor(Math.random() * tokens.length)];
+    return brands[Math.floor(Math.random() * brands.length)];
   };
 
   const setupMatrix = (w: number) => {
@@ -74,12 +111,12 @@ const CyberBackground = () => {
     matrix.cols = Math.max(1, Math.floor(w / matrix.fontSize));
     dropsRef.current = Array(matrix.cols).fill(0).map(() => ({
       y: Math.random() * 50,
-      speed: 1 + Math.random() * 2.2
+      speed: 0.4 + Math.random() * 0.85
     }));
   };
 
   const setupNodes = (w: number, h: number) => {
-    const count = 36;
+    const count = 44;
     nodesRef.current = Array.from({ length: count }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
@@ -90,15 +127,17 @@ const CyberBackground = () => {
 
   const setupKraken = (w: number, h: number) => {
     const kraken = krakenRef.current;
-    kraken.y = h * 0.55;
-    kraken.x = -w * 0.35;
+    kraken.y = h * 0.60;
+    kraken.x = -w * 0.38;
+    kraken.roll = 0;
     
-    const count = 8;
+    const count = KR_CFG.TENTACLES;
     tentaclesRef.current = Array.from({ length: count }, (_, i) => ({
-      baseAngle: (-Math.PI / 6) + (i / (count - 1)) * (Math.PI / 3),
-      len: 340 + Math.random() * 120,
-      phase: Math.random() * Math.PI * 2,
-      width: 3 - (i / count) * 1.5
+      angle0: (-Math.PI / 5) + (i / (count - 1)) * (Math.PI / 2.4),
+      len: KR_CFG.LEN_BASE + RAND() * 160,
+      phase: RAND() * Math.PI * 2,
+      r: KR_CFG.R_BASE * (0.9 + RAND() * 0.2),
+      side: i < count / 2 ? 'back' : 'front'
     }));
   };
 
@@ -107,33 +146,24 @@ const CyberBackground = () => {
     ctx.fillStyle = COLORS.RICH_BLACK;
     ctx.fillRect(0, 0, w, h);
 
-    // Noise effect
-    ctx.globalAlpha = 0.05;
-    for (let i = 0; i < 120; i++) {
-      ctx.fillStyle = COLORS.WHITE_05;
-      const x = (i * 73 + (t * 0.05) % w) % w;
-      const y = (i * 131 + (t * 0.08) % h) % h;
-      ctx.fillRect(x, y, 1, 1);
+    // Enhanced noise effect
+    if (!prefersReduced) {
+      ctx.globalAlpha = 0.05;
+      for (let i = 0; i < 140; i++) {
+        ctx.fillStyle = COLORS.W07;
+        const x = (i * 67 + (t * 0.05) % w) % w;
+        const y = (i * 149 + (t * 0.07) % h) % h;
+        ctx.fillRect(x, y, 1, 1);
+      }
+      ctx.globalAlpha = 1;
     }
-    ctx.globalAlpha = 1;
 
-    // Pulsing glows
-    const pulse = 0.5 + 0.5 * Math.sin(t * 0.0011);
-    const r1 = 220 + 60 * pulse;
-    const r2 = 140 + 40 * (1 - pulse);
-    
-    drawRadialGlow(ctx, w * 0.18, h * 0.22, r1, COLORS.Y_GHOST_12);
-    drawRadialGlow(ctx, w * 0.82, h * 0.72, r2, COLORS.Y_GHOST_08);
-  };
-
-  const drawRadialGlow = (ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, color: string) => {
-    const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    gradient.addColorStop(0, color);
-    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    // Vignette effect
+    const gradient = ctx.createRadialGradient(w * 0.5, h * 0.5, 0, w * 0.5, h * 0.5, Math.hypot(w, h) * 0.6);
+    gradient.addColorStop(0, 'rgba(0,0,0,0)');
+    gradient.addColorStop(1, 'rgba(0,0,0,0.45)');
     ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(0, 0, w, h);
   };
 
   const drawMatrix = (ctx: CanvasRenderingContext2D, w: number, h: number, t: number) => {
@@ -145,11 +175,11 @@ const CyberBackground = () => {
       drops = dropsRef.current;
     }
 
-    ctx.fillStyle = 'rgba(13,13,13,0.15)';
+    ctx.fillStyle = COLORS.B18;
     ctx.fillRect(0, 0, w, h);
 
     ctx.fillStyle = COLORS.VIVAD_YELLOW;
-    ctx.font = `${matrix.fontSize}px ui-monospace, monospace`;
+    ctx.font = `${matrix.fontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
 
     const mouse = mouseRef.current;
     const parX = mouse.nx * 4;
@@ -179,10 +209,10 @@ const CyberBackground = () => {
     
     ctx.clearRect(0, 0, w, h);
     
-    // Grid
-    ctx.strokeStyle = COLORS.Y_GHOST_20;
+    // Enhanced grid
+    ctx.strokeStyle = COLORS.Y18;
     ctx.lineWidth = 1;
-    const step = 80;
+    const step = 90;
     const off = (t * 0.01) % step;
     ctx.beginPath();
     for (let x = -step + off; x < w; x += step) {
@@ -198,26 +228,17 @@ const CyberBackground = () => {
     // Central circles
     const cx = w * 0.5 + mouse.nx * 8;
     const cy = h * 0.5 + mouse.ny * 6;
-    ctx.strokeStyle = COLORS.Y_GHOST_30;
+    ctx.strokeStyle = COLORS.Y25;
     for (let r = 120; r <= 360; r += 60) {
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.stroke();
     }
 
-    // Rotating sector
-    const ang = (t * 0.001) % (Math.PI * 2);
-    ctx.beginPath();
-    ctx.arc(cx, cy, 220, ang, ang + Math.PI / 12);
-    ctx.lineTo(cx, cy);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(255,211,0,0.08)';
-    ctx.fill();
-
     // Nodes and connections
     ctx.lineWidth = 0.8;
-    ctx.strokeStyle = COLORS.Y_GHOST_20;
-    ctx.fillStyle = COLORS.Y_GHOST_30;
+    ctx.strokeStyle = COLORS.Y18;
+    ctx.fillStyle = COLORS.Y25;
 
     // Connect nearby nodes
     for (let i = 0; i < nodes.length; i++) {
@@ -238,15 +259,22 @@ const CyberBackground = () => {
     }
     ctx.globalAlpha = 1;
 
-    // Draw nodes
+    // Draw nodes with pulsing
     for (const n of nodes) {
       const pulse = 0.5 + 0.5 * Math.sin(t * 0.003 + n.phase);
-      const rr = n.r + pulse * 1.5;
+      const rr = n.r + pulse * 1.2;
       ctx.beginPath();
       ctx.arc(n.x, n.y, rr, 0, Math.PI * 2);
       ctx.fill();
     }
   };
+
+  const normalize = (x: number, y: number) => {
+    const mag = Math.hypot(x, y) || 1;
+    return { x: x / mag, y: y / mag };
+  };
+
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
   const drawKraken = (ctx: CanvasRenderingContext2D, w: number, h: number, t: number) => {
     const kraken = krakenRef.current;
@@ -260,103 +288,118 @@ const CyberBackground = () => {
     
     ctx.clearRect(0, 0, w, h);
 
-    const targetBiasX = mouse.nx * 25;
-    const targetBiasY = mouse.ny * 15;
-    kraken.x += kraken.speed;
-    const driftY = Math.sin(t * 0.0006) * 0.3;
-    kraken.y += driftY + (targetBiasY - 0.02 * kraken.y) * 0.0001;
+    // Enhanced movement
+    kraken.x += KR_CFG.SPEED;
+    if (kraken.x > w + 520) kraken.x = -520;
+    
+    const cx = kraken.x + 280 + mouse.nx * 14 * 0.2;
+    const cy = kraken.y - 14 + Math.sin(t * 0.0005) * 2 + mouse.ny * 10 * 0.1;
+    kraken.roll = 0.04 * Math.sin(t * 0.0006);
 
-    if (kraken.x > w + 420) kraken.x = -420;
+    // Separate back and front tentacles for depth
+    const backTentacles = tentacles.filter(s => s.side === 'back');
+    const frontTentacles = tentacles.filter(s => s.side !== 'back');
 
-    const cx = kraken.x + 220 + targetBiasX * 0.2;
-    const cy = kraken.y - 40;
+    // Draw back tentacles (darker, in fog)
+    for (const tentacle of backTentacles) {
+      drawTentacle(ctx, cx, cy, tentacle, t, true);
+    }
 
-    // Body core
+    // Draw body
+    drawBody(ctx, cx, cy, t, kraken.roll);
+
+    // Draw front tentacles
+    for (const tentacle of frontTentacles) {
+      drawTentacle(ctx, cx, cy, tentacle, t, false);
+    }
+  };
+
+  const drawBody = (ctx: CanvasRenderingContext2D, cx: number, cy: number, t: number, roll: number) => {
     ctx.save();
     ctx.translate(cx, cy);
-    ctx.strokeStyle = COLORS.Y_GHOST_12;
+    ctx.rotate(roll);
+    ctx.globalAlpha = KR_CFG.BODY_ALPHA;
+
+    const W = 260, H = 98, R = 36;
+    
+    // Internal fill with gradient
+    const grad = ctx.createLinearGradient(0, -H/2, 0, H/2);
+    grad.addColorStop(0, COLORS.Y12);
+    grad.addColorStop(0.55, COLORS.Y35);
+    grad.addColorStop(1, COLORS.Y12);
+    
+    drawRoundedCapsule(ctx, -W/2, -H/2, W, H, R);
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Outer edge
+    ctx.strokeStyle = COLORS.Y25;
     ctx.lineWidth = 2;
-
-    // Central capsule
-    drawRoundedCapsule(ctx, -90, -28, 180, 56, 26);
+    drawRoundedCapsule(ctx, -W/2, -H/2, W, H, R);
     ctx.stroke();
 
-    // Body panels
+    // Tentacle sockets
+    ctx.strokeStyle = COLORS.Y18;
+    ctx.lineWidth = 1.2;
+    for (let i = 0; i < 4; i++) {
+      const gx = -W * 0.30 + i * (W * 0.2);
+      ctx.beginPath();
+      ctx.ellipse(gx, H * 0.20, 16, 8, 0, 0, Math.PI);
+      ctx.stroke();
+    }
+
+    // Armor plates
     ctx.beginPath();
-    ctx.moveTo(-70, -10); ctx.lineTo(-15, -22); ctx.lineTo(15, -22); ctx.lineTo(70, -10);
-    ctx.moveTo(-70, 10); ctx.lineTo(-15, 22); ctx.lineTo(15, 22); ctx.lineTo(70, 10);
+    ctx.moveTo(-W * 0.44, -H * 0.18);
+    ctx.lineTo(-W * 0.14, -H * 0.32);
+    ctx.lineTo(W * 0.14, -H * 0.32);
+    ctx.lineTo(W * 0.44, -H * 0.18);
+    ctx.moveTo(-W * 0.44, H * 0.18);
+    ctx.lineTo(-W * 0.14, H * 0.32);
+    ctx.lineTo(W * 0.14, H * 0.32);
+    ctx.lineTo(W * 0.44, H * 0.18);
     ctx.stroke();
 
-    // Eyes with glow
-    drawGlowDot(ctx, -26, -6, 4);
-    drawGlowDot(ctx, 26, -6, 4);
-
-    // Vents
+    // Ventilation slits
     ctx.beginPath();
-    for (let i = -40; i <= 40; i += 16) {
-      ctx.moveTo(i, -18); ctx.lineTo(i + 6, -12);
-      ctx.moveTo(i, 18); ctx.lineTo(i + 6, 12);
+    for (let i = -88; i <= 88; i += 18) {
+      ctx.moveTo(i, -H * 0.30);
+      ctx.lineTo(i + 8, -H * 0.20);
+      ctx.moveTo(i, H * 0.30);
+      ctx.lineTo(i + 8, H * 0.20);
     }
     ctx.stroke();
+
+    // Sensors with blinking
+    const blink = (Math.sin(t * 0.004) + 1) / 2 > 0.92 ? 1.6 : 1;
+    drawGlowDot(ctx, -42, -10, 7 * blink);
+    drawGlowDot(ctx, 42, -10, 7 * blink);
+
+    // Scanning sector
+    const ang = (t * 0.0012) % (Math.PI * 2);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, W * 0.52, ang, ang + Math.PI / 9);
+    ctx.closePath();
+    ctx.fillStyle = COLORS.Y06;
+    ctx.fill();
+
     ctx.restore();
-
-    // Tentacles
-    ctx.strokeStyle = COLORS.Y_GHOST_12;
-    for (let i = 0; i < tentacles.length; i++) {
-      const tnt = tentacles[i];
-      const baseAng = tnt.baseAngle + 0.15 * Math.sin(t * 0.001 + tnt.phase);
-      const len = tnt.len * (0.96 + 0.04 * Math.sin(t * 0.0013 + tnt.phase));
-      const baseX = cx + Math.cos(baseAng) * 40;
-      const baseY = cy + Math.sin(baseAng) * 40;
-
-      const segs = 4;
-      let px = baseX, py = baseY;
-      ctx.lineWidth = tnt.width;
-      ctx.beginPath();
-      ctx.moveTo(px, py);
-      
-      for (let s = 1; s <= segs; s++) {
-        const u = s / segs;
-        const ang = baseAng + 0.8 * u * Math.sin(t * 0.0012 + tnt.phase + u * 2);
-        const rad = len * u;
-        const tx = cx + Math.cos(ang) * (60 + rad);
-        const ty = cy + Math.sin(ang) * (60 + rad);
-        const mx = (px + tx) / 2 + 12 * Math.sin(t * 0.002 + i + s);
-        const my = (py + ty) / 2 + 12 * Math.cos(t * 0.0022 + i - s);
-        ctx.quadraticCurveTo(mx, my, tx, ty);
-        px = tx; py = ty;
-      }
-      ctx.stroke();
-
-      // Tech segments
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = COLORS.Y_GHOST_20;
-      ctx.beginPath();
-      for (let k = 0; k <= 5; k++) {
-        const u = k / 5;
-        const ang = baseAng + 0.8 * u;
-        const rad = len * u;
-        const tx = cx + Math.cos(ang) * (60 + rad);
-        const ty = cy + Math.sin(ang) * (60 + rad);
-        ctx.moveTo(tx - 6, ty - 4);
-        ctx.lineTo(tx + 6, ty + 4);
-      }
-      ctx.stroke();
-      ctx.strokeStyle = COLORS.Y_GHOST_12;
-    }
   };
 
   const drawGlowDot = (ctx: CanvasRenderingContext2D, x: number, y: number, r: number) => {
     ctx.save();
     ctx.fillStyle = COLORS.VIVAD_YELLOW;
-    ctx.shadowBlur = 14;
-    ctx.shadowColor = COLORS.VIVAD_YELLOW;
+    if (KR_CFG.GLOW) {
+      ctx.shadowBlur = 24;
+      ctx.shadowColor = COLORS.VIVAD_YELLOW;
+    }
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
     
-    ctx.strokeStyle = COLORS.Y_GHOST_30;
+    ctx.strokeStyle = COLORS.Y25;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(x, y, r + 3, 0, Math.PI * 2);
@@ -375,6 +418,117 @@ const CyberBackground = () => {
     ctx.quadraticCurveTo(x, y2, x, y2 - r);
     ctx.lineTo(x, y + r);
     ctx.quadraticCurveTo(x, y, x + r, y);
+  };
+
+  const drawTentacle = (ctx: CanvasRenderingContext2D, cx: number, cy: number, tnt: Tentacle, t: number, isBack: boolean) => {
+    const N = KR_CFG.SEGMENTS;
+    const baseAng = tnt.angle0 + 0.14 * Math.sin(t * 0.001 + tnt.phase);
+    const len = tnt.len * (0.96 + 0.04 * Math.sin(t * 0.0011 + tnt.phase));
+    const light = normalize(KR_CFG.LIGHT_DIR.x, KR_CFG.LIGHT_DIR.y);
+
+    // Build spine
+    const spine = [];
+    for (let i = 0; i <= N; i++) {
+      const u = i / N;
+      const ang = baseAng + 0.7 * u * Math.sin(t * 0.0012 + tnt.phase + u * 2);
+      const rad = 80 + len * u;
+      const x = cx + Math.cos(ang) * rad;
+      const y = cy + Math.sin(ang) * rad;
+      
+      // Tangent and normal
+      const du = 1 / (N * 3);
+      const ang2 = baseAng + 0.7 * (u + du) * Math.sin(t * 0.0012 + tnt.phase + (u + du) * 2);
+      const rad2 = 80 + len * (u + du);
+      const x2 = cx + Math.cos(ang2) * rad2;
+      const y2 = cy + Math.sin(ang2) * rad2;
+      const tx = x2 - x, ty = y2 - y;
+      const mag = Math.hypot(tx, ty) || 1;
+      const nx = -ty / mag, ny = tx / mag;
+
+      const taper = (1 - u);
+      const R = (tnt.r * (0.9 + 0.1 * Math.sin(t * 0.002 + u * 6))) * Math.pow(taper, 0.5) + 3;
+
+      spine.push({ x, y, nx, ny, R, u });
+    }
+
+    // Draw segments with shading and fog
+    for (let i = 0; i < N; i++) {
+      const a = spine[i], b = spine[i + 1];
+      const aL = { x: a.x + a.nx * a.R, y: a.y + a.ny * a.R };
+      const aR = { x: a.x - a.nx * a.R, y: a.y - a.ny * a.R };
+      const bL = { x: b.x + b.nx * b.R, y: b.y + b.ny * b.R };
+      const bR = { x: b.x - b.nx * b.R, y: b.y - b.ny * b.R };
+
+      // Lighting
+      const segNx = (a.nx + b.nx) * 0.5, segNy = (a.ny + b.ny) * 0.5;
+      const ndotl = Math.max(0, segNx * light.x + segNy * light.y);
+      const shadeFront = 0.12 + 0.38 * ndotl;
+      const fog = lerp(KR_CFG.FOG_NEAR, KR_CFG.FOG_FAR, a.u);
+
+      // Segment body
+      ctx.beginPath();
+      ctx.moveTo(aL.x, aL.y);
+      ctx.lineTo(bL.x, bL.y);
+      ctx.lineTo(bR.x, bR.y);
+      ctx.lineTo(aR.x, aR.y);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(255,211,0,${(shadeFront * fog).toFixed(3)})`;
+      ctx.fill();
+
+      // Specular highlight
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.strokeStyle = `rgba(255,255,255,${(0.08 * fog).toFixed(3)})`;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // Ring plates
+      if (i % 4 === 0) {
+        ctx.beginPath();
+        ctx.moveTo(aL.x, aL.y);
+        ctx.lineTo(aR.x, aR.y);
+        ctx.strokeStyle = `rgba(255,211,0,${(0.18 * fog).toFixed(3)})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+
+    // Glowing veins
+    if (KR_CFG.GLOW) {
+      ctx.globalCompositeOperation = 'lighter';
+      for (const offs of [-0.45, 0.45]) {
+        ctx.beginPath();
+        for (let i = 0; i <= N; i++) {
+          const p = spine[i];
+          const vx = p.x + p.nx * (p.R * offs);
+          const vy = p.y + p.ny * (p.R * offs);
+          if (i === 0) ctx.moveTo(vx, vy);
+          else ctx.lineTo(vx, vy);
+        }
+        ctx.strokeStyle = COLORS.VIVAD_YELLOW;
+        ctx.lineWidth = 0.9;
+        ctx.stroke();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // Outer edge for front tentacles
+    if (!isBack) {
+      ctx.beginPath();
+      for (let i = 0; i <= N; i++) {
+        const p = spine[i];
+        ctx.lineTo(p.x + p.nx * p.R, p.y + p.ny * p.R);
+      }
+      for (let i = N; i >= 0; i--) {
+        const p = spine[i];
+        ctx.lineTo(p.x - p.nx * p.R, p.y - p.ny * p.R);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = COLORS.Y18;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
   };
 
   useEffect(() => {
@@ -424,9 +578,11 @@ const CyberBackground = () => {
 
     const animate = (t: number) => {
       drawBackground(bgCtx.ctx, w, h, t);
-      drawMatrix(matrixCtx.ctx, w, h, t);
-      drawHUD(hudCtx.ctx, w, h, t);
-      drawKraken(krakenCtx.ctx, w, h, t);
+      if (!prefersReduced) {
+        drawMatrix(matrixCtx.ctx, w, h, t);
+        drawHUD(hudCtx.ctx, w, h, t);
+        drawKraken(krakenCtx.ctx, w, h, t);
+      }
       animationRef.current = requestAnimationFrame(animate);
     };
 
@@ -450,7 +606,7 @@ const CyberBackground = () => {
     <div className="fixed inset-0 pointer-events-none z-0"
          style={{
            background: 'radial-gradient(1200px 800px at 15% 20%, rgba(255,211,0,0.06), transparent 60%), radial-gradient(1000px 900px at 85% 70%, rgba(255,211,0,0.04), transparent 60%), #0D0D0D',
-           filter: 'saturate(1.05)'
+           filter: 'saturate(1.06)'
          }}>
       <canvas
         ref={bgCanvasRef}
