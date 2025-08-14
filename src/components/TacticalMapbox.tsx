@@ -116,15 +116,24 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
       return;
     }
 
-    // Проверяем готовность DOM элемента с задержкой
+    // Проверяем готовность DOM элемента с задержкой и таймаутом
+    let attempts = 0;
+    const maxAttempts = 50; // Максимум 5 секунд ожидания
+    
     const checkAndInitialize = () => {
-      console.log('🔍 [CHECK] Проверяем готовность mapContainer...');
+      attempts++;
+      console.log(`🔍 [CHECK] Проверяем готовность mapContainer... Попытка ${attempts}/${maxAttempts}`);
+      
       if (mapContainer.current) {
         console.log('✅ [CHECK] mapContainer готов, инициализируем карту');
         initializeMap();
-      } else {
+      } else if (attempts < maxAttempts) {
         console.log('⏳ [CHECK] mapContainer не готов, повторная проверка через 100ms');
         setTimeout(checkAndInitialize, 100);
+      } else {
+        console.error('❌ [CHECK] Превышен лимит попыток ожидания mapContainer');
+        setError('Не удалось инициализировать контейнер карты');
+        setLoading(false);
       }
     };
 
