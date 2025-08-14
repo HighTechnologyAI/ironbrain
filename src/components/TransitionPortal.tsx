@@ -27,43 +27,48 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
 
     console.log('Starting transition animation...');
 
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      console.error('Canvas not found!');
-      return;
-    }
+    // Задержка для убеждения что DOM готов
+    const initializeAnimation = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) {
+        console.error('Canvas not found!');
+        return;
+      }
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      console.error('Canvas context not found!');
-      return;
-    }
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Canvas context not found!');
+        return;
+      }
 
-    console.log('Canvas initialized successfully');
+      console.log('Canvas initialized successfully');
 
-    const resize = () => {
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
+      const resize = () => {
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+      };
 
-    resize();
-    window.addEventListener('resize', resize);
+      resize();
+      window.addEventListener('resize', resize);
 
-    let startTime = Date.now();
-    const PHASE_DURATION = 2000; // Увеличил до 2 секунд для лучшей видимости
+      let startTime = Date.now();
+      const PHASE_DURATION = 1500; // Оптимальное время
 
-    console.log('Animation started, phase:', phase);
+      console.log('Animation started, phase:', phase);
 
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const phaseProgress = Math.min(elapsed / PHASE_DURATION, 1);
-      
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      
-      ctx.clearRect(0, 0, w, h);
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const phaseProgress = Math.min(elapsed / PHASE_DURATION, 1);
+        
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        
+        ctx.clearRect(0, 0, w, h);
 
       if (phase === 'kraken') {
         drawKrakenAttraction(ctx, w, h, phaseProgress);
@@ -99,32 +104,40 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
         }
       }
 
-      animationRef.current = requestAnimationFrame(animate);
+        animationRef.current = requestAnimationFrame(animate);
+      };
+
+      animate();
+
+      return () => {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+        }
+        window.removeEventListener('resize', resize);
+      };
     };
 
-    animate();
-
+    // Запускаем инициализацию с небольшой задержкой
+    const timeoutId = setTimeout(initializeAnimation, 100);
+    
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-      window.removeEventListener('resize', resize);
+      clearTimeout(timeoutId);
     };
   }, [isActive, phase, navigate, onComplete]);
 
   const drawKrakenAttraction = (ctx: CanvasRenderingContext2D, w: number, h: number, progress: number) => {
     console.log('Drawing kraken attraction, progress:', progress);
-    // Dark overlay
-    ctx.fillStyle = `rgba(13, 13, 13, ${progress * 0.7})`;
+    // Темный оверлей
+    ctx.fillStyle = `rgba(13, 13, 13, ${progress * 0.8})`;
     ctx.fillRect(0, 0, w, h);
 
-    // Kraken position (left side)
-    const krakenX = w * 0.2;
-    const krakenY = h * 0.6;
+    // Позиция Кракена (слева)
+    const krakenX = w * 0.15;
+    const krakenY = h * 0.5;
 
-    // Energy beams from kraken to user
+    // Позиция пользователя (центр экрана, где окно авторизации)
     const userX = w * 0.5;
-    const userY = h * 0.5;
+    const userY = h * 0.4;
 
     for (let i = 0; i < 8; i++) {
       const offset = (i / 8) * Math.PI * 2;
@@ -159,16 +172,16 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
   };
 
   const drawDoorSlide = (ctx: CanvasRenderingContext2D, w: number, h: number, progress: number) => {
-    // Background portal energy
-    ctx.fillStyle = 'rgba(0, 20, 40, 0.9)';
+    // Кибер-фон
+    ctx.fillStyle = 'rgba(5, 10, 25, 0.95)';
     ctx.fillRect(0, 0, w, h);
 
-    // Door slide effect - auth window moves to the side
-    const slideDistance = w * 0.6 * progress;
-    const authX = w * 0.5 - slideDistance;
-    const authY = h * 0.25;
+    // Эффект сдвига двери - окно авторизации движется в сторону
+    const slideDistance = w * 0.7 * progress;
+    const authX = w * 0.3 - slideDistance;
+    const authY = h * 0.2;
     const authW = w * 0.4;
-    const authH = h * 0.5;
+    const authH = h * 0.6;
 
     // Draw sliding auth window
     ctx.save();
@@ -193,12 +206,13 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
   };
 
   const drawCyberPortal = (ctx: CanvasRenderingContext2D, w: number, h: number, progress: number) => {
-    // Dark cyber space
-    ctx.fillStyle = 'rgba(5, 10, 25, 0.95)';
+    // Темное киберпространство
+    ctx.fillStyle = 'rgba(2, 5, 15, 0.98)';
     ctx.fillRect(0, 0, w, h);
 
-    const centerX = w * 0.7;
-    const centerY = h * 0.5;
+    // Портал справа от центра, где была дверь
+    const centerX = w * 0.75;
+    const centerY = h * 0.4;
 
     // Portal rings
     for (let i = 0; i < 12; i++) {
@@ -250,9 +264,9 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
   };
 
   const drawConsumption = (ctx: CanvasRenderingContext2D, w: number, h: number, progress: number) => {
-    // Portal center
-    const centerX = w * 0.7;
-    const centerY = h * 0.5;
+    // Центр портала
+    const centerX = w * 0.75;
+    const centerY = h * 0.4;
 
     // Consumption vortex
     const vortexSize = 150 * (1 + progress * 3);
