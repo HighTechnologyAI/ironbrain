@@ -358,7 +358,7 @@ const Tasks = () => {
     <TaskDetails
       task={task}
       trigger={
-        <Card className="cyber-border group hover:scale-[1.01] cursor-pointer transition-all duration-300">
+        <Card className="cyber-border group hover:scale-[1.01] cursor-pointer transition-all duration-300 hover:shadow-neon hover:border-primary/30">
           <CardHeader className="pb-3">
             <div className="flex justify-between items-start gap-4">
               <div className="flex-1 min-w-0">
@@ -366,14 +366,14 @@ const Tasks = () => {
                   text={task.title} 
                   type="title" 
                   sourceLang={task.language}
-                  className="text-lg font-semibold group-hover:cyber-text transition-colors leading-snug break-words" 
+                  className="text-lg font-semibold group-hover:text-primary transition-colors leading-snug break-words" 
                 />
               </div>
               <div className="flex flex-col gap-2 flex-shrink-0">
-                <Badge className={`${priorityColors[task.priority]} px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap`}>
+                <Badge className={`${priorityColors[task.priority]} px-3 py-1 text-xs font-medium rounded-lg whitespace-nowrap border border-primary/20`}>
                   {priorityLabels[task.priority]}
                 </Badge>
-                <Badge className={`${statusColors[task.status]} px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap`}>
+                <Badge className={`${statusColors[task.status]} px-3 py-1 text-xs font-medium rounded-lg whitespace-nowrap border border-primary/20`}>
                   {statusLabels[task.status]}
                 </Badge>
               </div>
@@ -445,7 +445,7 @@ const Tasks = () => {
                           Меню
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()} className="cyber-border bg-surface-1 backdrop-blur-md z-50">
+                      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()} className="cyber-border bg-background/95 backdrop-blur-md z-50 border-primary/30 shadow-neon">
                         {/* Быстрое изменение статуса */}
                         {task.status !== 'pending' && (
                           <DropdownMenuItem
