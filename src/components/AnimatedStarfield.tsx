@@ -138,9 +138,12 @@ const CyberBackground = () => {
 
   const drawMatrix = (ctx: CanvasRenderingContext2D, w: number, h: number, t: number) => {
     const matrix = matrixRef.current;
-    const drops = dropsRef.current;
+    let drops = dropsRef.current;
     
-    if (!matrix.cols) setupMatrix(w);
+    if (!matrix.cols || !drops.length) {
+      setupMatrix(w);
+      drops = dropsRef.current;
+    }
 
     ctx.fillStyle = 'rgba(13,13,13,0.15)';
     ctx.fillRect(0, 0, w, h);
@@ -151,8 +154,10 @@ const CyberBackground = () => {
     const mouse = mouseRef.current;
     const parX = mouse.nx * 4;
     
-    for (let i = 0; i < matrix.cols; i++) {
+    for (let i = 0; i < Math.min(matrix.cols, drops.length); i++) {
       const drop = drops[i];
+      if (!drop) continue;
+      
       const x = i * matrix.fontSize + parX;
       const y = drop.y * matrix.fontSize;
       const glyph = getGlyph();
@@ -164,10 +169,13 @@ const CyberBackground = () => {
   };
 
   const drawHUD = (ctx: CanvasRenderingContext2D, w: number, h: number, t: number) => {
-    const nodes = nodesRef.current;
+    let nodes = nodesRef.current;
     const mouse = mouseRef.current;
     
-    if (!nodes.length) setupNodes(w, h);
+    if (!nodes.length) {
+      setupNodes(w, h);
+      nodes = nodesRef.current;
+    }
     
     ctx.clearRect(0, 0, w, h);
     
@@ -242,10 +250,13 @@ const CyberBackground = () => {
 
   const drawKraken = (ctx: CanvasRenderingContext2D, w: number, h: number, t: number) => {
     const kraken = krakenRef.current;
-    const tentacles = tentaclesRef.current;
+    let tentacles = tentaclesRef.current;
     const mouse = mouseRef.current;
     
-    if (!tentacles.length) setupKraken(w, h);
+    if (!tentacles.length) {
+      setupKraken(w, h);
+      tentacles = tentaclesRef.current;
+    }
     
     ctx.clearRect(0, 0, w, h);
 
