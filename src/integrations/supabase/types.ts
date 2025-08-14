@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -87,6 +87,111 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ai_analysis_history: {
+        Row: {
+          analysis_type: string
+          created_at: string
+          error_message: string | null
+          execution_time_ms: number | null
+          id: string
+          input_data: Json | null
+          model_used: string | null
+          priority: number | null
+          provider: string
+          queue_status: string | null
+          result_data: string | null
+          success: boolean
+          tokens_used: number | null
+          user_id: string
+        }
+        Insert: {
+          analysis_type: string
+          created_at?: string
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          input_data?: Json | null
+          model_used?: string | null
+          priority?: number | null
+          provider: string
+          queue_status?: string | null
+          result_data?: string | null
+          success?: boolean
+          tokens_used?: number | null
+          user_id: string
+        }
+        Update: {
+          analysis_type?: string
+          created_at?: string
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          input_data?: Json | null
+          model_used?: string | null
+          priority?: number | null
+          provider?: string
+          queue_status?: string | null
+          result_data?: string | null
+          success?: boolean
+          tokens_used?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_assistant_logs: {
+        Row: {
+          created_at: string | null
+          event: string | null
+          id: string
+          payload: Json | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event?: string | null
+          id?: string
+          payload?: Json | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event?: string | null
+          id?: string
+          payload?: Json | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ai_commands_queue: {
+        Row: {
+          args: Json | null
+          created_at: string | null
+          id: string
+          status: string | null
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          args?: Json | null
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          args?: Json | null
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       budget_entries: {
         Row: {
@@ -1528,7 +1633,40 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      recent_telemetry_summary: {
+        Row: {
+          battery_level: number | null
+          drone_name: string | null
+          latest_data: Json | null
+          model: string | null
+          status: string | null
+        }
+        Insert: {
+          battery_level?: number | null
+          drone_name?: string | null
+          latest_data?: never
+          model?: string | null
+          status?: string | null
+        }
+        Update: {
+          battery_level?: number | null
+          drone_name?: string | null
+          latest_data?: never
+          model?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      uav_analytics_summary: {
+        Row: {
+          active_days_this_month: number | null
+          avg_battery_level: number | null
+          offline_drones: number | null
+          online_drones: number | null
+          total_drones: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_current_user_profile: {
@@ -1550,6 +1688,10 @@ export type Database = {
           updated_at: string | null
           user_id: string | null
         }
+      }
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
     }
     Enums: {
