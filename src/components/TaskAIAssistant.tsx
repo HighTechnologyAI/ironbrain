@@ -261,25 +261,25 @@ ${task.tags?.length ? `• Тагове: ${task.tags.join(', ')}` : ''}
         </Button>
       </DialogTrigger>
       <DialogContent 
-        className="w-[95vw] sm:w-auto max-w-[500px] sm:max-w-3xl h-[85vh] sm:h-[700px] flex flex-col glass-effect"
+        className="w-[95vw] sm:w-auto max-w-[500px] sm:max-w-3xl h-[85vh] sm:h-[700px] flex flex-col cyber-border bg-background/95 backdrop-blur-lg border-primary/30 shadow-neon"
         onMouseDown={(e) => e.stopPropagation()} 
         onClick={(e) => e.stopPropagation()}
         onPointerDownOutside={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-lg">
-            <Bot className="h-5 w-5 text-primary" />
+        <DialogHeader className="border-b border-primary/20 pb-4">
+          <DialogTitle className="flex items-center gap-2 text-lg text-primary">
+            <Bot className="h-5 w-5 text-primary animate-pulse-glow" />
             {language === 'ru' ? 'AI Помощник' : language === 'bg' ? 'AI Асистент' : 'AI Assistant'}
-            <Badge variant="outline" className="ml-2 text-xs truncate max-w-40">
+            <Badge variant="outline" className="ml-2 text-xs truncate max-w-40 border-primary/30 text-primary">
               {task.title}
             </Badge>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowSettings(!showSettings)}
-              className="ml-auto"
+              className="ml-auto hover:bg-primary/10 hover:text-primary"
             >
               <Settings className="h-4 w-4" />
             </Button>
@@ -296,7 +296,7 @@ ${task.tags?.length ? `• Тагове: ${task.tags.join(', ')}` : ''}
         
         <div className="flex-1 flex flex-col gap-4 overflow-hidden">
           {showSettings && (
-            <div className="p-4 bg-muted/20 rounded-lg">
+            <div className="p-4 cyber-border bg-surface-1/50 rounded-lg border-primary/20">
               <ToneSelector
                 selectedTone={aiTone}
                 onToneChange={setAiTone}
@@ -305,24 +305,24 @@ ${task.tags?.length ? `• Тагове: ${task.tags.join(', ')}` : ''}
             </div>
           )}
           
-          <div className="flex-1 overflow-y-auto space-y-4 p-4 bg-muted/20 rounded-lg">
+          <div className="flex-1 overflow-y-auto space-y-4 p-4 cyber-border bg-surface-1/30 rounded-lg border-primary/20">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}
               >
                 <Card
-                  className={`max-w-[80%] p-3 ${
+                  className={`max-w-[80%] p-4 border-2 transition-all duration-300 ${
                     message.isBot
-                      ? 'bg-muted text-muted-foreground'
-                      : 'bg-primary text-primary-foreground'
+                      ? 'bg-surface-1/80 border-primary/30 text-foreground shadow-glow'
+                      : 'bg-primary/90 border-primary text-primary-foreground shadow-neon'
                   }`}
                 >
-                  <div className="flex items-start gap-2">
-                    {message.isBot && <Bot className="h-4 w-4 mt-1 flex-shrink-0" />}
+                  <div className="flex items-start gap-3">
+                    {message.isBot && <Bot className="h-5 w-5 mt-1 flex-shrink-0 text-primary animate-pulse-glow" />}
                     <div className="flex-1">
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      <p className="text-xs opacity-70 mt-1">
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed font-medium">{message.content}</p>
+                      <p className="text-xs opacity-70 mt-2 font-mono">
                         {message.timestamp.toLocaleTimeString(locale, { 
                           hour: '2-digit', 
                           minute: '2-digit' 
@@ -335,21 +335,22 @@ ${task.tags?.length ? `• Тагове: ${task.tags.join(', ')}` : ''}
             ))}
             {loading && (
               <div className="flex justify-start">
-                <Card className="bg-muted text-muted-foreground p-3">
-                  <div className="flex items-center gap-2">
-                    <Bot className="h-4 w-4" />
+                <Card className="cyber-border bg-surface-1/80 border-primary/30 text-foreground p-4 shadow-glow">
+                  <div className="flex items-center gap-3">
+                    <Bot className="h-5 w-5 text-primary animate-pulse-glow" />
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-current rounded-full animate-bounce" />
-                      <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:0.1s]" />
-                      <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:0.2s]" />
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.1s]" />
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.2s]" />
                     </div>
+                    <span className="text-sm text-muted-foreground">Tiger AI печатает...</span>
                   </div>
                 </Card>
               </div>
             )}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-3 pt-4 border-t border-primary/20">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -361,16 +362,16 @@ ${task.tags?.length ? `• Тагове: ${task.tags.join(', ')}` : ''}
                   ? 'Попитайте AI за задачата, поискайте съвет или помощ...'
                   : 'Ask AI about the task, request advice or help...'
               }
-              className="flex-1 min-h-[60px] max-h-[120px]"
+              className="flex-1 min-h-[60px] max-h-[120px] cyber-border bg-surface-1/50 border-primary/30 focus:border-primary/50 focus:shadow-glow resize-none"
               disabled={loading}
             />
             <Button
               onClick={handleSendMessage}
               disabled={!input.trim() || loading}
               size="icon"
-              className="h-[60px] w-[60px]"
+              className="h-[60px] w-[60px] cyber-border bg-primary hover:bg-primary/90 hover:shadow-neon transition-all duration-300"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-5 w-5" />
             </Button>
           </div>
         </div>
