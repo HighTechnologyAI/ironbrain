@@ -445,7 +445,7 @@ const Tasks = () => {
                           Меню
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()} className="cyber-border bg-surface-1 backdrop-blur-md z-50">
                         {/* Быстрое изменение статуса */}
                         {task.status !== 'pending' && (
                           <DropdownMenuItem
@@ -571,77 +571,116 @@ const Tasks = () => {
       <div className="flex">
         {/* Main Content */}
         <div className={`flex-1 transition-all duration-300 ${showAISidebar ? 'mr-80' : ''}`}>
-          <div className="p-6">
+          <div className="p-4 lg:p-6">
             <div className="max-w-7xl mx-auto">
-              <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigate('/')}
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </Button>
-                  <div>
-                    <h1 className="text-3xl font-bold">{t.tasksTitle}</h1>
-                    <p className="text-muted-foreground">
-                      {t.tasksDescription}
-                    </p>
+              {/* Tactical Header */}
+              <div className="cyber-border bg-surface-1/50 backdrop-blur-sm p-4 mb-6 rounded-lg">
+                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => navigate('/')}
+                      className="cyber-border-glow hover:cyber-text transition-all duration-300"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                    <div>
+                      <h1 className="text-2xl lg:text-3xl font-bold text-gradient bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                        {t.tasksTitle}
+                      </h1>
+                      <p className="text-muted-foreground text-sm lg:text-base">
+                        {t.tasksDescription}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowAISidebar(!showAISidebar)}
-                  >
-                    {showAISidebar ? <SidebarClose className="h-4 w-4" /> : <SidebarOpen className="h-4 w-4" />}
-                    {showAISidebar ? 'Скрыть AI' : 'AI Помощник'}
-                  </Button>
-                  <NotificationCenter />
-                  <LanguageSwitcher />
+                  
+                  {/* Action Panel */}
+                  <div className="flex flex-wrap items-center gap-2 lg:gap-3">
+                    <CreateTaskForm onTaskCreated={loadTasks} />
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowAISidebar(!showAISidebar)}
+                      className="cyber-border hover:cyber-text transition-all duration-300"
+                    >
+                      {showAISidebar ? <SidebarClose className="h-4 w-4" /> : <SidebarOpen className="h-4 w-4" />}
+                      <span className="hidden sm:inline ml-1">
+                        {showAISidebar ? 'Скрыть AI' : 'AI Помощник'}
+                      </span>
+                    </Button>
+                    
+                    <NotificationCenter />
+                    <LanguageSwitcher />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex gap-4 mb-6">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder={t.searchTasks}
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+              {/* Controls Panel */}
+              <div className="cyber-border bg-surface-1/30 backdrop-blur-sm p-4 mb-6 rounded-lg">
+                <div className="flex flex-col lg:flex-row gap-4">
+                  {/* Search */}
+                  <div className="flex-1 min-w-0">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder={t.searchTasks}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10 cyber-border bg-surface-2/50"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Filters */}
+                  <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
+                    <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
+                      <SelectTrigger className="w-full sm:w-48 cyber-border bg-surface-2/50">
+                        <SelectValue placeholder="Исполнитель" />
+                      </SelectTrigger>
+                      <SelectContent className="cyber-border bg-surface-1 backdrop-blur-md">
+                        <SelectItem value="self">Мои задачи</SelectItem>
+                        <SelectItem value="all">Все исполнители</SelectItem>
+                        {teamMembers.map((member) => (
+                          <SelectItem key={member.id} value={member.id}>
+                            {member.full_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-full sm:w-48 cyber-border bg-surface-2/50">
+                        <SelectValue placeholder={t.taskStatus} />
+                      </SelectTrigger>
+                      <SelectContent className="cyber-border bg-surface-1 backdrop-blur-md">
+                        <SelectItem value="all">{t.allStatuses}</SelectItem>
+                        <SelectItem value="pending">{t.pending}</SelectItem>
+                        <SelectItem value="in_progress">{t.inProgress}</SelectItem>
+                        <SelectItem value="completed">{t.completed}</SelectItem>
+                        <SelectItem value="cancelled">{t.cancelled}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                      <SelectTrigger className="w-full sm:w-48 cyber-border bg-surface-2/50">
+                        <SelectValue placeholder={t.taskPriority} />
+                      </SelectTrigger>
+                      <SelectContent className="cyber-border bg-surface-1 backdrop-blur-md">
+                        <SelectItem value="all">{t.allPriorities}</SelectItem>
+                        <SelectItem value="low">{t.low}</SelectItem>
+                        <SelectItem value="medium">{t.medium}</SelectItem>
+                        <SelectItem value="high">{t.high}</SelectItem>
+                        <SelectItem value="critical">{t.critical}</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder={t.taskStatus} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t.allStatuses}</SelectItem>
-                    <SelectItem value="pending">{t.pending}</SelectItem>
-                    <SelectItem value="in_progress">{t.inProgress}</SelectItem>
-                    <SelectItem value="completed">{t.completed}</SelectItem>
-                    <SelectItem value="cancelled">{t.cancelled}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder={t.taskPriority} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t.allPriorities}</SelectItem>
-                    <SelectItem value="low">{t.low}</SelectItem>
-                    <SelectItem value="medium">{t.medium}</SelectItem>
-                    <SelectItem value="high">{t.high}</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
 
               <Tabs defaultValue="my" className="w-full">
-                <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
+                <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'} cyber-border bg-surface-1/30 backdrop-blur-sm p-1 gap-1 h-auto`}>
                   {isAdmin && (
                     <TabsTrigger value="all">{t.allTasks} ({filteredTasks.length})</TabsTrigger>
                   )}

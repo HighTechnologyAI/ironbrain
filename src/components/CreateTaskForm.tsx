@@ -200,12 +200,12 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button className="gap-2 cyber-border-glow bg-primary/20 hover:bg-primary/30 text-primary hover:text-primary transition-all duration-300">
           <Plus className="h-4 w-4" />
           {t.createTask}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto cyber-border bg-surface-1 backdrop-blur-md">
         <DialogHeader>
           <DialogTitle>{t.formCreatingNewTask}</DialogTitle>
           <DialogDescription>
@@ -259,7 +259,7 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
                         <SelectValue placeholder="Выберите исполнителя" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="cyber-border bg-surface-1 backdrop-blur-md z-50">
                       {employees.map((employee) => (
                         <SelectItem key={employee.id} value={employee.id}>
                           <div className="flex items-center gap-2">
@@ -293,7 +293,7 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="cyber-border bg-surface-1 backdrop-blur-md z-50">
                         {Object.entries(priorityLabels).map(([value, label]) => (
                           <SelectItem key={value} value={value}>
                             <div className="flex items-center gap-2">
