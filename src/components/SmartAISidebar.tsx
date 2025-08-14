@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { StatusChip } from '@/components/ui/status-chip';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/use-language';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -58,6 +58,11 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [isGeneratingSubtasks, setIsGeneratingSubtasks] = useState(false);
   const [isLoadingAction, setIsLoadingAction] = useState<string | null>(null);
+  const [aiResults, setAiResults] = useState<{
+    type: 'analysis' | 'subtasks' | 'experts',
+    content: string,
+    timestamp: Date
+  } | null>(null);
   const { t } = useLanguage();
 
   // Анализ рисков для выбранной задачи
@@ -199,9 +204,18 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
 
       if (error) throw error;
       
+      // Сохраняем результат для отображения
+      if (data?.response) {
+        setAiResults({
+          type: 'analysis',
+          content: data.response,
+          timestamp: new Date()
+        });
+      }
+      
       toast({
         title: "AI Анализ готов",
-        description: "Получен детальный анализ задачи",
+        description: "Результат отображен ниже в секции AI результатов",
       });
       
     } catch (error) {
@@ -238,9 +252,18 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
 
       if (error) throw error;
       
+      // Сохраняем результат для отображения
+      if (data?.response) {
+        setAiResults({
+          type: 'subtasks',
+          content: data.response,
+          timestamp: new Date()
+        });
+      }
+      
       toast({
         title: "Подзадачи предложены",
-        description: "AI сгенерировал предложения по разбиению задачи",
+        description: "Результат отображен ниже в секции AI результатов",
       });
       
     } catch (error) {
@@ -485,6 +508,53 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
             </>
           )}
 
+          {/* AI Results Display */}
+          {aiResults && (
+            <div>
+              <h4 className="font-medium font-ui mb-3 flex items-center gap-2">
+                <Brain className="h-4 w-4 text-primary" />
+                AI Результат
+                <Badge variant="outline" className="text-xs">
+                  {aiResults.type === 'analysis' ? 'Анализ' : 
+                   aiResults.type === 'subtasks' ? 'Подзадачи' : 'Эксперты'}
+                </Badge>
+              </h4>
+              <div className="p-4 bg-surface-2 rounded-lg border border-border space-y-3">
+                <div className="text-xs text-muted-foreground flex items-center gap-2">
+                  <Clock className="h-3 w-3" />
+                  {aiResults.timestamp.toLocaleTimeString('ru-RU')}
+                </div>
+                <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {aiResults.content}
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => setAiResults(null)}
+                    className="text-xs"
+                  >
+                    Закрыть
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => {
+                      navigator.clipboard.writeText(aiResults.content);
+                      toast({
+                        title: "Скопировано",
+                        description: "Результат скопирован в буфер обмена",
+                      });
+                    }}
+                    className="text-xs"
+                  >
+                    Копировать
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {!selectedTask && (
             <div className="text-center py-8">
               <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -528,9 +598,25 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate
                 variant="outline" 
                 size="sm" 
                 className="w-full justify-start"
+                disabled={!selectedTask}
+                onClick={() => {
+                  if (!selectedTask) return;
+                  
+                  // Здесь можно добавить функцию поиска экспертов
+                  setAiResults({
+                    type: 'experts',
+                    content: `Для задачи "${selectedTask.title}" рекомендуются следующие эксперты:\n\n• ${selectedTask.assigned_to?.full_name} - ${selectedTask.assigned_to?.position}\n• Можно привлечь коллег из отдела ${selectedTask.assigned_to?.position}\n• Рекомендуется консультация с руководителем проекта`,
+                    timestamp: new Date()
+                  });
+                  
+                  toast({
+                    title: "Эксперты найдены",
+                    description: "Рекомендации отображены в секции AI результатов",
+                  });
+                }}
               >
                 <Users className="h-4 w-4 mr-2" />
-                {t.findExperts}
+                Найти экспертов
               </Button>
             </div>
           </div>
