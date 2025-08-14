@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useAdmin } from '@/hooks/use-admin';
 import { useLanguage } from '@/hooks/use-language';
+import { useFeatures, isFeatureEnabled } from '@/utils/features';
 
 interface Item {
   title: string;
@@ -28,52 +29,63 @@ export function AppSidebar() {
   const location = useLocation();
   const { isAdmin } = useAdmin();
   const { t, language } = useLanguage();
+  const { isCRMMode, isUAVMode, isHybridMode } = useFeatures();
   const currentPath = location.pathname;
 
-  // UAV-focused navigation groups
-  const operationsItems: Item[] = [
-    { title: t.dashboard || 'Операционный центр', url: '/', icon: Home },
-    // Operations Center pages - conditional on feature flags
-    ...(import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' ? [
-      { title: 'Operations Center', url: '/ops-center', icon: Activity, badge: 'OPS' }
-    ] : []),
-    ...(import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' ? [
-      { title: 'Mission Control', url: '/mission-control', icon: Map, badge: 'LIVE', variant: 'mission' as const }
-    ] : []),
-    ...(import.meta.env.VITE_FEATURE_FLEET === 'true' ? [
-      { title: 'Fleet Management', url: '/fleet', icon: Plane }
-    ] : []),
-    ...(import.meta.env.VITE_FEATURE_COMMAND_CENTER === 'true' ? [
-      { title: 'Command Center', url: '/command-center', icon: Shield, badge: 'CTRL', variant: 'warning' as const }
-    ] : []),
+  // Core CRM навигация
+  const coreItems: Item[] = [
+    { title: t.dashboard || 'Панель управления', url: '/', icon: Home },
     { title: t.tasks || 'Задачи', url: '/tasks', icon: CheckSquare },
-    { title: t.team || 'Команда', url: '/team', icon: Users }
+    { title: t.team || 'Команда', url: '/team', icon: Users },
+    { title: t.projects || 'Проекты', url: '/projects', icon: Target },
   ];
 
+  // UAV операции (только если включены UAV функции)
+  const operationsItems: Item[] = [
+    ...(isFeatureEnabled('UAV_OPERATIONS') ? [
+      { title: 'Operations Center', url: '/ops-center', icon: Activity, badge: 'OPS' }
+    ] : []),
+    ...(isFeatureEnabled('MISSION_CONTROL') ? [
+      { title: 'Mission Control', url: '/mission-control', icon: Map, badge: 'LIVE', variant: 'mission' as const }
+    ] : []),
+    ...(isFeatureEnabled('FLEET_MANAGEMENT') ? [
+      { title: 'Fleet Management', url: '/fleet', icon: Plane }
+    ] : []),
+    ...(isFeatureEnabled('UAV_OPERATIONS') ? [
+      { title: 'Command Center', url: '/command-center', icon: Shield, badge: 'CTRL', variant: 'warning' as const }
+    ] : []),
+  ];
+
+  // Производство (UAV-специфичная функциональность)
   const productionItems: Item[] = [
-    { title: t.production || 'Производство', url: '/production', icon: Factory },
-    { title: t.projects || 'Проекты', url: '/projects', icon: Target },
-    { title: t.maintenance || 'Техобслуживание', url: '/maintenance', icon: Wrench, badge: '3', variant: 'warning' }
+    ...(isFeatureEnabled('UAV_OPERATIONS') ? [
+      { title: t.production || 'Производство', url: '/production', icon: Factory },
+      { title: t.maintenance || 'Техобслуживание', url: '/maintenance', icon: Wrench, badge: '3', variant: 'warning' as 'warning' }
+    ] : []),
   ];
 
   const systemItems: Item[] = [
     { title: t.analytics || 'Аналитика', url: '/analytics', icon: BarChart3 },
     { title: t.issues || 'Проблемы', url: '/issues', icon: Shield },
     { title: t.awards || 'Награды', url: '/awards', icon: Award },
-    { title: t.aiAssistant || 'AI Помощник', url: '/ai-assistant', icon: Bot, badge: 'AI' }
+    ...(isFeatureEnabled('AI_ASSISTANT') ? [
+      { title: t.aiAssistant || 'AI Помощник', url: '/ai-assistant', icon: Bot, badge: 'AI' }
+    ] : []),
   ];
 
   const adminItems: Item[] = [
-    { title: t.documents || 'Документооборот', url: '/documents', icon: FileText },
-    // System Logs - conditional on feature flag
-    ...(import.meta.env.VITE_FEATURE_LOGS === 'true' ? [
+    ...(isFeatureEnabled('UAV_OPERATIONS') ? [
+      { title: t.documents || 'Документооборот', url: '/documents', icon: FileText }
+    ] : []),
+    ...(isFeatureEnabled('UAV_OPERATIONS') ? [
       { title: 'System Logs', url: '/logs', icon: Radio, badge: 'LOG' }
     ] : []),
-    // AI Operations - conditional on feature flag
-    ...(import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' ? [
+    ...(isFeatureEnabled('UAV_OPERATIONS') ? [
       { title: 'AI Operations', url: '/ai-operations', icon: Sparkles, badge: 'AI' }
     ] : []),
-    { title: t.integrations || 'Интеграции', url: '/integrations', icon: ExternalLink },
+    ...(isFeatureEnabled('INTEGRATIONS') ? [
+      { title: t.integrations || 'Интеграции', url: '/integrations', icon: ExternalLink }
+    ] : []),
     ...(isAdmin ? [{ title: t.admin || 'Админ', url: '/admin', icon: Settings, badge: 'SYS' } as Item] : [])
   ];
 
@@ -140,10 +152,20 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
       <SidebarContent className="bg-surface-1">
-        {renderMenuGroup(operationsItems, 'ОПЕРАЦИИ')}
-        {renderMenuGroup(productionItems, 'ПРОИЗВОДСТВО')}
+        {/* Core CRM - всегда показываем */}
+        {renderMenuGroup(coreItems, isCRMMode ? 'УПРАВЛЕНИЕ' : 'ОСНОВНОЕ')}
+        
+        {/* UAV операции - только если включены */}
+        {operationsItems.length > 0 && renderMenuGroup(operationsItems, 'ОПЕРАЦИИ')}
+        
+        {/* Производство - только для UAV режима */}
+        {productionItems.length > 0 && renderMenuGroup(productionItems, 'ПРОИЗВОДСТВО')}
+        
+        {/* Системные функции */}
         {renderMenuGroup(systemItems, 'АНАЛИТИКА')}
-        {renderMenuGroup(adminItems, 'СЛУЖЕБНОЕ')}
+        
+        {/* Административные функции */}
+        {adminItems.length > 0 && renderMenuGroup(adminItems, 'СЛУЖЕБНОЕ')}
       </SidebarContent>
     </Sidebar>
   );

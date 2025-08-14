@@ -42,6 +42,11 @@ import RealTimeAlerts from "@/components/RealTimeAlerts";
 // Simple Voice Button
 import { VoiceManager } from "@/voice/VoiceManager";
 import { SimpleVoiceButton } from "@/voice/SimpleVoiceButton";
+import { FeatureGate, isFeatureEnabled } from '@/utils/features';
+import { lazy, Suspense } from 'react';
+
+// UAV страницы загружаются lazy для CRM режима
+const UAVDashboard = lazy(() => import("./pages/UAVDashboard"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -87,30 +92,41 @@ const AppShell = () => {
               <Route path="/issues" element={<ProtectedRoute><Issues /></ProtectedRoute>} />
               <Route path="/awards" element={<ProtectedRoute><Awards /></ProtectedRoute>} />
               <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
-              {/* UAV-specific routes */}
-              <Route path="/missions" element={<ProtectedRoute><MissionControl /></ProtectedRoute>} />
-              <Route path="/production" element={<ProtectedRoute><ProductionKanban /></ProtectedRoute>} />
-              <Route path="/maintenance" element={<ProtectedRoute><MaintenanceCenter /></ProtectedRoute>} />
-              <Route path="/documents" element={<ProtectedRoute><DocumentCenter /></ProtectedRoute>} />
-              {/* Operations Center Routes - Feature Flag Protected */}
-              {import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' && (
+              {/* UAV-specific routes - conditionally loaded */}
+              <FeatureGate feature="UAV_OPERATIONS">
+                <Route path="/missions" element={
+                  <ProtectedRoute>
+                    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                      <MissionControl />
+                    </Suspense>
+                  </ProtectedRoute>
+                } />
+              </FeatureGate>
+              
+              <FeatureGate feature="UAV_OPERATIONS">
+                <Route path="/production" element={<ProtectedRoute><ProductionKanban /></ProtectedRoute>} />
+                <Route path="/maintenance" element={<ProtectedRoute><MaintenanceCenter /></ProtectedRoute>} />
+                <Route path="/documents" element={<ProtectedRoute><DocumentCenter /></ProtectedRoute>} />
+              </FeatureGate>
+              
+              {/* Operations Center Routes - новая система feature flags */}
+              <FeatureGate feature="UAV_OPERATIONS">
                 <Route path="/ops-center" element={<ProtectedRoute><OpsCenter /></ProtectedRoute>} />
-              )}
-              {import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' && (
+              </FeatureGate>
+              
+              <FeatureGate feature="MISSION_CONTROL">
                 <Route path="/mission-control" element={<ProtectedRoute><MissionControlPage /></ProtectedRoute>} />
-              )}
-              {import.meta.env.VITE_FEATURE_FLEET === 'true' && (
+              </FeatureGate>
+              
+              <FeatureGate feature="FLEET_MANAGEMENT">
                 <Route path="/fleet" element={<ProtectedRoute><FleetPage /></ProtectedRoute>} />
-              )}
-              {import.meta.env.VITE_FEATURE_COMMAND_CENTER === 'true' && (
+              </FeatureGate>
+              
+              <FeatureGate feature="UAV_OPERATIONS">
                 <Route path="/command-center" element={<ProtectedRoute><CommandCenterPage /></ProtectedRoute>} />
-              )}
-              {import.meta.env.VITE_FEATURE_LOGS === 'true' && (
                 <Route path="/logs" element={<ProtectedRoute><SystemLogsPage /></ProtectedRoute>} />
-              )}
-              {import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' && (
                 <Route path="/ai-operations" element={<ProtectedRoute><AIOperationsCenter /></ProtectedRoute>} />
-              )}
+              </FeatureGate>
               <Route path="/auth" element={<Auth />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/create-demo-users" element={<CreateDemoUsers />} />

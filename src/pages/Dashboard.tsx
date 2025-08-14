@@ -7,6 +7,8 @@ import SystemHealth from '@/components/SystemHealth';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
 import AISystemStatus from '@/components/AISystemStatus';
+import { AppModeIndicator } from '@/components/AppModeIndicator';
+import { useFeatures, FeatureGate } from '@/utils/features';
 import { 
   Activity, 
   Users, 
@@ -23,6 +25,7 @@ import { useNavigate } from 'react-router-dom';
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { isCRMMode, isUAVMode, isHybridMode } = useFeatures();
 
   // Quick stats for the dashboard
   const stats = [
@@ -57,68 +60,79 @@ const Dashboard: React.FC = () => {
   ];
 
   // Quick actions based on available features
-  const quickActions = [];
-  
-  if (import.meta.env.VITE_FEATURE_OPS_CENTER === 'true') {
-    quickActions.push({
-      title: 'Operations Center',
-      description: 'Monitor system status and KPIs',
-      icon: Activity,
-      action: () => navigate('/ops-center'),
-      variant: 'neon' as const
-    });
-  }
-  
-  if (import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true') {
-    quickActions.push({
-      title: 'Mission Control',
-      description: 'Real-time UAV management',
-      icon: Zap,
-      action: () => navigate('/mission-control'),
-      variant: 'neon' as const
-    });
-  }
-  
-  quickActions.push(
-    {
-      title: t('common.tasks', 'Tasks'),
-      description: 'Manage your work items',
-      icon: CheckCircle,
-      action: () => navigate('/tasks'),
-      variant: 'neon-outline' as const
-    },
-    {
-      title: t('common.team', 'Team'),
-      description: 'Collaborate with colleagues',
-      icon: Users,
-      action: () => navigate('/team'),
-      variant: 'neon-outline' as const
+  const getQuickActions = () => {
+    const actions = [];
+    
+    // Core CRM actions - всегда доступны
+    actions.push(
+      {
+        title: t('common.tasks', 'Tasks'),
+        description: 'Manage your work items',
+        icon: CheckCircle,
+        action: () => navigate('/tasks'),
+        variant: 'neon-outline' as const
+      },
+      {
+        title: t('common.team', 'Team'),
+        description: 'Collaborate with colleagues',
+        icon: Users,
+        action: () => navigate('/team'),
+        variant: 'neon-outline' as const
+      }
+    );
+    
+    // UAV actions - только если включены
+    if (isUAVMode || isHybridMode) {
+      actions.unshift({
+        title: 'Operations Center',
+        description: 'Monitor system status and KPIs',
+        icon: Activity,
+        action: () => navigate('/ops-center'),
+        variant: 'neon' as const
+      });
+      
+      actions.unshift({
+        title: 'Mission Control',
+        description: 'Real-time UAV management',
+        icon: Zap,
+        action: () => navigate('/mission-control'),
+        variant: 'neon' as const
+      });
     }
-  );
+    
+    return actions;
+  };
+  
+  const quickActions = getQuickActions();
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          {t('navigation.dashboard', 'Operations Dashboard')}
-        </h1>
-        <p className="text-muted-foreground">
-          Welcome to the IronBrain CRM Operations Center
-        </p>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {isCRMMode ? 'Tiger CRM Dashboard' : isUAVMode ? 'UAV Operations Center' : 'Integrated Platform'}
+            </h1>
+            <p className="text-muted-foreground">
+              {isCRMMode ? 'Управление командой и задачами' : 
+               isUAVMode ? 'Центр управления беспилотными аппаратами' :
+               'Комплексная система управления'}
+            </p>
+          </div>
+          <AppModeIndicator />
+        </div>
       </div>
 
       {/* UAV Metrics Section - Only show if UAV features are enabled */}
-      {(import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' || 
-        import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' ||
-        import.meta.env.VITE_FEATURE_FLEET === 'true') && (
+      <FeatureGate feature="UAV_OPERATIONS">
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-bold tracking-tight mb-4">UAV Operations</h2>
             <UAVMetricsWidget />
           </div>
         </div>
-      )}
+      </FeatureGate>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -186,15 +200,13 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Recent UAV Events - Only show if UAV features are enabled */}
-      {(import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' || 
-        import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' ||
-        import.meta.env.VITE_FEATURE_FLEET === 'true') && (
+      <FeatureGate feature="UAV_OPERATIONS">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="lg:col-span-2">
             <RecentEventsWidget />
           </div>
         </div>
-      )}
+      </FeatureGate>
     </div>
   );
 };
