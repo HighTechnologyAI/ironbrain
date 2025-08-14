@@ -37,6 +37,7 @@ import SystemLogsPage from "./pages/SystemLogs";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import RealTimeAlerts from "@/components/RealTimeAlerts";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -67,6 +68,7 @@ const AppShell = () => {
         <main className="flex-1">
           <ConnectionStatus />
           <NotificationsBoot />
+          <RealTimeAlerts />
           <Toaster />
           <Sonner />
           <Routes>

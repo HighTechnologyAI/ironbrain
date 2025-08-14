@@ -6,7 +6,8 @@ import { Button } from '@/components/neon/Button';
 import { Switch } from '@/components/ui/switch';
 import MapComponent from '@/components/MapComponent';
 import { EmptyState } from '@/components/neon/EmptyState';
-import { useRealTimeTelemetry, useMockTelemetry, TelemetryDisplay } from '@/hooks/use-telemetry';
+import { useRealTimeTelemetry, useMockTelemetry } from '@/hooks/use-real-time-telemetry';
+import { TelemetryDisplay } from '@/hooks/use-telemetry';
 import { Map, Navigation, Radio, Gauge, Battery, Thermometer, Play, Square } from 'lucide-react';
 
 const MissionControl: React.FC = () => {
@@ -20,7 +21,7 @@ const MissionControl: React.FC = () => {
   }
 
   // Real telemetry data
-  const { latestData: realTelemetry, isLoading } = useRealTimeTelemetry(selectedDrone);
+  const { latestData: realTelemetry, isLoading, connectionStatus } = useRealTimeTelemetry(selectedDrone);
   
   // Mock telemetry for demo
   const mockTelemetry = useMockTelemetry(demoMode);
@@ -59,8 +60,12 @@ const MissionControl: React.FC = () => {
                 Demo Mode
               </label>
             </div>
-            <StatusChip status={currentTelemetry ? 'online' : 'offline'} size="sm">
-              {currentTelemetry ? 'Live Data' : 'No Signal'}
+            <StatusChip 
+              status={connectionStatus === 'connected' && currentTelemetry ? 'online' : 'offline'} 
+              size="sm"
+            >
+              {connectionStatus === 'connected' && currentTelemetry ? 'Live Data' : 
+               connectionStatus === 'connecting' ? 'Connecting...' : 'No Signal'}
             </StatusChip>
           </div>
         </div>
