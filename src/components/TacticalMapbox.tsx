@@ -116,29 +116,17 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
       return;
     }
 
-    // Проверяем готовность DOM элемента с задержкой и таймаутом
-    let attempts = 0;
-    const maxAttempts = 50; // Максимум 5 секунд ожидания
-    
-    const checkAndInitialize = () => {
-      attempts++;
-      console.log(`🔍 [CHECK] Проверяем готовность mapContainer... Попытка ${attempts}/${maxAttempts}`);
-      
+    // Простая одноразовая задержка для рендеринга DOM
+    setTimeout(() => {
       if (mapContainer.current) {
-        console.log('✅ [CHECK] mapContainer готов, инициализируем карту');
+        console.log('✅ [INIT] DOM готов, инициализируем карту');
         initializeMap();
-      } else if (attempts < maxAttempts) {
-        console.log('⏳ [CHECK] mapContainer не готов, повторная проверка через 100ms');
-        setTimeout(checkAndInitialize, 100);
       } else {
-        console.error('❌ [CHECK] Превышен лимит попыток ожидания mapContainer');
-        setError('Не удалось инициализировать контейнер карты');
+        console.error('❌ [INIT] mapContainer недоступен, возможно модальное окно закрыто');
+        setError('Контейнер карты недоступен');
         setLoading(false);
       }
-    };
-
-    // Запускаем проверку с небольшой задержкой чтобы дать DOM отрендериться
-    setTimeout(checkAndInitialize, 50);
+    }, 200); // Одна проверка через 200ms
 
     const initializeMap = () => {
       console.log('🗺️ [INIT] Начинаем инициализацию карты');
