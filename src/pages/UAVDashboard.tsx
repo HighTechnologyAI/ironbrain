@@ -128,7 +128,7 @@ const UAVDashboard = () => {
               </div>
             </div>
           </div>
-          <Button variant="mission" size="lg" onClick={() => navigate('/missions')}>
+          <Button variant="mission" size="lg" className="hover-scale" onClick={() => navigate('/missions')}>
             <Plane className="h-4 w-4 mr-2" />
             {t.launchMission}
           </Button>
@@ -215,13 +215,13 @@ const UAVDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Button 
             variant="outline" 
-            className="h-16 flex-col gap-2 relative"
+            className="h-16 flex-col gap-2 relative hover-scale transition-all duration-300"
             onClick={() => navigate('/tasks')}
           >
             <CheckSquare className="h-5 w-5" />
             <span className="text-sm">{t.tasks}</span>
             {performanceData.pendingTasks > 0 && (
-              <Badge variant="default" className="absolute -top-1 -right-1 min-w-6 h-6 flex items-center justify-center px-2 text-xs font-semibold">
+              <Badge variant="default" className="absolute -top-1 -right-1 min-w-6 h-6 flex items-center justify-center px-2 text-xs font-semibold animate-pulse">
                 {performanceData.pendingTasks}
               </Badge>
             )}
@@ -229,7 +229,7 @@ const UAVDashboard = () => {
           
           <Button 
             variant="outline" 
-            className="h-16 flex-col gap-2"
+            className="h-16 flex-col gap-2 hover-scale transition-all duration-300"
             onClick={() => navigate('/analytics')}
           >
             <Activity className="h-5 w-5" />
@@ -238,13 +238,13 @@ const UAVDashboard = () => {
           
           <Button 
             variant="outline" 
-            className="h-16 flex-col gap-2 relative"
+            className="h-16 flex-col gap-2 relative hover-scale transition-all duration-300"
             onClick={() => navigate('/issues')}
           >
             <AlertTriangle className="h-5 w-5" />
             <span className="text-sm">{t.issues}</span>
             {performanceData.overdueTasks > 0 && (
-              <Badge variant="critical" className="absolute -top-1 -right-1 min-w-6 h-6 flex items-center justify-center px-2 text-xs font-semibold">
+              <Badge variant="critical" className="absolute -top-1 -right-1 min-w-6 h-6 flex items-center justify-center px-2 text-xs font-semibold animate-pulse">
                 {performanceData.overdueTasks}
               </Badge>
             )}
