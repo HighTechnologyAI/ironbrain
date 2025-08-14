@@ -17,7 +17,7 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
   const [error, setError] = useState<string | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
 
-  // Инициализация карты с надежной проверкой готовности DOM
+  // Простая и надежная инициализация карты
   useEffect(() => {
     // Если карта уже создана, не создаваем заново
     if (map.current) return;
@@ -25,127 +25,70 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
     // Устанавливаем валидный токен Mapbox
     mapboxgl.accessToken = 'pk.eyJ1IjoiaGlnaHRlY2hhaSIsImEiOiJjbWViZTBoaW0wbzVwMmpxdmFpeTVnbWdsIn0.8-x4oZ4TfetTTa5BEAXDYg';
 
-    // Функция проверки готовности контейнера
-    const checkContainerReady = () => {
+    // Простая функция инициализации
+    const initMap = () => {
+      console.log('🔄 Начинаем инициализацию карты...');
+      console.log('🔍 mapContainer.current:', mapContainer.current);
+      console.log('🔍 mapContainer type:', typeof mapContainer.current);
+      
       const container = mapContainer.current;
       if (!container) {
-        console.log('❌ mapContainer.current отсутствует');
-        return false;
-      }
-      
-      // Проверяем что элемент действительно в DOM
-      const isInDOM = document.contains(container);
-      if (!isInDOM) {
-        console.log('❌ Контейнер не в DOM');
-        return false;
-      }
-      
-      // Проверяем что элемент имеет размеры
-      const rect = container.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) {
-        console.log('❌ Контейнер имеет нулевые размеры:', rect);
-        return false;
-      }
-      
-      console.log('✅ Контейнер готов:', rect);
-      return true;
-    };
-
-    // Функция инициализации карты
-    const initializeMap = () => {
-      if (!checkContainerReady()) {
-        return false;
-      }
-
-      try {
-        console.log('🗺️ Инициализация Mapbox карты...');
-        
-        // Создаем карту Mapbox
-        const mapInstance = new mapboxgl.Map({
-          container: mapContainer.current!,
-          style: 'mapbox://styles/mapbox/dark-v11',
-          center: [26.8916, 43.3968], // Центр Болгарии
-          zoom: 8,
-          projection: 'mercator'
-        });
-
-        // Добавляем контролы навигации
-        mapInstance.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-        // Обработчик загрузки карты
-        mapInstance.on('load', () => {
-          console.log('✅ Mapbox карта загружена успешно');
-          setLoading(false);
-          setError(null);
-          
-          // Добавляем маркеры дронов
-          addDroneMarkers();
-        });
-
-        // Обработчик ошибок карты
-        mapInstance.on('error', (e) => {
-          console.error('❌ Ошибка Mapbox карты:', e);
-          setError('Ошибка загрузки карты Mapbox');
-          setLoading(false);
-        });
-
-        // Сохраняем ссылку на карту
-        map.current = mapInstance;
-        return true;
-
-      } catch (err) {
-        console.error('❌ Ошибка создания Mapbox карты:', err);
-        setError('Не удалось создать карту');
-        setLoading(false);
-        return false;
-      }
-    };
-
-    // Попытки инициализации с возрастающими интервалами
-    let attempts = 0;
-    const maxAttempts = 20;
-    const intervals = [100, 200, 300, 500, 1000]; // Возрастающие задержки
-
-    const tryInitialize = () => {
-      attempts++;
-      console.log(`🔄 Попытка инициализации ${attempts}/${maxAttempts}`);
-      
-      if (initializeMap()) {
-        console.log('✅ Карта успешно инициализирована');
-        return;
-      }
-      
-      if (attempts >= maxAttempts) {
-        console.error('❌ Превышено максимальное количество попыток');
+        console.error('❌ mapContainer.current === null/undefined');
         setError('Контейнер карты недоступен');
         setLoading(false);
         return;
       }
-      
-      // Вычисляем задержку для следующей попытки
-      const delayIndex = Math.min(attempts - 1, intervals.length - 1);
-      const delay = intervals[delayIndex];
-      
-      console.log(`⏳ Следующая попытка через ${delay}ms`);
-      setTimeout(tryInitialize, delay);
+
+      console.log('✅ Контейнер найден, создаем карту...');
+
+      try {
+        // Создаем карту
+        const mapInstance = new mapboxgl.Map({
+          container: container,
+          style: 'mapbox://styles/mapbox/dark-v11',
+          center: [26.8916, 43.3968],
+          zoom: 8
+        });
+
+        // Добавляем контролы
+        mapInstance.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+        // События карты
+        mapInstance.on('load', () => {
+          console.log('✅ Карта загружена успешно');
+          setLoading(false);
+          setError(null);
+          addDroneMarkers();
+        });
+
+        mapInstance.on('error', (e) => {
+          console.error('❌ Ошибка карты:', e);
+          setError('Ошибка загрузки карты');
+          setLoading(false);
+        });
+
+        map.current = mapInstance;
+
+      } catch (err) {
+        console.error('❌ Ошибка создания карты:', err);
+        setError('Не удалось создать карту');
+        setLoading(false);
+      }
     };
 
-    // Начинаем попытки инициализации
-    const initialTimer = setTimeout(tryInitialize, 200);
+    // Ждем 500ms для рендеринга модального окна
+    const timer = setTimeout(initMap, 500);
 
-    // Cleanup функция
     return () => {
-      clearTimeout(initialTimer);
-      // Очищаем маркеры
+      clearTimeout(timer);
       markers.current.forEach(marker => marker.remove());
       markers.current = [];
-      // Удаляем карту
       if (map.current) {
         map.current.remove();
         map.current = null;
       }
     };
-  }, []); // Выполняется только при монтировании
+  }, []);
 
   // Функция создания маркера дрона
   const createDroneMarker = (drone: Drone) => {
