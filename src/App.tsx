@@ -34,6 +34,7 @@ import MissionControlPage from "./pages/MissionControlOps";
 import FleetPage from "./pages/FleetManagement";
 import CommandCenterPage from "./pages/CommandCenter";
 import SystemLogsPage from "./pages/SystemLogs";
+import AIOperationsCenter from "./pages/AIOperationsCenter";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -101,6 +102,9 @@ const AppShell = () => {
             )}
             {import.meta.env.VITE_FEATURE_LOGS === 'true' && (
               <Route path="/logs" element={<ProtectedRoute><SystemLogsPage /></ProtectedRoute>} />
+            )}
+            {import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' && (
+              <Route path="/ai-operations" element={<ProtectedRoute><AIOperationsCenter /></ProtectedRoute>} />
             )}
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<AdminPanel />} />

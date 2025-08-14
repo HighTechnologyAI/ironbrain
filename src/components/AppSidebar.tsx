@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LucideIcon, Home, Bot, CheckSquare, Users, Target, BarChart3, Shield, Award, ExternalLink, Settings, Plane, Factory, Wrench, FileText, Activity, Map, Radio } from 'lucide-react';
+import { LucideIcon, Home, Bot, CheckSquare, Users, Target, BarChart3, Shield, Award, ExternalLink, Settings, Plane, Factory, Wrench, Sparkles, Activity, Map, Radio, FileText } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -68,6 +68,10 @@ export function AppSidebar() {
     // System Logs - conditional on feature flag
     ...(import.meta.env.VITE_FEATURE_LOGS === 'true' ? [
       { title: 'System Logs', url: '/logs', icon: Radio, badge: 'LOG' }
+    ] : []),
+    // AI Operations - conditional on feature flag
+    ...(import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' ? [
+      { title: 'AI Operations', url: '/ai-operations', icon: Sparkles, badge: 'AI' }
     ] : []),
     { title: t.integrations || 'Интеграции', url: '/integrations', icon: ExternalLink },
     ...(isAdmin ? [{ title: t.admin || 'Админ', url: '/admin', icon: Settings, badge: 'SYS' } as Item] : [])

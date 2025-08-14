@@ -80,5 +80,19 @@
     "volts": "В",
     "degrees": "°",
     "percent": "%"
+  },
+  "aiOperations": {
+    "title": "ИИ Операции",
+    "subtitle": "Интелигентна аналитика и планиране на мисии"
+  },
+  "aiAnalytics": {
+    "title": "ИИ Аналитика", 
+    "analysisTypes": {
+      "telemetry": "Анализ на телеметрията",
+      "mission": "Планиране на мисии",
+      "maintenance": "Предиктивна поддръжка",
+      "anomaly": "Откриване на аномалии", 
+      "optimization": "Оптимизация на операциите"
+    }
   }
 }
