@@ -12,6 +12,8 @@ import AISystemMetrics from '@/components/AISystemMetrics';
 import AIVisualAnalytics from '@/components/AIVisualAnalytics';
 import AIRealtimeDashboard from '@/components/AIRealtimeDashboard';
 import AIDecisionSupport from '@/components/AIDecisionSupport';
+import AIRealtimeStreaming from '@/components/AIRealtimeStreaming';
+import AIAutomatedInsights from '@/components/AIAutomatedInsights';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
 import { 
@@ -25,7 +27,9 @@ import {
   FileText,
   Monitor,
   Image,
-  Target
+  Target,
+  Wifi,
+  Sparkles as SparklesIcon
 } from 'lucide-react';
 
 const AIAssistantPage: React.FC = () => {
@@ -59,7 +63,7 @@ const AIAssistantPage: React.FC = () => {
 
       {/* AI Tools */}
       <Tabs defaultValue="enhanced" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-10">
+        <TabsList className="grid w-full grid-cols-12">
           <TabsTrigger value="enhanced" className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             Enhanced AI
@@ -95,6 +99,14 @@ const AIAssistantPage: React.FC = () => {
           <TabsTrigger value="decisions" className="flex items-center gap-2">
             <Target className="h-4 w-4" />
             Decisions
+          </TabsTrigger>
+          <TabsTrigger value="streaming" className="flex items-center gap-2">
+            <Wifi className="h-4 w-4" />
+            Streaming
+          </TabsTrigger>
+          <TabsTrigger value="automated" className="flex items-center gap-2">
+            <SparklesIcon className="h-4 w-4" />
+            Automated
           </TabsTrigger>
           <TabsTrigger value="metrics" className="flex items-center gap-2">
             <Monitor className="h-4 w-4" />
@@ -136,6 +148,14 @@ const AIAssistantPage: React.FC = () => {
 
         <TabsContent value="decisions" className="space-y-6">
           <AIDecisionSupport />
+        </TabsContent>
+
+        <TabsContent value="streaming" className="space-y-6">
+          <AIRealtimeStreaming />
+        </TabsContent>
+
+        <TabsContent value="automated" className="space-y-6">
+          <AIAutomatedInsights />
         </TabsContent>
 
         <TabsContent value="metrics" className="space-y-6">
