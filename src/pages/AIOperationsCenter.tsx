@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AIAnalyticsPanel } from '@/components/AIAnalyticsPanel';
 import { AIMissionPlanner } from '@/components/AIMissionPlanner';
+import { EnhancedAIPanel } from '@/components/EnhancedAIPanel';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
 import { 
@@ -44,17 +45,25 @@ const AIAssistantPage: React.FC = () => {
       </div>
 
       {/* AI Tools */}
-      <Tabs defaultValue="analytics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+      <Tabs defaultValue="enhanced" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="enhanced" className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            Enhanced AI
+          </TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center gap-2">
             <Brain className="h-4 w-4" />
-            AI Analytics
+            Legacy Analytics
           </TabsTrigger>
           <TabsTrigger value="mission-planner" className="flex items-center gap-2">
             <Route className="h-4 w-4" />
             Mission Planner
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="enhanced" className="space-y-6">
+          <EnhancedAIPanel />
+        </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
           <AIAnalyticsPanel />
