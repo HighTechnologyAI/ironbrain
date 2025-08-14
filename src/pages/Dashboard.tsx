@@ -15,6 +15,7 @@ import {
   Clock
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import SystemHealth from '@/components/SystemHealth';
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -163,43 +164,7 @@ const Dashboard: React.FC = () => {
         </Card>
 
         {/* System Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
-              System Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">CRM System</span>
-              <StatusChip status="online" size="sm">Online</StatusChip>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Database</span>
-              <StatusChip status="online" size="sm">Healthy</StatusChip>
-            </div>
-            {import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' && (
-              <>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">UAV Systems</span>
-                  <StatusChip status="ready" size="sm">Ready</StatusChip>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Telemetry</span>
-                  <StatusChip status="online" size="sm">Active</StatusChip>
-                </div>
-              </>
-            )}
-            <div className="flex items-center justify-between pt-2 border-t">
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="h-3 w-3" />
-                Last updated
-              </div>
-              <span className="text-xs font-medium">Just now</span>
-            </div>
-          </CardContent>
-        </Card>
+        <SystemHealth />
       </div>
     </div>
   );
