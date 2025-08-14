@@ -90,7 +90,7 @@ const Tasks = () => {
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
   const [collaboratedTasks, setCollaboratedTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [showAISidebar, setShowAISidebar] = useState(true);
+  const [showAISidebar, setShowAISidebar] = useState(false);
   const [activeTab, setActiveTab] = useState('my');
   const tabsRef = useRef<HTMLDivElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ width: 0, left: 0 });
@@ -641,7 +641,7 @@ const Tasks = () => {
                     >
                       {showAISidebar ? <SidebarClose className="h-4 w-4" /> : <SidebarOpen className="h-4 w-4" />}
                       <span className="hidden sm:inline ml-1">
-                        {showAISidebar ? 'Скрыть AI' : 'AI Помощник'}
+                        {showAISidebar ? t.smartAISidebar : t.aiAssistant}
                       </span>
                     </Button>
                     
