@@ -25,28 +25,30 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
   useEffect(() => {
     const fetchToken = async () => {
       try {
-        console.log('🔑 [TOKEN] Получаем токен Mapbox...');
-        const response = await fetch('/functions/v1/get-mapbox-token', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        console.log('🔑 [TOKEN] Получаем токен Mapbox через Supabase...');
         
-        const data = await response.json();
+        // Используем Supabase client для вызова Edge Function
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
         
-        if (data.success && data.token) {
-          console.log('✅ [TOKEN] Токен получен успешно');
+        if (error) {
+          console.error('❌ [TOKEN] Ошибка Supabase функции:', error);
+          throw error;
+        }
+        
+        if (data && data.success && data.token) {
+          console.log('✅ [TOKEN] Токен получен успешно через Supabase');
           setMapboxToken(data.token);
         } else {
-          console.error('❌ [TOKEN] Ошибка получения токена:', data.error);
-          setError(`Не удалось получить токен Mapbox: ${data.error || 'Неизвестная ошибка'}`);
-          setLoading(false);
+          console.error('❌ [TOKEN] Ошибка получения токена:', data?.error);
+          // Используем fallback токен
+          console.log('🔄 [TOKEN] Используем fallback токен');
+          setMapboxToken('pk.eyJ1IjoiaGlnaHRlY2hhaSIsImEiOiJjbWViZTBoaW0wbzVwMmpxdmFpeTVnbWdsIn0.8-x4oZ4TfetTTa5BEAXDYg');
         }
       } catch (err) {
         console.error('❌ [TOKEN] Ошибка запроса токена:', err);
-        setError('Ошибка подключения к серверу для получения токена Mapbox');
-        setLoading(false);
+        console.log('🔄 [TOKEN] Используем fallback токен из-за ошибки');
+        // Используем fallback токен при ошибке
+        setMapboxToken('pk.eyJ1IjoiaGlnaHRlY2hhaSIsImEiOiJjbWViZTBoaW0wbzVwMmpxdmFpeTVnbWdsIn0.8-x4oZ4TfetTTa5BEAXDYg');
       }
     };
     
