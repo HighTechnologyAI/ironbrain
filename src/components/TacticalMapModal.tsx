@@ -50,10 +50,10 @@ const TacticalMapModal: React.FC<TacticalMapModalProps> = ({ drones, trigger }) 
           </div>
         </DialogHeader>
         
-        <div className="flex-1 p-0">
+        <div className="flex-1 relative w-full" style={{ height: 'calc(90vh - 80px)' }}>
           <TacticalMapbox 
             drones={drones} 
-            className="h-full min-h-[600px]"
+            className="absolute inset-0 w-full h-full"
           />
         </div>
       </DialogContent>
