@@ -1,6 +1,4 @@
-import { useEffect, useRef, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
-import StarEntity from './StarEntity';
+import { useEffect, useRef } from 'react';
 
 interface Star {
   x: number;
@@ -12,19 +10,41 @@ interface Star {
 
 const AnimatedStarfield = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const entityCanvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
   const starsRef = useRef<Star[]>([]);
 
+  const initEntity = (canvas: HTMLCanvasElement) => {
+    const c = canvas.getContext('2d');
+    if (!c) return null;
+    
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
+    
+    c.fillStyle = "rgb(30,30,30)";
+    c.fillRect(0, 0, w, h);
+    
+    return { c, canvas };
+  };
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const entityCanvas = entityCanvasRef.current;
+    if (!canvas || !entityCanvas) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Инициализируем entity canvas
+    initEntity(entityCanvas);
+
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      entityCanvas.width = window.innerWidth;
+      entityCanvas.height = window.innerHeight;
+      initEntity(entityCanvas);
     };
 
     const createStars = () => {
@@ -110,15 +130,11 @@ const AnimatedStarfield = () => {
         className="absolute inset-0"
         style={{ background: 'rgb(10, 10, 10)' }}
       />
-      <Canvas
+      <canvas
+        ref={entityCanvasRef}
         className="absolute inset-0"
-        camera={{ position: [0, 0, 10], fov: 60 }}
         style={{ background: 'transparent' }}
-      >
-        <Suspense fallback={null}>
-          <StarEntity />
-        </Suspense>
-      </Canvas>
+      />
     </div>
   );
 };
