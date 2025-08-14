@@ -46,7 +46,7 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
       key: 'dashboard', 
       path: '/', 
       icon: Home, 
-      label: t.dashboard || 'Главная',
+      label: t.dashboardOld || 'Главная',
       badge: null
     },
     { 
@@ -105,7 +105,7 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
       key: 'integrations', 
       path: '/integrations', 
       icon: ExternalLink, 
-      label: language === 'en' ? 'Integrations' : 'Интеграции',
+      label: t.integrations || 'Интеграции',
       badge: null
     },
     { 
@@ -175,7 +175,7 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
               size="sm"
               onClick={signOut}
               className="hover:bg-destructive/10 hover:border-destructive"
-              title={t.logout || 'Выйти'}
+              title={t.common.logout || 'Выйти'}
             >
               <LogOut className="h-4 w-4" />
             </Button>

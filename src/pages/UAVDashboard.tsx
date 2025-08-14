@@ -50,50 +50,50 @@ const UAVDashboard = () => {
   // KPI Cards Data
   const kpiCards = [
     {
-      title: "Active Missions",
+      title: t.dashboard.activeMissions,
       value: "12",
       change: "+3",
       icon: Plane,
       status: "armed" as const,
-      description: "Drones in flight",
+      description: t.dashboard.dronesInFlight,
       onClick: () => navigate('/missions')
     },
     {
-      title: "Production Line", 
+      title: t.dashboard.productionLine, 
       value: "47",
       change: "+8",
       icon: Target,
       status: "ready" as const,
-      description: "Units in production",
+      description: t.dashboard.unitsInProduction,
       onClick: () => navigate('/production')
     },
     {
-      title: "Technical Status",
+      title: t.dashboard.technicalStatus,
       value: "98.2%",
       change: "+0.5%",
       icon: ShieldCheck,
       status: "ready" as const,
-      description: "System health"
+      description: t.dashboard.systemHealth
     },
     {
-      title: "Team Members",
+      title: t.teamMembers,
       value: onlineUserCount.toString(),
       change: "+5",
       icon: Users,
       status: "info" as const,
-      description: "Operators online",
+      description: t.dashboard.operatorsOnline,
       onClick: () => navigate('/team')
     }
   ];
 
   // System Status Panel Data
   const systemMetrics = [
-    { label: "БД", value: "99.9%", icon: Database, status: "ready" },
-    { label: "CPU", value: "24%", icon: Cpu, status: "ready" },
-    { label: "RTT", value: "42ms", icon: Activity, status: "ready" },
-    { label: "ESC Темп.", value: "42°C", icon: Thermometer, status: "warning" },
-    { label: "Батарея", value: "87%", icon: Battery, status: "ready" },
-    { label: "Связь", value: "RSSI -45", icon: Radio, status: "ready" }
+    { label: t.dashboard.db, value: "99.9%", icon: Database, status: "ready" },
+    { label: t.dashboard.cpu, value: "24%", icon: Cpu, status: "ready" },
+    { label: t.dashboard.rtt, value: "42ms", icon: Activity, status: "ready" },
+    { label: t.dashboard.escTemp, value: "42°C", icon: Thermometer, status: "warning" },
+    { label: t.dashboard.battery, value: "87%", icon: Battery, status: "ready" },
+    { label: t.dashboard.connection, value: "RSSI -45", icon: Radio, status: "ready" }
   ];
 
   return (
@@ -142,34 +142,34 @@ const UAVDashboard = () => {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-xl font-ui">Strategic Goal Q3 2025</CardTitle>
+                <CardTitle className="text-xl font-ui">{t.dashboard.strategicGoal}</CardTitle>
                 <CardDescription className="font-mono text-sm">
-                  Increase production capacity to 100 units/month
+                  {t.dashboard.increaseCapacity}
                 </CardDescription>
               </div>
-              <StatusChip variant="ready">НА ПУТИ</StatusChip>
+              <StatusChip variant="ready">{t.dashboard.onTrack}</StatusChip>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-lg font-semibold">{objectiveProgress}% выполнения</span>
+              <span className="text-lg font-semibold">{objectiveProgress}% {t.dashboard.completion}</span>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <TrendingUp className="h-4 w-4 text-success" />
-                <span>+12% за месяц</span>
+                <span>+12% {t.dashboard.monthlyGrowth}</span>
               </div>
             </div>
             <Progress value={objectiveProgress} className="h-3" />
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
-                <span className="text-muted-foreground">Производство:</span>
-                <div className="font-mono font-semibold">78 ед/мес</div>
+                <span className="text-muted-foreground">{t.dashboard.production}:</span>
+                <div className="font-mono font-semibold">78 {t.dashboard.unitsMonth}</div>
               </div>
               <div>
-                <span className="text-muted-foreground">Качество:</span>
+                <span className="text-muted-foreground">{t.dashboard.quality}:</span>
                 <div className="font-mono font-semibold">99.2%</div>
               </div>
               <div>
-                <span className="text-muted-foreground">Дедлайн:</span>
+                <span className="text-muted-foreground">{t.dashboard.deadline}:</span>
                 <div className="font-mono font-semibold">31 дек</div>
               </div>
             </div>
@@ -200,9 +200,9 @@ const UAVDashboard = () => {
                     <span className="text-success font-semibold">{kpi.change}</span>
                   </div>
                   <StatusChip variant={kpi.status} className="text-xs">
-                    {kpi.status === "armed" ? "ВООРУЖЕН" : 
-                     kpi.status === "ready" ? "ГОТОВ" : 
-                     kpi.status === "info" ? "ИНФО" : "ПРЕДУПРЕЖДЕНИЕ"}
+                    {kpi.status === "armed" ? t.dashboard.armed : 
+                     kpi.status === "ready" ? t.dashboard.ready : 
+                     kpi.status === "info" ? t.dashboard.info : t.dashboard.warning}
                   </StatusChip>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">{kpi.description}</p>
@@ -256,7 +256,7 @@ const UAVDashboard = () => {
           <CardHeader>
             <CardTitle className="text-lg font-ui flex items-center gap-2">
               <Activity className="h-5 w-5 text-primary" />
-              {t.systemStatusLabel || "Системный статус"}
+              {t.dashboard.systemStatusLabel}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -270,13 +270,13 @@ const UAVDashboard = () => {
                     variant={metric.status as any} 
                     className="mt-2 text-xs scale-75"
                   >
-                    {metric.status === "ready" ? "ОК" : "ВНИМАНИЕ"}
+                    {metric.status === "ready" ? t.dashboard.ok : t.dashboard.attention}
                   </StatusChip>
                 </div>
               ))}
             </div>
             <div className="mt-4 text-xs text-muted-foreground text-center font-mono">
-              Последнее обновление: {currentTime.toLocaleString()}
+              {t.dashboard.lastUpdate}: {currentTime.toLocaleString()}
             </div>
           </CardContent>
         </Card>

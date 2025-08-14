@@ -246,7 +246,7 @@ const AdminPanel = () => {
           className="absolute top-6 left-6 text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {t.dashboard}
+          {t.dashboardOld}
         </Button>
         
         <Card className="w-full max-w-md border-primary/30 shadow-2xl">
@@ -346,7 +346,7 @@ const AdminPanel = () => {
           <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="dashboard">
               <Activity className="h-4 w-4 mr-2" />
-              {t.dashboard}
+              {t.dashboardOld}
             </TabsTrigger>
             <TabsTrigger value="tasks">
               <Settings className="h-4 w-4 mr-2" />

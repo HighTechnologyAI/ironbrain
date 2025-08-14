@@ -45,7 +45,7 @@ export interface Translations {
   aiAssistant: string;
   
   // Navigation
-  dashboard: string;
+  dashboardOld: string;
   missionControl: string;
   tasks: string;
   team: string;
@@ -60,7 +60,7 @@ export interface Translations {
   documents: string;
   integrations: string;
   
-  // Dashboard
+  // Dashboard old keys (for backwards compatibility)
   operationalCenter: string;
   uavSystem: string;
   welcomeUser: string;
@@ -68,7 +68,7 @@ export interface Translations {
   ready: string;
   launchMission: string;
   
-  // UAV specific
+  // UAV specific old keys (for backwards compatibility)
   strategicGoal: string;
   increaseCapacity: string;
   productionUnit: string;
@@ -124,6 +124,11 @@ export interface Translations {
     registrationError: string;
   };
   
+  // Common structure
+  common: {
+    logout: string;
+  };
+  
   // Departments
   departments: {
     management: string;
@@ -133,6 +138,48 @@ export interface Translations {
     leadership: string;
     it: string;
     consulting: string;
+  };
+  
+  // Dashboard structure
+  dashboard: {
+    strategicGoal: string;
+    increaseCapacity: string;
+    onTrack: string;
+    completion: string;
+    monthlyGrowth: string;
+    production: string;
+    quality: string;
+    deadline: string;
+    unitsMonth: string;
+    activeMissions: string;
+    dronesInFlight: string;
+    productionLine: string;
+    unitsInProduction: string;
+    technicalStatus: string;
+    systemHealth: string;
+    operatorsOnline: string;
+    armed: string;
+    ready: string;
+    info: string;
+    warning: string;
+    systemStatusLabel: string;
+    lastUpdate: string;
+    operations: string;
+    productionGroup: string;
+    analyticsGroup: string;
+    administrative: string;
+    missionControl: string;
+    maintenance: string;
+    documents: string;
+    integrations: string;
+    db: string;
+    cpu: string;
+    rtt: string;
+    escTemp: string;
+    battery: string;
+    connection: string;
+    ok: string;
+    attention: string;
   };
   
   // All missing keys with fallback to prevent build errors
@@ -496,7 +543,7 @@ const baseTranslations: Translations = {
   aiAssistant: 'AI Assistant',
   
   // Navigation
-  dashboard: 'Dashboard',
+  dashboardOld: 'Dashboard',
   missionControl: 'Mission Control',
   tasks: 'Tasks',
   team: 'Team',
@@ -575,6 +622,11 @@ const baseTranslations: Translations = {
     registrationError: 'Registration error'
   },
   
+  // Common structure object
+  common: {
+    logout: 'Logout'
+  },
+  
   // Departments structure object  
   departments: {
     management: 'Management',
@@ -584,6 +636,48 @@ const baseTranslations: Translations = {
     leadership: 'Leadership',
     it: 'IT',
     consulting: 'Consulting'
+  },
+  
+  // Dashboard structure object
+  dashboard: {
+    strategicGoal: 'Strategic Goal Q3 2025',
+    increaseCapacity: 'Increase production capacity to 100 units/month',
+    onTrack: 'ON TRACK',
+    completion: 'completion',
+    monthlyGrowth: 'monthly growth',
+    production: 'Production',
+    quality: 'Quality',
+    deadline: 'Deadline',
+    unitsMonth: 'units/month',
+    activeMissions: 'Active Missions',
+    dronesInFlight: 'Drones in flight',
+    productionLine: 'Production Line',
+    unitsInProduction: 'Units in production',
+    technicalStatus: 'Technical Status',
+    systemHealth: 'System health',
+    operatorsOnline: 'Operators online',
+    armed: 'ARMED',
+    ready: 'READY',
+    info: 'INFO',
+    warning: 'WARNING',
+    systemStatusLabel: 'System Status',
+    lastUpdate: 'Last update',
+    operations: 'OPERATIONS',
+    productionGroup: 'PRODUCTION',
+    analyticsGroup: 'ANALYTICS',
+    administrative: 'ADMINISTRATIVE',
+    missionControl: 'Mission Control',
+    maintenance: 'Maintenance',
+    documents: 'Document Flow',
+    integrations: 'Integrations',
+    db: 'DB',
+    cpu: 'CPU',
+    rtt: 'RTT',
+    escTemp: 'ESC Temp',
+    battery: 'Battery',
+    connection: 'Connection',
+    ok: 'OK',
+    attention: 'ATTENTION'
   },
   
   notifications: 'Notifications',
@@ -1000,6 +1094,10 @@ export const translations: Record<string, Translations> = {
       registrationError: 'Ошибка регистрации'
     },
     
+    common: {
+      logout: 'Выйти'
+    },
+    
     departments: {
       management: 'Управление',
       marketing: 'Маркетинг',
@@ -1008,6 +1106,47 @@ export const translations: Record<string, Translations> = {
       leadership: 'Руководство',
       it: 'ИТ',
       consulting: 'Консультации'
+    },
+    
+    dashboard: {
+      strategicGoal: 'Стратегическая цель Q3 2025',
+      increaseCapacity: 'Увеличить производственные мощности до 100 единиц/месяц',
+      onTrack: 'НА ПУТИ',
+      completion: 'выполнения',
+      monthlyGrowth: 'за месяц',
+      production: 'Производство',
+      quality: 'Качество',
+      deadline: 'Дедлайн',
+      unitsMonth: 'ед/мес',
+      activeMissions: 'Активные миссии',
+      dronesInFlight: 'Дроны в полете',
+      productionLine: 'Производственная линия',
+      unitsInProduction: 'Единиц в производстве',
+      technicalStatus: 'Техническое состояние',
+      systemHealth: 'Состояние системы',
+      operatorsOnline: 'Операторы онлайн',
+      armed: 'ВООРУЖЕН',
+      ready: 'ГОТОВ',
+      info: 'ИНФО',
+      warning: 'ПРЕДУПРЕЖДЕНИЕ',
+      systemStatusLabel: 'Системный статус',
+      lastUpdate: 'Последнее обновление',
+      operations: 'ОПЕРАЦИИ',
+      productionGroup: 'ПРОИЗВОДСТВО',
+      analyticsGroup: 'АНАЛИТИКА',
+      administrative: 'СЛУЖЕБНОЕ',
+      missionControl: 'Управление миссиями',
+      maintenance: 'Техобслуживание',
+      documents: 'Документооборот',
+      integrations: 'Интеграции',
+      db: 'БД',
+      cpu: 'CPU',
+      rtt: 'RTT',
+      escTemp: 'ESC Темп.',
+      battery: 'Батарея',
+      connection: 'Связь',
+      ok: 'ОК',
+      attention: 'ВНИМАНИЕ'
     },
   },
   
@@ -1086,6 +1225,10 @@ export const translations: Record<string, Translations> = {
       registrationError: 'Грешка при регистрация'
     },
     
+    common: {
+      logout: 'Излез'
+    },
+    
     departments: {
       management: 'Управление',
       marketing: 'Маркетинг',
@@ -1094,6 +1237,47 @@ export const translations: Record<string, Translations> = {
       leadership: 'Ръководство',
       it: 'ИТ',
       consulting: 'Консултации'
+    },
+    
+    dashboard: {
+      strategicGoal: 'Стратегическа цел Q3 2025',
+      increaseCapacity: 'Увеличаване на производствения капацитет до 100 единици/месец',
+      onTrack: 'НА ПЪТ',
+      completion: 'завършване',
+      monthlyGrowth: 'за месец',
+      production: 'Производство',
+      quality: 'Качество',
+      deadline: 'Краен срок',
+      unitsMonth: 'ед/мес',
+      activeMissions: 'Активни мисии',
+      dronesInFlight: 'Дронове в полет',
+      productionLine: 'Производствена линия',
+      unitsInProduction: 'Единици в производство',
+      technicalStatus: 'Техническо състояние',
+      systemHealth: 'Състояние на системата',
+      operatorsOnline: 'Оператори онлайн',
+      armed: 'ВЪОРЪЖЕН',
+      ready: 'ГОТОВ',
+      info: 'ИНФО',
+      warning: 'ПРЕДУПРЕЖДЕНИЕ',
+      systemStatusLabel: 'Системен статус',
+      lastUpdate: 'Последна актуализация',
+      operations: 'ОПЕРАЦИИ',
+      productionGroup: 'ПРОИЗВОДСТВО',
+      analyticsGroup: 'АНАЛИТИКА',
+      administrative: 'СЛУЖЕБНО',
+      missionControl: 'Управление на мисии',
+      maintenance: 'Техническо обслужване',
+      documents: 'Документооборот',
+      integrations: 'Интеграции',
+      db: 'БД',
+      cpu: 'CPU',
+      rtt: 'RTT',
+      escTemp: 'ESC Темп.',
+      battery: 'Батерия',
+      connection: 'Връзка',
+      ok: 'ОК',
+      attention: 'ВНИМАНИЕ'
     },
   }
 };

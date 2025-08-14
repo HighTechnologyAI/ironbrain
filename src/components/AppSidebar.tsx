@@ -32,8 +32,8 @@ export function AppSidebar() {
 
   // UAV-focused navigation groups
   const operationsItems: Item[] = [
-    { title: t.dashboard || 'Операционный центр', url: '/', icon: Home },
-    { title: 'Mission Control', url: '/missions', icon: Plane, badge: 'LIVE', variant: 'mission' },
+    { title: t.dashboardOld || 'Операционный центр', url: '/', icon: Home },
+    { title: t.dashboard.missionControl, url: '/missions', icon: Plane, badge: 'LIVE', variant: 'mission' },
     { title: t.tasks || 'Задачи', url: '/tasks', icon: CheckSquare },
     { title: t.team || 'Команда', url: '/team', icon: Users }
   ];
@@ -41,7 +41,7 @@ export function AppSidebar() {
   const productionItems: Item[] = [
     { title: t.production || 'Производство', url: '/production', icon: Factory },
     { title: t.projects || 'Проекты', url: '/projects', icon: Target },
-    { title: t.maintenance || 'Техобслуживание', url: '/maintenance', icon: Wrench, badge: '3', variant: 'warning' }
+    { title: t.dashboard.maintenance, url: '/maintenance', icon: Wrench, badge: '3', variant: 'warning' }
   ];
 
   const systemItems: Item[] = [
@@ -52,8 +52,8 @@ export function AppSidebar() {
   ];
 
   const adminItems: Item[] = [
-    { title: t.documents || 'Документооборот', url: '/documents', icon: FileText },
-    { title: t.integrations || 'Интеграции', url: '/integrations', icon: ExternalLink },
+    { title: t.dashboard.documents, url: '/documents', icon: FileText },
+    { title: t.dashboard.integrations, url: '/integrations', icon: ExternalLink },
     ...(isAdmin ? [{ title: t.admin || 'Админ', url: '/admin', icon: Settings, badge: 'SYS' } as Item] : [])
   ];
 
@@ -120,10 +120,10 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
       <SidebarContent className="bg-surface-1">
-        {renderMenuGroup(operationsItems, 'ОПЕРАЦИИ')}
-        {renderMenuGroup(productionItems, 'ПРОИЗВОДСТВО')}
-        {renderMenuGroup(systemItems, 'АНАЛИТИКА')}
-        {renderMenuGroup(adminItems, 'СЛУЖЕБНОЕ')}
+        {renderMenuGroup(operationsItems, t.dashboard.operations)}
+        {renderMenuGroup(productionItems, t.dashboard.productionGroup)}
+        {renderMenuGroup(systemItems, t.dashboard.analyticsGroup)}
+        {renderMenuGroup(adminItems, t.dashboard.administrative)}
       </SidebarContent>
     </Sidebar>
   );
