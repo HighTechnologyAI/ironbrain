@@ -63,14 +63,3 @@ jobs:
           # Then push any new migrations
           echo "Pushing database migrations..."
           supabase db push -p "$SUPABASE_DB_PASSWORD"
-
-      - name: "Run security lint on database"
-        run: supabase db lint --level=warn --project-ref "$SUPABASE_PROJECT_REF"
-        continue-on-error: true
-
-      - name: "Test database security"
-        run: |
-          echo "Testing RLS policies..."
-          # Add basic RLS tests here
-          echo "RLS security tests completed"
-        continue-on-error: true

@@ -6,19 +6,16 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import enCommon from './locales/en/common.json';
 import ruCommon from './locales/ru/common.json';
 import bgCommon from './locales/bg/common.json';
-import enOps from './locales/en/ops.json';
-import ruOps from './locales/ru/ops.json';
-import bgOps from './locales/bg/ops.json';
 
 const resources = {
   en: {
-    translation: { ...enCommon, ...enOps },
+    common: enCommon,
   },
   ru: {
-    translation: { ...ruCommon, ...ruOps },
+    common: ruCommon,
   },
   bg: {
-    translation: { ...bgCommon, ...bgOps },
+    common: bgCommon,
   },
 };
 
@@ -45,6 +42,10 @@ i18n
       caches: ['localStorage'],
       lookupLocalStorage: 'language',
     },
+    
+    // Namespace configuration
+    defaultNS: 'common',
+    ns: ['common'],
     
     // Handle missing keys
     saveMissing: import.meta.env.DEV,

@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Paperclip, Download, X, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { APP_CONFIG } from '@/config/app-config';
+import { PROJECT_CONFIG } from '@/config/project';
 import { useLanguage } from '@/hooks/use-language';
 
 interface TaskAttachment {
@@ -49,7 +49,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
     setIsUploading(true);
     try {
       for (const file of Array.from(files)) {
-        if (!APP_CONFIG.files.allowedTypes.includes(file.type as any)) {
+        if (!PROJECT_CONFIG.FILE_UPLOAD.ALLOWED_TYPES.includes(file.type as any)) {
           const lower = file.name.toLowerCase();
           const allowedExts = ['.pdf','.jpg','.jpeg','.png','.gif','.webp','.doc','.docx','.xls','.xlsx','.txt','.csv'];
           const isExtOk = allowedExts.some(ext => lower.endsWith(ext));
@@ -64,10 +64,10 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
         }
 
         // Validate file size
-        if (file.size > APP_CONFIG.files.maxFileSize) {
+        if (file.size > PROJECT_CONFIG.FILE_UPLOAD.MAX_FILE_SIZE) {
           toast({
             title: t.error,
-            description: `${t.fileTooLarge}: ${formatFileSize(file.size)} (max ${formatFileSize(APP_CONFIG.files.maxFileSize)})`,
+            description: `${t.fileTooLarge}: ${formatFileSize(file.size)} (max ${formatFileSize(PROJECT_CONFIG.FILE_UPLOAD.MAX_FILE_SIZE)})`,
             variant: 'destructive',
           });
           continue;
@@ -79,7 +79,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
 
         // Upload to Supabase Storage
         const { error: storageError } = await supabase.storage
-          .from(APP_CONFIG.files.bucket)
+          .from(PROJECT_CONFIG.FILE_UPLOAD.STORAGE_BUCKET)
           .upload(fileName, file);
 
         if (storageError) {
@@ -122,7 +122,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
         if (dbError) {
           // Clean up uploaded file if database insert fails
           await supabase.storage
-            .from(APP_CONFIG.files.bucket)
+            .from(PROJECT_CONFIG.FILE_UPLOAD.STORAGE_BUCKET)
             .remove([fileName]);
           
           toast({
@@ -157,7 +157,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
   const handleDownload = async (attachment: TaskAttachment) => {
     try {
       const { data, error } = await supabase.storage
-        .from(APP_CONFIG.files.bucket)
+        .from(PROJECT_CONFIG.FILE_UPLOAD.STORAGE_BUCKET)
         .download(attachment.file_path);
 
       if (error) throw error;
@@ -193,7 +193,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
 
       // Delete from storage
       const { error: storageError } = await supabase.storage
-        .from(APP_CONFIG.files.bucket)
+        .from(PROJECT_CONFIG.FILE_UPLOAD.STORAGE_BUCKET)
         .remove([filePath]);
 
       if (storageError) {
@@ -230,7 +230,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
               multiple
               onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
               className="hidden"
-              accept={[...APP_CONFIG.files.allowedTypes, '.pdf','.jpg','.jpeg','.png','.gif','.webp','.doc','.docx','.xls','.xlsx','.txt','.csv'].join(',')}
+              accept={[...PROJECT_CONFIG.FILE_UPLOAD.ALLOWED_TYPES, '.pdf','.jpg','.jpeg','.png','.gif','.webp','.doc','.docx','.xls','.xlsx','.txt','.csv'].join(',')}
             />
             <Button
               size="sm"

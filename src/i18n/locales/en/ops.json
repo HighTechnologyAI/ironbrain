@@ -80,19 +80,5 @@
     "volts": "V",
     "degrees": "°",
     "percent": "%"
-  },
-  "aiOperations": {
-    "title": "AI Operations",
-    "subtitle": "Intelligent analytics and mission planning"
-  },
-  "aiAnalytics": {
-    "title": "AI Analytics",
-    "analysisTypes": {
-      "telemetry": "Telemetry Analysis",
-      "mission": "Mission Planning", 
-      "maintenance": "Predictive Maintenance",
-      "anomaly": "Anomaly Detection",
-      "optimization": "Operations Optimization"
-    }
   }
 }

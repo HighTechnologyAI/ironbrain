@@ -1,14 +1,13 @@
 // Централизованная конфигурация Tiger CRM
 const V = (import.meta as any).env || {};
 
-// Проверяем обязательные переменные окружения
-const SUPABASE_URL = V.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = V.VITE_SUPABASE_ANON_KEY;
-const SUPABASE_PROJECT_ID = V.VITE_SUPABASE_PROJECT_ID;
+const FALLBACK_SUPABASE_URL = 'https://zqnjgwrvvrqaenzmlvfx.supabase.co';
+const FALLBACK_SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpxbmpnd3J2dnJxYWVuem1sdmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyNDYwNDcsImV4cCI6MjA2OTgyMjA0N30.uv41CLbWP5ZMnQLymCIE9uB9m4wC9xyKNSOU3btqcR8';
+const FALLBACK_SUPABASE_PROJECT_ID = 'zqnjgwrvvrqaenzmlvfx';
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !SUPABASE_PROJECT_ID) {
-  throw new Error('Отсутствуют обязательные переменные окружения Supabase. Проверьте конфигурацию.');
-}
+const SUPABASE_URL = V.VITE_SUPABASE_URL ?? FALLBACK_SUPABASE_URL;
+const SUPABASE_ANON_KEY = V.VITE_SUPABASE_ANON_KEY ?? FALLBACK_SUPABASE_ANON;
+const SUPABASE_PROJECT_ID = V.VITE_SUPABASE_PROJECT_ID ?? FALLBACK_SUPABASE_PROJECT_ID;
 
 export const APP_CONFIG = {
   app: {

@@ -11,53 +11,37 @@ import { useLanguage } from '@/hooks/use-language';
 import { supabase } from '@/integrations/supabase/client';
 import AppNavigation from '@/components/AppNavigation';
 import {
+  Shield,
   Database,
   Users,
   BarChart3,
   Terminal,
   Download,
+  RefreshCw,
+  Activity,
   Settings,
   Code,
-  ArrowLeft,
-  Home,
-  Activity,
   Play,
-  RefreshCw,
-  Eye
+  Lock,
+  Server,
+  MonitorSpeaker,
+  Eye,
+  ArrowLeft,
+  Home
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import TerminalInterface from '@/components/TerminalInterface';
 import TeamManagement from '@/components/TeamManagement';
-import { useAdminService } from '@/hooks/use-admin-service';
-import { AdminAuthentication } from '@/components/admin/AdminAuthentication';
-import { SystemStatusCard } from '@/components/admin/SystemStatusCard';
 
 const AdminPanel = () => {
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const { toast } = useToast();
-  const { t } = useLanguage();
-  
-  const {
-    isAuthenticated,
-    authAttempts,
-    lockoutTime,
-    authenticate,
-    logout,
-    getSystemStatus,
-    executeSqlQuery,
-    getTasks,
-    getAnalytics,
-    getProfiles,
-    generateBackup
-  } = useAdminService();
-
+  const [adminKey, setAdminKey] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [sqlQuery, setSqlQuery] = useState('');
   const [queryResult, setQueryResult] = useState<any>(null);
   const [tasks, setTasks] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
-  const [profiles, setProfiles] = useState<any[]>([]);
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
@@ -66,6 +50,10 @@ const AdminPanel = () => {
     assigned_to: '',
     estimated_hours: ''
   });
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -75,20 +63,77 @@ const AdminPanel = () => {
     getCurrentUser();
   }, []);
 
+  const adminApiCall = async (action: string, method = 'GET', body?: any) => {
+    try {
+      const response = await fetch(`https://zqnjgwrvvrqaenzmlvfx.supabase.co/functions/v1/admin-api?action=${action}`, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-key': adminKey,
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpxbmpnd3J2dnJxYWVuem1sdmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyNDYwNDcsImV4cCI6MjA2OTgyMjA0N30.uv41CLbWP5ZMnQLymCIE9uB9m4wC9xyKNSOU3btqcR8`
+        },
+        body: body ? JSON.stringify(body) : undefined
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error: any) {
+      toast({
+        title: 'API Error',
+        description: error.message,
+        variant: 'destructive'
+      });
+      throw error;
+    }
+  };
+
+  const authenticate = async () => {
+    if (!adminKey.trim()) {
+      toast({
+        title: t.error,
+        description: t.enterAdminKey,
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await adminApiCall('system_status');
+      setIsAuthenticated(true);
+      loadDashboard();
+      toast({
+        title: t.success,
+        description: t.loginToAdmin,
+      });
+    } catch (error) {
+      toast({
+        title: 'Ошибка аутентификации',
+        description: 'Неверный admin ключ',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const loadDashboard = async () => {
     setLoading(true);
     try {
-      const [statusResult, tasksResult, analyticsResult, profilesResult] = await Promise.all([
-        getSystemStatus(),
-        getTasks(),
-        getAnalytics(),
-        getProfiles()
+      const [statusRes, tasksRes, analyticsRes, profilesRes] = await Promise.all([
+        adminApiCall('system_status'),
+        adminApiCall('tasks_management'),
+        adminApiCall('analytics'),
+        supabase.from('profiles').select('*').eq('is_active', true)
       ]);
 
-      if (statusResult) setSystemStatus(statusResult);
-      if (tasksResult) setTasks(tasksResult.tasks || []);
-      if (analyticsResult) setAnalytics(analyticsResult.analytics);
-      if (profilesResult) setProfiles(profilesResult);
+      setSystemStatus(statusRes);
+      setTasks(tasksRes.tasks || []);
+      setAnalytics(analyticsRes.analytics);
+      setProfiles(profilesRes.data || []);
     } catch (error) {
       console.error('Failed to load dashboard:', error);
     } finally {
@@ -101,14 +146,14 @@ const AdminPanel = () => {
 
     setLoading(true);
     try {
-      const result = await executeSqlQuery(sqlQuery);
-      if (result) {
-        setQueryResult(result);
-        toast({
-          title: 'Query executed',
-          description: `Returned ${result.rowCount || 0} rows`,
-        });
-      }
+      const result = await adminApiCall('database_query', 'POST', {
+        query: sqlQuery
+      });
+      setQueryResult(result);
+      toast({
+        title: t.requestCompleted,
+        description: `${t.recordsReceived} ${result.result?.length || 0} ${t.recordsReceived}`,
+      });
     } catch (error) {
       console.error('Query failed:', error);
     } finally {
@@ -119,26 +164,25 @@ const AdminPanel = () => {
   const downloadBackup = async () => {
     setLoading(true);
     try {
-      const backup = await generateBackup();
-      if (backup) {
-        // Download backup file
-        const blob = new Blob([JSON.stringify(backup, null, 2)], {
-          type: 'application/json'
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `tiger-crm-backup-${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+      const backup = await adminApiCall('backup_data');
+      
+      // Download backup file
+      const blob = new Blob([JSON.stringify(backup.backup, null, 2)], {
+        type: 'application/json'
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tiger-crm-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
 
-        toast({
-          title: 'Backup created',
-          description: 'File downloaded successfully',
-        });
-      }
+      toast({
+        title: t.backupCreated,
+        description: t.fileDownloaded,
+      });
     } catch (error) {
       console.error('Backup failed:', error);
     } finally {
@@ -146,13 +190,46 @@ const AdminPanel = () => {
     }
   };
 
-  const refreshSystemStatus = async () => {
+  const createTask = async () => {
+    if (!newTask.title.trim()) {
+      toast({
+        title: t.error,
+        description: t.enterTaskName,
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      const status = await getSystemStatus();
-      if (status) setSystemStatus(status);
+      const taskData = {
+        ...newTask,
+        estimated_hours: newTask.estimated_hours ? parseInt(newTask.estimated_hours) : null,
+        assigned_to: newTask.assigned_to || null,
+        created_by: profiles.find(p => p.user_id === currentUser?.id)?.id
+      };
+
+      await adminApiCall('tasks_management', 'POST', { task_data: taskData });
+      
+      // Reset form
+      setNewTask({
+        title: '',
+        description: '',
+        priority: 'medium',
+        status: 'pending',
+        assigned_to: '',
+        estimated_hours: ''
+      });
+
+      // Reload tasks
+      loadDashboard();
+
+      toast({
+        title: t.success,
+        description: t.taskCreatedViaAPI,
+      });
     } catch (error) {
-      console.error('Failed to refresh status:', error);
+      console.error('Create task failed:', error);
     } finally {
       setLoading(false);
     }
@@ -161,6 +238,7 @@ const AdminPanel = () => {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 relative">
+        {/* Back button */}
         <Button
           variant="ghost"
           size="sm"
@@ -168,15 +246,56 @@ const AdminPanel = () => {
           className="absolute top-6 left-6 text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Dashboard
+          {t.dashboard}
         </Button>
         
-        <AdminAuthentication
-          onAuthenticate={authenticate}
-          authAttempts={authAttempts}
-          lockoutTime={lockoutTime}
-          loading={loading}
-        />
+        <Card className="w-full max-w-md border-primary/30 shadow-2xl">
+          <CardHeader className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+              <Lock className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Tiger CRM Admin</h1>
+              <p className="text-muted-foreground text-sm">
+                Панель администрирования системы
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="admin-key" className="text-sm font-medium">
+                Admin Key
+              </label>
+              <Input
+                id="admin-key"
+                type="password"
+                placeholder={t.enterAdminKey}
+                value={adminKey}
+                onChange={(e) => setAdminKey(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && authenticate()}
+                className="border-primary/30 focus:border-primary"
+              />
+            </div>
+            <Button 
+              onClick={authenticate} 
+              disabled={loading}
+              className="w-full bg-primary hover:bg-primary/90"
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <Activity className="h-4 w-4 animate-spin" />
+                  {t.checking}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  {t.loginToAdmin}
+                </div>
+              )}
+            </Button>
+            
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -185,7 +304,7 @@ const AdminPanel = () => {
     <div className="min-h-screen bg-background">
       <AppNavigation 
         title="Tiger CRM Admin Panel"
-        subtitle="System Administration"
+        subtitle={t.systemAdministration}
       />
       
       <div className="max-w-7xl mx-auto p-6">
@@ -193,11 +312,11 @@ const AdminPanel = () => {
         <Card className="mb-6 bg-gradient-to-r from-primary/10 to-destructive/10 border-primary/30">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <Settings className="h-6 w-6 text-primary" />
+              <Shield className="h-6 w-6 text-primary" />
               <div>
-                <h3 className="font-semibold text-primary">Admin Mode Active</h3>
+                <h3 className="font-semibold text-primary">{t.adminModeActive}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Full system access enabled
+                  {t.fullAccess}
                 </p>
               </div>
               <div className="ml-auto flex items-center gap-2">
@@ -208,18 +327,15 @@ const AdminPanel = () => {
                   className="bg-background hover:bg-muted"
                 >
                   <Home className="h-4 w-4 mr-2" />
-                  Main Menu
+                  {t.mainMenu}
                 </Button>
                 <Button variant="outline" onClick={loadDashboard} disabled={loading} size="sm">
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  Refresh
+                  {t.update}
                 </Button>
                 <Button variant="outline" onClick={downloadBackup} disabled={loading} size="sm">
                   <Download className="h-4 w-4 mr-2" />
-                  Backup
-                </Button>
-                <Button variant="outline" onClick={logout} size="sm">
-                  Logout
+                  {t.backup}
                 </Button>
               </div>
             </div>
@@ -227,30 +343,34 @@ const AdminPanel = () => {
         </Card>
 
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="dashboard">
               <Activity className="h-4 w-4 mr-2" />
-              Dashboard
+              {t.dashboard}
             </TabsTrigger>
-            <TabsTrigger value="system">
+            <TabsTrigger value="tasks">
               <Settings className="h-4 w-4 mr-2" />
-              System
+              {t.tasks}
             </TabsTrigger>
             <TabsTrigger value="database">
               <Database className="h-4 w-4 mr-2" />
-              Database
+              {t.database}
             </TabsTrigger>
             <TabsTrigger value="users">
               <Users className="h-4 w-4 mr-2" />
-              Users
+              Пользователи
+            </TabsTrigger>
+            <TabsTrigger value="team">
+              <Users className="h-4 w-4 mr-2" />
+              Команда
             </TabsTrigger>
             <TabsTrigger value="analytics">
               <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
+              Аналитика
             </TabsTrigger>
             <TabsTrigger value="terminal">
               <Terminal className="h-4 w-4 mr-2" />
-              Terminal
+              API Терминал
             </TabsTrigger>
           </TabsList>
 
@@ -258,12 +378,12 @@ const AdminPanel = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">System Health</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.systemHealth}</CardTitle>
                   <Activity className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-600">
-                    {systemStatus?.database && systemStatus?.api ? 'Healthy' : 'Issues'}
+                    {systemStatus?.system_status || 'Loading...'}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {systemStatus?.timestamp && new Date(systemStatus.timestamp).toLocaleString()}
@@ -273,45 +393,45 @@ const AdminPanel = () => {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {tasks.length}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Current tasks
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.totalUsers}</CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {profiles.length}
+                    {systemStatus?.stats?.total_users || 0}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Registered profiles
+                    {t.activeProfiles}: {systemStatus?.stats?.total_profiles || 0}
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">API Status</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t.totalTasks}</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {systemStatus?.stats?.total_tasks || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {t.allTime}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t.apiStatus}</CardTitle>
                   <Database className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-600">
-                    Online
+                    {systemStatus?.health?.api || 'Unknown'}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    All services operational
+                    {t.database}: {systemStatus?.health?.database || 'Unknown'}
                   </p>
                 </CardContent>
               </Card>
@@ -320,7 +440,7 @@ const AdminPanel = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Recent Tasks</CardTitle>
+                  <CardTitle>{t.recentTasks}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -329,7 +449,7 @@ const AdminPanel = () => {
                         <div>
                           <p className="font-medium">{task.title}</p>
                           <p className="text-sm text-muted-foreground">
-                            {task.assigned_to?.full_name || 'Unassigned'}
+                            {task.assigned_to?.full_name}
                           </p>
                         </div>
                         <Badge variant={task.status === 'completed' ? 'default' : 'secondary'}>
@@ -343,32 +463,28 @@ const AdminPanel = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
+                  <CardTitle>{t.quickActions}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button className="w-full justify-start" variant="outline" onClick={loadDashboard}>
+                  <Button className="w-full justify-start" variant="outline">
                     <Database className="h-4 w-4 mr-2" />
-                    Refresh Data
+                    {t.optimizeDB}
                   </Button>
-                  <Button className="w-full justify-start" variant="outline" onClick={downloadBackup}>
+                  <Button className="w-full justify-start" variant="outline">
+                    <Users className="h-4 w-4 mr-2" />
+                    {t.userManagement}
+                  </Button>
+                  <Button className="w-full justify-start" variant="outline">
                     <Download className="h-4 w-4 mr-2" />
-                    Create Backup
+                    {t.exportReports}
                   </Button>
                   <Button className="w-full justify-start" variant="outline">
                     <Settings className="h-4 w-4 mr-2" />
-                    System Settings
+                    {t.systemSettings}
                   </Button>
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
-
-          <TabsContent value="system" className="mt-6">
-            <SystemStatusCard 
-              systemStatus={systemStatus}
-              loading={loading}
-              onRefresh={refreshSystemStatus}
-            />
           </TabsContent>
 
           <TabsContent value="database" className="mt-6">
@@ -381,7 +497,7 @@ const AdminPanel = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">SQL Query (SELECT only)</label>
+                  <label className="text-sm font-medium">SQL Query (только SELECT)</label>
                   <Textarea
                     placeholder="SELECT * FROM profiles LIMIT 10;"
                     value={sqlQuery}
@@ -391,12 +507,12 @@ const AdminPanel = () => {
                 </div>
                 <Button onClick={executeQuery} disabled={loading || !sqlQuery.trim()}>
                   <Play className="h-4 w-4 mr-2" />
-                  Execute Query
+                  Выполнить запрос
                 </Button>
 
                 {queryResult && (
                   <div className="space-y-2">
-                    <h4 className="font-medium">Result:</h4>
+                    <h4 className="font-medium">Результат:</h4>
                     <pre className="bg-muted p-4 rounded-md overflow-auto max-h-96 text-sm">
                       {JSON.stringify(queryResult, null, 2)}
                     </pre>
@@ -406,7 +522,144 @@ const AdminPanel = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="tasks" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Создать новую задачу</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Название задачи *</label>
+                    <Input
+                      placeholder="Введите название задачи"
+                      value={newTask.title}
+                      onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Описание</label>
+                    <Textarea
+                      placeholder="Опишите задачу"
+                      value={newTask.description}
+                      onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+                      className="min-h-[100px]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Приоритет</label>
+                      <Select value={newTask.priority} onValueChange={(value) => setNewTask({...newTask, priority: value})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Низкий</SelectItem>
+                          <SelectItem value="medium">Средний</SelectItem>
+                          <SelectItem value="high">Высокий</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Статус</label>
+                      <Select value={newTask.status} onValueChange={(value) => setNewTask({...newTask, status: value})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">В ожидании</SelectItem>
+                          <SelectItem value="in_progress">В работе</SelectItem>
+                          <SelectItem value="completed">Завершена</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Назначить</label>
+                      <Select value={newTask.assigned_to} onValueChange={(value) => setNewTask({...newTask, assigned_to: value})}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Выберите исполнителя" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {profiles.map((profile) => (
+                            <SelectItem key={profile.id} value={profile.id}>
+                              {profile.full_name} ({profile.position})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Часы (оценка)</label>
+                      <Input
+                        type="number"
+                        placeholder="Часов"
+                        value={newTask.estimated_hours}
+                        onChange={(e) => setNewTask({...newTask, estimated_hours: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  <Button onClick={createTask} disabled={loading || !newTask.title.trim()} className="w-full">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Создать задачу через API
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Последние созданные задачи</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {tasks.slice(0, 10).map((task: any) => (
+                      <div key={task.id} className="flex justify-between items-start p-3 border rounded-lg">
+                        <div className="flex-1">
+                          <p className="font-medium">{task.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {task.assigned_to?.full_name || 'Не назначено'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(task.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <Badge variant={task.status === 'completed' ? 'default' : 'secondary'}>
+                            {task.status}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {task.priority}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
           <TabsContent value="users" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Управление пользователями</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Интерфейс управления пользователями будет добавлен в следующей версии.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="team" className="mt-6">
             <TeamManagement />
           </TabsContent>
 
@@ -414,52 +667,48 @@ const AdminPanel = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Task Performance</CardTitle>
+                  <CardTitle>Производительность задач</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {analytics ? (
+                  {analytics && (
                     <div className="space-y-4">
                       <div>
-                        <p className="text-sm text-muted-foreground">Completion Rate</p>
+                        <p className="text-sm text-muted-foreground">Процент завершения</p>
                         <p className="text-2xl font-bold">
-                          {analytics.tasks?.completion_rate?.toFixed(1) || 'N/A'}%
+                          {analytics.tasks?.completion_rate?.toFixed(1)}%
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Average Time</p>
+                        <p className="text-sm text-muted-foreground">Среднее время выполнения</p>
                         <p className="text-2xl font-bold">
-                          {analytics.tasks?.average_time || 'N/A'} days
+                          {analytics.tasks?.average_time} дней
                         </p>
                       </div>
                     </div>
-                  ) : (
-                    <p className="text-muted-foreground">Loading analytics...</p>
                   )}
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>30-Day Trends</CardTitle>
+                  <CardTitle>Тренды за 30 дней</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {analytics ? (
+                  {analytics && (
                     <div className="space-y-4">
                       <div>
-                        <p className="text-sm text-muted-foreground">Tasks Created</p>
+                        <p className="text-sm text-muted-foreground">Создано задач</p>
                         <p className="text-2xl font-bold">
-                          {analytics.trends?.tasks_created_last_30_days || 0}
+                          {analytics.trends?.tasks_created_last_30_days}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Completion Trend</p>
+                        <p className="text-sm text-muted-foreground">Тренд завершения</p>
                         <p className="text-2xl font-bold">
-                          {analytics.trends?.completion_trend || 'N/A'}%
+                          {analytics.trends?.completion_trend}%
                         </p>
                       </div>
                     </div>
-                  ) : (
-                    <p className="text-muted-foreground">Loading trends...</p>
                   )}
                 </CardContent>
               </Card>
@@ -471,34 +720,40 @@ const AdminPanel = () => {
               title="Admin API Terminal"
               endpoint="/functions/v1/admin-api"
               onExecute={async (command) => {
+                // Handle admin commands through API
+                if (command.startsWith('admin ')) {
+                  const adminCmd = command.substring(6);
+                  return await adminApiCall(adminCmd);
+                }
                 return `Command executed: ${command}`;
               }}
             />
 
             <Card className="mt-6">
               <CardHeader>
-                <CardTitle>External API Access</CardTitle>
+                <CardTitle>Внешний API доступ</CardTitle>
               </CardHeader>
               <CardContent>
                 <Alert className="mb-4">
                   <Eye className="h-4 w-4" />
                   <AlertDescription>
-                    For external access use:<br />
+                    Для внешнего доступа используйте:<br />
                     <code className="text-sm">
-                      POST https://your-project.supabase.co/functions/v1/admin-api
+                      POST https://zqnjgwrvvrqaenzmlvfx.supabase.co/functions/v1/admin-api?action=ACTION
                     </code><br />
-                    Header: <code>x-admin-key: YOUR_ADMIN_KEY</code>
+                    Header: <code>x-admin-key: {adminKey}</code>
                   </AlertDescription>
                 </Alert>
                 
                 <div className="space-y-2">
-                  <h4 className="font-medium">Available API endpoints:</h4>
+                  <h4 className="font-medium">Доступные API endpoints:</h4>
                   <ul className="text-sm space-y-1 text-muted-foreground">
-                    <li>• <code>system-status</code> - System status</li>
-                    <li>• <code>execute-query</code> - Database queries</li>
-                    <li>• <code>tasks</code> - Task management</li>
-                    <li>• <code>analytics</code> - Analytics data</li>
-                    <li>• <code>backup</code> - Create backup</li>
+                    <li>• <code>system_status</code> - Статус системы</li>
+                    <li>• <code>users_stats</code> - Статистика пользователей</li>
+                    <li>• <code>tasks_management</code> - Управление задачами</li>
+                    <li>• <code>database_query</code> - Выполнение запросов к БД</li>
+                    <li>• <code>backup_data</code> - Создание бэкапа</li>
+                    <li>• <code>analytics</code> - Аналитика</li>
                   </ul>
                 </div>
               </CardContent>

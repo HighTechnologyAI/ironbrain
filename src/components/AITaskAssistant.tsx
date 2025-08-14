@@ -1,435 +1,585 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useLanguage } from '@/hooks/use-language';
 import { 
   Bot, 
-  Send, 
+  Zap, 
+  User, 
   Clock, 
-  CheckCircle, 
-  AlertCircle, 
-  Lightbulb,
-  Target,
-  Calendar,
-  Users,
-  Paperclip,
-  Star
+  Target, 
+  Sparkles,
+  MessageSquare,
+  BarChart3,
+  Settings,
+  Send
 } from 'lucide-react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-
-interface AIMessage {
-  id: string;
-  content: string;
-  isBot: boolean;
-  timestamp: string;
-  taskId?: string;
-  language?: string;
-}
-
-interface TaskSuggestion {
-  id: string;
-  type: 'priority' | 'deadline' | 'assignment' | 'optimization';
-  title: string;
-  description: string;
-  confidence: number;
-  impact: 'low' | 'medium' | 'high';
-  action: string;
-}
+import { ToneSelector, type AITone } from '@/components/ui/tone-selector';
 
 interface AITaskAssistantProps {
-  taskId?: string;
-  projectId?: string;
+  employees?: Array<{
+    id: string;
+    full_name: string;
+    position: string;
+    department: string;
+  }>;
+  onTaskCreated?: (task: any) => void;
 }
 
-const AITaskAssistant: React.FC<AITaskAssistantProps> = ({ taskId, projectId }) => {
+const AITaskAssistant: React.FC<AITaskAssistantProps> = ({ 
+  employees = [], 
+  onTaskCreated 
+}) => {
+  const [selectedEmployee, setSelectedEmployee] = useState('');
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<AIMessage[]>([]);
-  const [suggestions, setSuggestions] = useState<TaskSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [aiResponse, setAiResponse] = useState<any>(null);
+  const [mode, setMode] = useState<'create_task' | 'analyze_workload' | 'suggest_optimization' | 'chat'>('create_task');
+  const { toast } = useToast();
+  const { t, language } = useLanguage();
 
-  // Fetch AI messages for the task
-  const { data: aiMessages, refetch: refetchMessages } = useQuery({
-    queryKey: ['task-ai-messages', taskId],
-    queryFn: async () => {
-      if (!taskId) return [];
-      
-      const { data, error } = await supabase
-        .from('task_ai_messages')
-        .select('*')
-        .eq('task_id', taskId)
-        .order('created_at', { ascending: true });
+  // Task-aware chat state
+  type Message = { id: string; content: string; isBot: boolean; timestamp: Date };
+  const [taskOptions, setTaskOptions] = useState<Array<{ id: string; title: string }>>([]);
+  const [selectedTaskId, setSelectedTaskId] = useState('');
+  const [selectedTaskCtx, setSelectedTaskCtx] = useState<any | null>(null);
+  const [chatMessages, setChatMessages] = useState<Message[]>([]);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [profileId, setProfileId] = useState<string | null>(null);
+  const [aiTone, setAiTone] = useState<AITone>('professional');
 
+  // Load own profile and a simple tasks list
+  useEffect(() => {
+    (async () => {
+      const [{ data: me }, { data: tasks }] = await Promise.all([
+        supabase.rpc('get_current_user_profile'),
+        supabase
+          .from('tasks')
+          .select('id, title')
+          .order('created_at', { ascending: false })
+          .limit(100)
+      ]);
+      if (me) setProfileId((me as any).id);
+      if (tasks) setTaskOptions(tasks as any);
+    })();
+  }, []);
+
+  const persistMessage = async (content: string, isBot: boolean) => {
+    if (!profileId || !selectedTaskId) return;
+    await supabase.from('task_ai_messages').insert({
+      task_id: selectedTaskId,
+      user_id: profileId,
+      is_bot: isBot,
+      content,
+      language
+    });
+  };
+
+  const loadMessages = async () => {
+    if (!profileId || !selectedTaskId) return;
+    const { data } = await supabase
+      .from('task_ai_messages')
+      .select('id, content, is_bot, created_at')
+      .eq('task_id', selectedTaskId)
+      .eq('user_id', profileId)
+      .order('created_at', { ascending: true });
+    if (data) {
+      setChatMessages(
+        data.map((m: any) => ({ id: m.id, content: m.content, isBot: m.is_bot, timestamp: new Date(m.created_at) }))
+      );
+    }
+  };
+
+  const loadSelectedTaskCtx = async (taskId: string) => {
+    const { data: task } = await supabase
+      .from('tasks')
+      .select('id, title, description, status, priority, tags, estimated_hours, assigned_to')
+      .eq('id', taskId)
+      .maybeSingle();
+    if (task) {
+      let assignee: any = null;
+      if (task.assigned_to) {
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('full_name, position, id')
+          .eq('id', task.assigned_to)
+          .maybeSingle();
+        if (prof) assignee = { full_name: prof.full_name, position: prof.position, id: prof.id };
+      }
+      setSelectedTaskCtx({ ...task, assigned_to: assignee });
+    }
+  };
+
+  useEffect(() => {
+    if (selectedTaskId) {
+      loadSelectedTaskCtx(selectedTaskId);
+      loadMessages();
+    } else {
+      setChatMessages([]);
+      setSelectedTaskCtx(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTaskId, profileId]);
+
+  const chatSend = async () => {
+    if (!selectedTaskId || !selectedTaskCtx) {
+      toast({ title: t.error, description: 'Выберите задачу для чата', variant: 'destructive' });
+      return;
+    }
+    if (!message.trim() || chatLoading) return;
+
+    const userMsg: Message = { id: Date.now().toString(), content: message, isBot: false, timestamp: new Date() };
+    setChatMessages((prev) => [...prev, userMsg]);
+    setMessage('');
+    setChatLoading(true);
+    await persistMessage(userMsg.content, false);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('task-ai-assistant', {
+        body: {
+          message: userMsg.content,
+          taskContext: selectedTaskCtx,
+          employeeId: selectedTaskCtx?.assigned_to?.id || null,
+          language,
+          tone: aiTone,
+        },
+      });
       if (error) throw error;
-      return data || [];
-    },
-    enabled: !!taskId
-  });
+      const botMsg: Message = { id: (Date.now() + 1).toString(), content: data.response, isBot: true, timestamp: new Date() };
+      setChatMessages((prev) => [...prev, botMsg]);
+      await persistMessage(botMsg.content, true);
+    } catch (e: any) {
+      console.error('AI chat error:', e);
+      toast({ title: t.aiErrorTitle, description: e.message || t.aiErrorDesc, variant: 'destructive' });
+    } finally {
+      setChatLoading(false);
+    }
+  };
 
-  // Send message to AI assistant
-  const sendMessageMutation = useMutation({
-    mutationFn: async ({ content, taskId: msgTaskId }: { content: string, taskId?: string }) => {
+  const handleAIRequest = async () => {
+    // In chat mode we use the task-focused chat flow
+    if (mode === 'chat') {
+      await chatSend();
+      return;
+    }
+
+    if (!message.trim() && mode !== 'analyze_workload') {
+      toast({
+        title: t.aiErrorTitle,
+        description: t.aiMessageRequired,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!selectedEmployee) {
+      toast({
+        title: t.aiErrorTitle, 
+        description: t.aiEmployeeRequired,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
       const { data, error } = await supabase.functions.invoke('ai-task-assistant', {
         body: {
-          message: content,
-          taskId: msgTaskId,
-          projectId,
-          context: {
-            previousMessages: messages.slice(-5), // Last 5 messages for context
-            suggestions: suggestions
-          }
+          action: mode,
+          employeeId: selectedEmployee || null,
+          message: message.trim(),
+          taskContext: "Mode: " + mode,
+          language,
+          tone: aiTone,
         }
       });
 
       if (error) throw error;
-      return data;
-    },
-    onSuccess: (data) => {
-      const botMessage: AIMessage = {
-        id: Date.now().toString() + '_bot',
-        content: data.response || 'I understand. Let me help you with that.',
-        isBot: true,
-        timestamp: new Date().toISOString(),
-        taskId
-      };
-      
-      setMessages(prev => [...prev, botMessage]);
-      
-      if (data.suggestions) {
-        setSuggestions(data.suggestions);
+
+      if (data.success) {
+        setAiResponse(data.data);
+        toast({ title: t.aiAssistantReadyTitle, description: t.aiAssistantReadyDesc });
+      } else {
+        throw new Error(data.error || 'Неизвестная ошибка');
       }
-      
-      toast.success('AI assistant responded');
-      refetchMessages();
-    },
-    onError: (error) => {
-      console.error('AI assistant error:', error);
-      // Fallback response
-      const botMessage: AIMessage = {
-        id: Date.now().toString() + '_fallback',
-        content: 'I\'m having trouble connecting right now, but I can help you with task management, prioritization, and optimization suggestions.',
-        isBot: true,
-        timestamp: new Date().toISOString(),
-        taskId
-      };
-      setMessages(prev => [...prev, botMessage]);
-      toast.error('AI assistant unavailable - using offline mode');
-    },
-    onSettled: () => {
+    } catch (error) {
+      console.error('AI Assistant error:', error);
+      toast({ title: t.aiErrorTitle, description: (error as any).message || t.aiErrorDesc, variant: "destructive" });
+    } finally {
       setIsLoading(false);
     }
-  });
+  };
 
-  // Initialize with sample suggestions
-  useEffect(() => {
-    const sampleSuggestions: TaskSuggestion[] = [
-      {
-        id: '1',
-        type: 'priority',
-        title: 'Increase Task Priority',
-        description: 'This task affects critical system components and should be prioritized',
-        confidence: 89,
-        impact: 'high',
-        action: 'Change priority to High'
-      },
-      {
-        id: '2',
-        type: 'deadline',
-        title: 'Extend Deadline',
-        description: 'Based on current workload, consider extending deadline by 2 days',
-        confidence: 72,
-        impact: 'medium',
-        action: 'Extend deadline to next Friday'
-      },
-      {
-        id: '3',
-        type: 'assignment',
-        title: 'Add Team Member',
-        description: 'Task complexity suggests adding a specialist to the team',
-        confidence: 84,
-        impact: 'high',
-        action: 'Assign specialist from engineering team'
-      },
-      {
-        id: '4',
-        type: 'optimization',
-        title: 'Break Down Task',
-        description: 'This task could be more manageable if broken into 3 subtasks',
-        confidence: 76,
-        impact: 'medium',
-        action: 'Create subtasks for better tracking'
+  const handleCreateTask = async () => {
+    if (!aiResponse || !selectedEmployee) return;
+
+    try {
+      // Профиль выбранного исполнителя (валидация)
+      const { data: profile, error: profileErr } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', selectedEmployee)
+        .single();
+
+      if (profileErr || !profile) {
+        throw new Error('Профиль сотрудника не найден');
       }
-    ];
-    
-    setSuggestions(sampleSuggestions);
-  }, []);
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
+      // Текущий пользователь (создатель задачи)
+      const { data: me, error: meError } = await supabase.rpc('get_current_user_profile');
+      if (meError || !me) {
+        throw new Error('Не удалось получить профиль текущего пользователя');
+      }
 
-    const userMessage: AIMessage = {
-      id: Date.now().toString(),
-      content: message,
-      isBot: false,
-      timestamp: new Date().toISOString(),
-      taskId
-    };
+      // Нормализуем оценку времени
+      let estimated: number | null = null;
+      if (typeof aiResponse.estimated_hours === 'number') {
+        estimated = Math.round(aiResponse.estimated_hours);
+      } else if (typeof aiResponse.estimated_hours === 'string') {
+        const m = aiResponse.estimated_hours.match(/\d+(?:[\.,]\d+)?/);
+        if (m) estimated = Math.round(parseFloat(m[0].replace(',', '.')));
+      }
 
-    setMessages(prev => [...prev, userMessage]);
-    setIsLoading(true);
-    
-    sendMessageMutation.mutate({ content: message, taskId });
-    setMessage('');
-  };
+      // Нормализуем теги
+      let tags: string[] = [];
+      if (Array.isArray(aiResponse.tags)) {
+        tags = aiResponse.tags.map((t: any) => String(t));
+      } else if (typeof aiResponse.tags === 'string') {
+        tags = aiResponse.tags.split(',').map((s: string) => s.trim()).filter(Boolean);
+      }
 
-  const getSuggestionIcon = (type: string) => {
-    switch (type) {
-      case 'priority': return <Star className="h-4 w-4" />;
-      case 'deadline': return <Calendar className="h-4 w-4" />;
-      case 'assignment': return <Users className="h-4 w-4" />;
-      case 'optimization': return <Target className="h-4 w-4" />;
-      default: return <Lightbulb className="h-4 w-4" />;
+      const taskData = {
+        title: aiResponse.title || 'AI Generated Task',
+        description: aiResponse.description || message,
+        assigned_to: selectedEmployee,
+        status: 'pending' as const,
+        priority: (aiResponse.priority as 'low' | 'medium' | 'high' | 'critical') || 'medium',
+        estimated_hours: estimated,
+        tags,
+        created_by: (me as any).id,
+        company_id: null
+      };
+
+      const { data: inserted, error } = await supabase
+        .from('tasks')
+        .insert(taskData)
+        .select()
+        .maybeSingle();
+
+      if (error) throw error;
+
+      toast({
+        title: t.taskCreatedTitle,
+        description: `${t.taskAssigned}: "${taskData.title}"`,
+      });
+
+      setMessage('');
+      setAiResponse(null);
+      
+      if (onTaskCreated) {
+        onTaskCreated(inserted || taskData);
+      }
+    } catch (error: any) {
+      console.error('Task creation error:', error);
+      toast({
+        title: t.error,
+        description: error?.message || t.taskCreationError,
+        variant: "destructive"
+      });
     }
   };
 
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case 'high': return 'bg-red-500 text-white';
-      case 'medium': return 'bg-yellow-500 text-white';
-      case 'low': return 'bg-green-500 text-white';
-      default: return 'bg-muted text-muted-foreground';
-    }
-  };
-
-  const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const modes = [
+    { value: 'create_task', label: t.aiModeCreateTask, icon: Target },
+    { value: 'analyze_workload', label: t.aiModeAnalyzeWorkload, icon: BarChart3 },
+    { value: 'suggest_optimization', label: t.aiModeSuggestOptimization, icon: Settings },
+    { value: 'chat', label: t.aiModeChat, icon: MessageSquare }
+  ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Bot className="h-5 w-5" />
-          AI Task Assistant
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Get intelligent suggestions and assistance for task management
-        </p>
-      </div>
-
-      {/* AI Suggestions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Lightbulb className="h-4 w-4" />
-            AI Suggestions
-          </CardTitle>
-          <CardDescription>
-            Smart recommendations to optimize this task
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {suggestions.map((suggestion) => (
-              <div key={suggestion.id} className="p-3 border rounded-lg space-y-2">
-                <div className="flex items-start justify-between">
+    <Card className="bg-card border-border cyber-glow">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 cyber-text">
+          <Bot className="h-5 w-5 animate-pulse" />
+          {t.aiAssistant}
+          <Sparkles className="h-4 w-4 text-accent" />
+        </CardTitle>
+        <CardDescription>
+          {t.aiAssistantDesc}
+        </CardDescription>
+      </CardHeader>
+      
+      <CardContent className="space-y-6">
+        {/* Настройки тональности */}
+        <ToneSelector
+          selectedTone={aiTone}
+          onToneChange={setAiTone}
+          size="sm"
+        />
+        
+        {/* Режим работы */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground">{t.aiModeLabel}</label>
+          <Select value={mode} onValueChange={(value: any) => setMode(value)}>
+            <SelectTrigger className="bg-input border-border">
+              <SelectValue placeholder={t.aiModePlaceholder} />
+            </SelectTrigger>
+            <SelectContent>
+              {modes.map((modeOption) => (
+                <SelectItem key={modeOption.value} value={modeOption.value}>
                   <div className="flex items-center gap-2">
-                    {getSuggestionIcon(suggestion.type)}
-                    <h4 className="font-medium text-sm">{suggestion.title}</h4>
+                    <modeOption.icon className="h-4 w-4" />
+                    {modeOption.label}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className={getImpactColor(suggestion.impact)} variant="secondary">
-                      {suggestion.impact} impact
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {suggestion.confidence}% confidence
-                    </span>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground">{suggestion.description}</p>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <CheckCircle className="h-3 w-3" />
-                    Apply Suggestion
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    Learn More
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      {/* Chat Interface */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Bot className="h-4 w-4" />
-            Chat with AI Assistant
-          </CardTitle>
-          <CardDescription>
-            Ask questions about task management, optimization, or get help
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Messages */}
-          <ScrollArea className="h-64 w-full border rounded-lg p-4">
-            {messages.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
-                <div className="text-center">
-                  <Bot className="h-8 w-8 mx-auto mb-2" />
-                  <p className="text-sm">Start a conversation with the AI assistant</p>
-                  <p className="text-xs">Ask about task optimization, deadlines, or team management</p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {messages.map((msg, index) => (
-                  <div key={msg.id}>
-                    <div className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'}`}>
-                      <div className={`max-w-[80%] rounded-lg p-3 ${
-                        msg.isBot 
-                          ? 'bg-muted text-foreground' 
-                          : 'bg-primary text-primary-foreground'
-                      }`}>
-                        <div className="flex items-center gap-2 mb-1">
-                          {msg.isBot ? (
-                            <Bot className="h-3 w-3" />
-                          ) : (
-                            <Users className="h-3 w-3" />
-                          )}
-                          <span className="text-xs opacity-70">
-                            {msg.isBot ? 'AI Assistant' : 'You'} • {formatTime(msg.timestamp)}
-                          </span>
-                        </div>
-                        <p className="text-sm">{msg.content}</p>
-                      </div>
-                    </div>
-                    {index < messages.length - 1 && <Separator className="my-2" />}
-                  </div>
+        {/* Выбор задачи для режима чата */}
+        {mode === 'chat' && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">{t.tasks || 'Задачи'}</label>
+            <Select value={selectedTaskId} onValueChange={setSelectedTaskId}>
+              <SelectTrigger className="bg-input border-border">
+                <SelectValue placeholder={t.aiModeChat || 'Выберите задачу'} />
+              </SelectTrigger>
+              <SelectContent>
+                {taskOptions.map((task) => (
+                  <SelectItem key={task.id} value={task.id}>
+                    {task.title}
+                  </SelectItem>
                 ))}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                      <div className="flex items-center gap-2">
-                        <Bot className="h-3 w-3 animate-pulse" />
-                        <span className="text-xs">AI is thinking...</span>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {/* Выбор сотрудника */}
+        {mode !== 'chat' && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">{t.employee}</label>
+            <Select value={selectedEmployee} onValueChange={setSelectedEmployee}>
+              <SelectTrigger className="bg-input border-border">
+                <SelectValue placeholder={t.aiEmployeePlaceholder} />
+              </SelectTrigger>
+              <SelectContent>
+                {employees.map((employee) => (
+                  <SelectItem key={employee.id} value={employee.id}>
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      <div>
+                        <div className="font-medium">{employee.full_name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {employee.position} • {employee.department}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </ScrollArea>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
-          {/* Message Input */}
-          <div className="flex gap-2">
+        {/* Сообщение для AI */}
+        {mode !== 'analyze_workload' && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              {mode === 'create_task' ? t.aiTaskDescriptionLabel : t.aiMessageLabel}
+            </label>
             <Textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Ask the AI assistant about task management, optimization, or any questions..."
-              className="flex-1"
-              rows={2}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
+              placeholder={
+                mode === 'create_task' 
+                  ? t.aiPlaceholderCreateTask
+                  : mode === 'suggest_optimization'
+                  ? t.aiPlaceholderSuggestOptimization
+                  : t.aiPlaceholderChat
+              }
+              className="bg-input border-border min-h-[100px]"
             />
-            <div className="flex flex-col gap-2">
-              <Button 
-                onClick={handleSendMessage}
-                disabled={!message.trim() || isLoading}
-                size="sm"
-                className="gap-2"
-              >
-                <Send className="h-4 w-4" />
-                Send
-              </Button>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Paperclip className="h-4 w-4" />
-                Attach
-              </Button>
-            </div>
           </div>
+        )}
 
-          {/* Quick Actions */}
-          <div className="flex flex-wrap gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setMessage('How can I optimize this task?')}
-              className="text-xs"
-            >
-              Optimize Task
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setMessage('What are the dependencies for this task?')}
-              className="text-xs"
-            >
-              Check Dependencies
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setMessage('Suggest team members for this task')}
-              className="text-xs"
-            >
-              Team Suggestions
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setMessage('Estimate completion time')}
-              className="text-xs"
-            >
-              Time Estimate
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Кнопка запроса */}
+        <Button 
+          onClick={handleAIRequest}
+          disabled={isLoading}
+          className="w-full bg-primary hover:bg-primary/90 cyber-glow"
+        >
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <Zap className="h-4 w-4 animate-spin" />
+              {t.aiProcessing}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              {t.aiRequest}
+            </div>
+          )}
+        </Button>
 
-      {/* Task Insights */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Target className="h-4 w-4" />
-            Task Insights
-          </CardTitle>
-          <CardDescription>
-            AI-powered analysis of task patterns and performance
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-blue-500 mb-2">87%</div>
-              <div className="text-sm text-muted-foreground">Completion Probability</div>
-            </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-green-500 mb-2">3.2d</div>
-              <div className="text-sm text-muted-foreground">Estimated Duration</div>
-            </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-orange-500 mb-2">Medium</div>
-              <div className="text-sm text-muted-foreground">Complexity Level</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        {/* Ответ AI */}
+        {aiResponse && (
+          <Card className="bg-secondary/50 border-primary/30">
+            <CardHeader>
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Bot className="h-4 w-4 text-primary" />
+                {t.aiResponseTitle}
+                <Badge variant="outline" className="border-primary/30 text-primary">
+                  {mode === 'create_task' ? t.aiBadgeTask : 
+                   mode === 'analyze_workload' ? t.aiBadgeAnalysis : 
+                   mode === 'suggest_optimization' ? t.aiBadgeOptimization : t.aiBadgeChat}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {mode === 'create_task' && aiResponse.title && (
+                <>
+                  <div>
+                    <h4 className="font-medium text-foreground mb-1">{t.aiTaskName}</h4>
+                    <p className="text-sm cyber-text font-mono">{aiResponse.title}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-foreground mb-1">{t.aiDescription}</h4>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {aiResponse.description}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-4 text-xs">
+                    <div className="flex items-center gap-1">
+                      <Target className="h-3 w-3" />
+                      <span>{t.aiPriority}: </span>
+                      <Badge variant="outline" className="border-accent/30 text-accent">
+                        {aiResponse.priority}
+                      </Badge>
+                    </div>
+                    {aiResponse.estimated_hours && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        <span>{t.aiTime}: {aiResponse.estimated_hours}{t.hours}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {aiResponse.tags && aiResponse.tags.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">{t.aiTags}</h4>
+                      <div className="flex gap-1 flex-wrap">
+                        {aiResponse.tags.map((tag: string, index: number) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {aiResponse.recommendations && (
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">{t.aiRecommendations}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {aiResponse.recommendations}
+                      </p>
+                    </div>
+                  )}
+
+                  <Button 
+                    onClick={handleCreateTask}
+                    className="w-full bg-accent hover:bg-accent/90"
+                  >
+                    {t.createTask}
+                  </Button>
+                </>
+              )}
+
+              {mode === 'analyze_workload' && (
+                <>
+                  {aiResponse.workload_status && (
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">{t.aiWorkloadStatus}</h4>
+                      <Badge 
+                        variant={aiResponse.workload_status === 'critical' ? 'destructive' : 'outline'}
+                        className="text-sm"
+                      >
+                        {aiResponse.workload_status}
+                      </Badge>
+                    </div>
+                  )}
+                  
+                  {aiResponse.analysis && (
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">{t.aiAnalysis}</h4>
+                      <p className="text-sm text-muted-foreground">{aiResponse.analysis}</p>
+                    </div>
+                  )}
+
+                  {aiResponse.recommendations && Array.isArray(aiResponse.recommendations) && (
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">{t.aiRecommendations}</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        {aiResponse.recommendations.map((rec: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <span className="text-primary">•</span>
+                            {rec}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {mode === 'suggest_optimization' && (
+                <>
+                  {aiResponse.optimizations && Array.isArray(aiResponse.optimizations) && (
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">{t.aiOptimizations}</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        {aiResponse.optimizations.map((opt: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <span className="text-primary">⚡</span>
+                            {opt}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {aiResponse.skill_development && (
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">{t.aiSkillDevelopment}</h4>
+                      <p className="text-sm text-muted-foreground">{aiResponse.skill_development}</p>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {(mode === 'chat' || aiResponse.response) && (
+                <div>
+                  <h4 className="font-medium text-foreground mb-1">{t.aiAnswer}</h4>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {aiResponse.response || JSON.stringify(aiResponse, null, 2)}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
