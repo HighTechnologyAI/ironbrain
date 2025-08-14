@@ -170,35 +170,6 @@ const UAVDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* KPI Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {kpiCards.map((kpi, index) => (
-            <Card key={index} className="bg-surface-1 border-border hover:shadow-medium transition-all duration-300">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
-                  {kpi.title}
-                </CardTitle>
-                <kpi.icon className="h-5 w-5 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold font-mono text-foreground">{kpi.value}</div>
-                <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center gap-1 text-xs">
-                    <TrendingUp className="h-3 w-3 text-success" />
-                    <span className="text-success font-semibold">{kpi.change}</span>
-                  </div>
-                  <StatusChip variant={kpi.status} className="text-xs">
-                    {kpi.status === "armed" ? t.armedStatus || "ВООРУЖЕН" : 
-                     kpi.status === "ready" ? t.readyStatus || "ГОТОВ" : 
-                     kpi.status === "info" ? "ИНФО" : t.warningStatus || "ПРЕДУПРЕЖДЕНИЕ"}
-                  </StatusChip>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">{kpi.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
         {/* System Status Panel */}
         <Card className="bg-surface-1 border-border">
           <CardHeader>
@@ -276,6 +247,35 @@ const UAVDashboard = () => {
               </Badge>
             )}
           </Button>
+        </div>
+
+        {/* KPI Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {kpiCards.map((kpi, index) => (
+            <Card key={index} className="bg-surface-1 border-border hover:shadow-medium transition-all duration-300">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium font-ui text-muted-foreground">
+                  {kpi.title}
+                </CardTitle>
+                <kpi.icon className="h-5 w-5 text-primary" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold font-mono text-foreground">{kpi.value}</div>
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center gap-1 text-xs">
+                    <TrendingUp className="h-3 w-3 text-success" />
+                    <span className="text-success font-semibold">{kpi.change}</span>
+                  </div>
+                  <StatusChip variant={kpi.status} className="text-xs">
+                    {kpi.status === "armed" ? t.armedStatus || "ВООРУЖЕН" : 
+                     kpi.status === "ready" ? t.readyStatus || "ГОТОВ" : 
+                     kpi.status === "info" ? "ИНФО" : t.warningStatus || "ПРЕДУПРЕЖДЕНИЕ"}
+                  </StatusChip>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">{kpi.description}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </div>
