@@ -139,6 +139,60 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_assistant_logs: {
+        Row: {
+          created_at: string | null
+          event: string | null
+          id: string
+          payload: Json | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event?: string | null
+          id?: string
+          payload?: Json | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event?: string | null
+          id?: string
+          payload?: Json | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ai_commands_queue: {
+        Row: {
+          args: Json | null
+          created_at: string | null
+          id: string
+          status: string | null
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          args?: Json | null
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          args?: Json | null
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       budget_entries: {
         Row: {
           actual_amount: number
