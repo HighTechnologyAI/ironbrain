@@ -630,7 +630,7 @@ const Tasks = () => {
                   </div>
                   
                   {/* Action Panel */}
-                  <div className="flex flex-wrap items-center gap-2 lg:gap-3">
+                  <div className="flex flex-wrap items-center gap-2 lg:gap-3 min-w-0">
                     <CreateTaskForm onTaskCreated={loadTasks} />
                     
                     <Button
