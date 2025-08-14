@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusChip } from '@/components/neon/StatusChip';
 import { Button } from '@/components/neon/Button';
+import SystemHealth from '@/components/SystemHealth';
+import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
+import { RecentEventsWidget } from '@/components/RecentEventsWidget';
 import { 
   Activity, 
   Users, 
@@ -15,7 +18,6 @@ import {
   Clock
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import SystemHealth from '@/components/SystemHealth';
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -105,6 +107,18 @@ const Dashboard: React.FC = () => {
         </p>
       </div>
 
+      {/* UAV Metrics Section - Only show if UAV features are enabled */}
+      {(import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' || 
+        import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' ||
+        import.meta.env.VITE_FEATURE_FLEET === 'true') && (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-4">UAV Operations</h2>
+            <UAVMetricsWidget />
+          </div>
+        </div>
+      )}
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => {
@@ -163,8 +177,15 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* System Status */}
+        {/* System Health */}
         <SystemHealth />
+        
+        {/* Recent UAV Events - Only show if UAV features are enabled */}
+        {(import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' || 
+          import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' ||
+          import.meta.env.VITE_FEATURE_FLEET === 'true') && (
+          <RecentEventsWidget />
+        )}
       </div>
     </div>
   );
