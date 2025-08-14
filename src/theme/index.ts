@@ -65,12 +65,20 @@ export const applyNeonTheme = (config: NeonThemeConfig = {}) => {
 
 // Check if Neon UI v2 is enabled
 export const isNeonUIEnabled = (): boolean => {
-  return import.meta.env.VITE_UI_V2_ENABLED === 'true';
+  try {
+    return import.meta.env?.VITE_UI_V2_ENABLED === 'true';
+  } catch {
+    return false;
+  }
 };
 
 // Get accent color from environment
 export const getAccentColor = (): string => {
-  return import.meta.env.VITE_UI_V2_ACCENT || '#16C172';
+  try {
+    return import.meta.env?.VITE_UI_V2_ACCENT || '#16C172';
+  } catch {
+    return '#16C172';
+  }
 };
 
 // Initialize theme system
