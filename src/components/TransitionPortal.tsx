@@ -12,14 +12,34 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
   const [phase, setPhase] = useState<'kraken' | 'door' | 'portal' | 'consume' | 'complete'>('kraken');
   const navigate = useNavigate();
 
+  // Debug logs
   useEffect(() => {
-    if (!isActive) return;
+    if (isActive) {
+      console.log('TransitionPortal activated!');
+    }
+  }, [isActive]);
+
+  useEffect(() => {
+    if (!isActive) {
+      console.log('TransitionPortal not active, returning');
+      return;
+    }
+
+    console.log('Starting transition animation...');
 
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      console.error('Canvas not found!');
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.error('Canvas context not found!');
+      return;
+    }
+
+    console.log('Canvas initialized successfully');
 
     const resize = () => {
       const dpr = Math.max(1, window.devicePixelRatio || 1);
@@ -32,7 +52,9 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
     window.addEventListener('resize', resize);
 
     let startTime = Date.now();
-    const PHASE_DURATION = 1200; // milliseconds per phase
+    const PHASE_DURATION = 2000; // Увеличил до 2 секунд для лучшей видимости
+
+    console.log('Animation started, phase:', phase);
 
     const animate = () => {
       const elapsed = Date.now() - startTime;
@@ -46,24 +68,28 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
       if (phase === 'kraken') {
         drawKrakenAttraction(ctx, w, h, phaseProgress);
         if (phaseProgress >= 1) {
+          console.log('Transitioning to door phase');
           setPhase('door');
           startTime = Date.now();
         }
       } else if (phase === 'door') {
         drawDoorSlide(ctx, w, h, phaseProgress);
         if (phaseProgress >= 1) {
+          console.log('Transitioning to portal phase');
           setPhase('portal');
           startTime = Date.now();
         }
       } else if (phase === 'portal') {
         drawCyberPortal(ctx, w, h, phaseProgress);
         if (phaseProgress >= 1) {
+          console.log('Transitioning to consume phase');
           setPhase('consume');
           startTime = Date.now();
         }
       } else if (phase === 'consume') {
         drawConsumption(ctx, w, h, phaseProgress);
         if (phaseProgress >= 1) {
+          console.log('Animation complete, navigating...');
           setPhase('complete');
           navigate('/');
           setTimeout(() => {
@@ -87,6 +113,7 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
   }, [isActive, phase, navigate, onComplete]);
 
   const drawKrakenAttraction = (ctx: CanvasRenderingContext2D, w: number, h: number, progress: number) => {
+    console.log('Drawing kraken attraction, progress:', progress);
     // Dark overlay
     ctx.fillStyle = `rgba(13, 13, 13, ${progress * 0.7})`;
     ctx.fillRect(0, 0, w, h);
@@ -281,12 +308,19 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
 
   if (!isActive) return null;
 
+  console.log('Rendering TransitionPortal, isActive:', isActive, 'phase:', phase);
+
   return (
-    <div className="fixed inset-0 z-[9999] pointer-events-none">
+    <div className="fixed inset-0 z-[9999] pointer-events-none bg-transparent">
+      <div className="absolute inset-0 bg-black/20" />
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
-        style={{ background: 'transparent' }}
+        style={{ 
+          background: 'transparent',
+          display: 'block',
+          zIndex: 10000
+        }}
       />
     </div>
   );

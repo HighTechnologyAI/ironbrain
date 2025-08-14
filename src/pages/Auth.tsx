@@ -164,6 +164,12 @@ const Auth = () => {
     setIsTransitioning(false);
   };
 
+  // Test button for animation
+  const testAnimation = () => {
+    console.log('Testing animation...');
+    setIsTransitioning(true);
+  };
+
   return (
     <>
       <TransitionPortal 
@@ -174,6 +180,14 @@ const Auth = () => {
       <CyberBackground />
       <div className={`w-full max-w-md relative z-10 transition-all duration-1000 ${isTransitioning ? 'transform translate-x-8 scale-95' : ''}`}>
         {/* Header */}
+        {/* Test Animation Button */}
+        <button 
+          onClick={testAnimation}
+          className="fixed top-20 right-4 z-50 px-4 py-2 bg-primary text-black rounded-lg hover:bg-primary/80 transition-colors"
+        >
+          Test Animation
+        </button>
+
         {/* Language Switcher */}
         <div className="fixed top-4 right-4 z-50">
           <LanguageSwitcher />
