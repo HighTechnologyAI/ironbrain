@@ -123,30 +123,40 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         setLoading(true);
         setError(null);
         
-        // Получаем токен через edge function
-        console.log('Calling get-mapbox-token edge function...');
-        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        console.log('🗺️ Инициализация карты...');
         
-        console.log('Edge function response:', { data, error });
+        // Получаем токен через edge function с таймаутом
+        console.log('📡 Вызов get-mapbox-token edge function...');
+        
+        const { data, error } = await Promise.race([
+          supabase.functions.invoke('get-mapbox-token'),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 10000)
+          )
+        ]) as any;
+        
+        console.log('📡 Ответ edge function:', { data, error });
         
         if (error) {
-          console.error('Edge function error:', error);
+          console.error('❌ Ошибка edge function:', error);
           setError('Ошибка получения Mapbox токена: ' + error.message);
           setLoading(false);
           return;
         }
 
         if (!data?.token) {
-          console.error('No token in response:', data);
+          console.error('❌ Токен не найден в ответе:', data);
           setError('Mapbox токен не найден в ответе сервера');
           setLoading(false);
           return;
         }
 
         const token = data.token;
+        console.log('✅ Токен получен успешно');
         setMapboxToken(token);
         mapboxgl.accessToken = token;
 
+        console.log('🗺️ Создание экземпляра карты...');
         // Инициализируем карту с кибер-стилем
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
@@ -158,6 +168,7 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
           antialias: true
         });
 
+        console.log('🗺️ Добавление контролов навигации...');
         // Добавляем контролы навигации
         map.current.addControl(
           new mapboxgl.NavigationControl({
@@ -166,8 +177,18 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
           'top-right'
         );
 
+        // Таймаут для загрузки карты
+        const loadTimeout = setTimeout(() => {
+          console.error('⏰ Таймаут загрузки карты');
+          setError('Таймаут загрузки карты. Попробуйте еще раз.');
+          setLoading(false);
+        }, 15000);
+
         // Кастомизация стиля карты для кибер-эффекта
         map.current.on('style.load', () => {
+          console.log('🎨 Стиль карты загружен');
+          clearTimeout(loadTimeout);
+          
           if (!map.current) return;
           
           try {
@@ -188,14 +209,17 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
               map.current.setPaintProperty('land', 'fill-color', '#0a0a0f');
             }
           } catch (err) {
-            console.warn('Style customization error:', err);
+            console.warn('⚠️ Ошибка кастомизации стиля:', err);
           }
           
+          console.log('✅ Карта готова к использованию');
           setLoading(false);
         });
 
         map.current.on('error', (e) => {
-          console.error('Mapbox error:', e);
+          console.error('❌ Ошибка Mapbox:', e);
+          clearTimeout(loadTimeout);
+          
           if (e.error?.message?.includes('401')) {
             setError('Неверный Mapbox токен. Проверьте настройки.');
           } else {
@@ -205,12 +229,18 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         });
 
         map.current.on('load', () => {
+          console.log('🗺️ Карта полностью загружена');
+          clearTimeout(loadTimeout);
           setLoading(false);
         });
 
       } catch (err) {
-        console.error('Map initialization error:', err);
-        setError('Ошибка инициализации карты: ' + (err instanceof Error ? err.message : 'неизвестная ошибка'));
+        console.error('❌ Ошибка инициализации карты:', err);
+        if (err instanceof Error && err.message === 'Timeout') {
+          setError('Таймаут получения токена. Проверьте подключение к интернету.');
+        } else {
+          setError('Ошибка инициализации карты: ' + (err instanceof Error ? err.message : 'неизвестная ошибка'));
+        }
         setLoading(false);
       }
     };
