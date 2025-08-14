@@ -6,6 +6,9 @@ import { AIAnalyticsPanel } from '@/components/AIAnalyticsPanel';
 import { AIMissionPlanner } from '@/components/AIMissionPlanner';
 import { EnhancedAIPanel } from '@/components/EnhancedAIPanel';
 import { AIAnalysisHistory } from '@/components/AIAnalysisHistory';
+import AIPredictiveAnalytics from '@/components/AIPredictiveAnalytics';
+import AIReportGenerator from '@/components/AIReportGenerator';
+import AISystemMetrics from '@/components/AISystemMetrics';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
 import { 
@@ -14,7 +17,10 @@ import {
   BarChart3, 
   Activity,
   Sparkles,
-  Clock
+  Clock,
+  TrendingUp,
+  FileText,
+  Monitor
 } from 'lucide-react';
 
 const AIAssistantPage: React.FC = () => {
@@ -48,22 +54,34 @@ const AIAssistantPage: React.FC = () => {
 
       {/* AI Tools */}
       <Tabs defaultValue="enhanced" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="enhanced" className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             Enhanced AI
           </TabsTrigger>
           <TabsTrigger value="history" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
-            Analysis History
+            History
           </TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center gap-2">
             <Brain className="h-4 w-4" />
-            Legacy Analytics
+            Analytics
           </TabsTrigger>
           <TabsTrigger value="mission-planner" className="flex items-center gap-2">
             <Route className="h-4 w-4" />
-            Mission Planner
+            Planner
+          </TabsTrigger>
+          <TabsTrigger value="predictions" className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Predictions
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Reports
+          </TabsTrigger>
+          <TabsTrigger value="metrics" className="flex items-center gap-2">
+            <Monitor className="h-4 w-4" />
+            Metrics
           </TabsTrigger>
         </TabsList>
 
@@ -81,6 +99,18 @@ const AIAssistantPage: React.FC = () => {
 
         <TabsContent value="mission-planner" className="space-y-6">
           <AIMissionPlanner />
+        </TabsContent>
+
+        <TabsContent value="predictions" className="space-y-6">
+          <AIPredictiveAnalytics />
+        </TabsContent>
+
+        <TabsContent value="reports" className="space-y-6">
+          <AIReportGenerator />
+        </TabsContent>
+
+        <TabsContent value="metrics" className="space-y-6">
+          <AISystemMetrics />
         </TabsContent>
       </Tabs>
     </div>
