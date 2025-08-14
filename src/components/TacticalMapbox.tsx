@@ -111,17 +111,25 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
       return;
     }
 
-    if (!mapContainer.current) {
-      console.log('⏳ [EFFECT] mapContainer.current отсутствует, компонент может быть не в DOM');
-      return;
-    }
-
     if (!mapboxToken) {
       console.log('⏳ [EFFECT] mapboxToken отсутствует, ждем получения токена');
       return;
     }
 
-    console.log('✅ [EFFECT] Все условия выполнены, запускаем инициализацию карты');
+    // Проверяем готовность DOM элемента с задержкой
+    const checkAndInitialize = () => {
+      console.log('🔍 [CHECK] Проверяем готовность mapContainer...');
+      if (mapContainer.current) {
+        console.log('✅ [CHECK] mapContainer готов, инициализируем карту');
+        initializeMap();
+      } else {
+        console.log('⏳ [CHECK] mapContainer не готов, повторная проверка через 100ms');
+        setTimeout(checkAndInitialize, 100);
+      }
+    };
+
+    // Запускаем проверку с небольшой задержкой чтобы дать DOM отрендериться
+    setTimeout(checkAndInitialize, 50);
 
     const initializeMap = () => {
       console.log('🗺️ [INIT] Начинаем инициализацию карты');
