@@ -914,6 +914,7 @@ const Tasks = () => {
                     console.log(`AI Action: ${action} for task ${taskId}`);
                 }
               }}
+              onTaskUpdate={loadTasks}
             />
           </div>
         )}

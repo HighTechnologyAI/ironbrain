@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { StatusChip } from '@/components/ui/status-chip';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { toast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/hooks/use-language';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   Brain, 
   Target, 
@@ -49,10 +51,13 @@ interface SmartAISidebarProps {
   selectedTask?: Task | null;
   tasks: Task[];
   onTaskAction?: (action: string, taskId: string) => void;
+  onTaskUpdate?: () => void;
 }
 
-export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISidebarProps) => {
+export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction, onTaskUpdate }: SmartAISidebarProps) => {
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [isGeneratingSubtasks, setIsGeneratingSubtasks] = useState(false);
+  const [isLoadingAction, setIsLoadingAction] = useState<string | null>(null);
   const { t } = useLanguage();
 
   // Анализ рисков для выбранной задачи
@@ -169,6 +174,151 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
     };
   };
 
+  // Действия с задачами через AI
+  const handleGenerateSummary = async () => {
+    if (!selectedTask) return;
+    
+    setIsGeneratingSummary(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-task-assistant', {
+        body: {
+          action: 'analyze_task',
+          taskContext: {
+            id: selectedTask.id,
+            title: selectedTask.title,
+            description: selectedTask.description,
+            status: selectedTask.status,
+            priority: selectedTask.priority,
+            estimated_hours: selectedTask.estimated_hours,
+            actual_hours: selectedTask.actual_hours
+          },
+          message: 'Создай подробный анализ этой задачи с рекомендациями по улучшению',
+          language: 'ru'
+        }
+      });
+
+      if (error) throw error;
+      
+      toast({
+        title: "AI Анализ готов",
+        description: "Получен детальный анализ задачи",
+      });
+      
+    } catch (error) {
+      console.error('Error generating summary:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось сгенерировать анализ",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingSummary(false);
+    }
+  };
+
+  const handleGenerateSubtasks = async () => {
+    if (!selectedTask) return;
+    
+    setIsGeneratingSubtasks(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-task-assistant', {
+        body: {
+          action: 'suggest_optimization',
+          taskContext: {
+            id: selectedTask.id,
+            title: selectedTask.title,
+            description: selectedTask.description,
+            status: selectedTask.status,
+            priority: selectedTask.priority
+          },
+          message: 'Предложи подзадачи для разбиения этой задачи на более мелкие части',
+          language: 'ru'
+        }
+      });
+
+      if (error) throw error;
+      
+      toast({
+        title: "Подзадачи предложены",
+        description: "AI сгенерировал предложения по разбиению задачи",
+      });
+      
+    } catch (error) {
+      console.error('Error generating subtasks:', error);
+      toast({
+        title: "Ошибка", 
+        description: "Не удалось сгенерировать подзадачи",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingSubtasks(false);
+    }
+  };
+
+  const handleTaskAction = async (action: string, taskId: string) => {
+    if (!selectedTask) return;
+    
+    setIsLoadingAction(action);
+    
+    try {
+      let updateData: any = {};
+      
+      switch (action) {
+        case 'start_task':
+          updateData = { status: 'in_progress' };
+          break;
+        case 'update_progress':
+          // Здесь можно открыть модальное окно для обновления прогресса
+          toast({
+            title: "Обновление прогресса",
+            description: "Добавьте комментарий к задаче для обновления прогресса",
+          });
+          setIsLoadingAction(null);
+          return;
+        case 'log_time':
+          // Здесь можно открыть модальное окно для ввода времени
+          toast({
+            title: "Фиксация времени",
+            description: "Используйте форму редактирования задачи для добавления времени",
+          });
+          setIsLoadingAction(null);
+          return;
+        case 'resolve_blocker':
+          updateData = { status: 'in_progress' };
+          break;
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        const { error } = await supabase
+          .from('tasks')
+          .update({
+            ...updateData,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', taskId);
+
+        if (error) throw error;
+
+        toast({
+          title: "Задача обновлена",
+          description: `Действие "${action}" выполнено успешно`,
+        });
+
+        onTaskUpdate?.();
+      }
+      
+    } catch (error) {
+      console.error('Error performing task action:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось выполнить действие",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingAction(null);
+    }
+  };
+
   const summary = generateTaskSummary();
   const risks = selectedTask ? analyzeTaskRisks(selectedTask) : [];
   const nextActions = selectedTask ? generateNextActions(selectedTask) : [];
@@ -272,10 +422,15 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
                           <Button 
                             size="sm" 
                             variant="outline"
-                            onClick={() => onTaskAction?.(action.action, selectedTask.id)}
+                            onClick={() => handleTaskAction(action.action, selectedTask.id)}
                             className="flex-shrink-0"
+                            disabled={isLoadingAction === action.action}
                           >
-                            <ArrowRight className="h-3 w-3" />
+                            {isLoadingAction === action.action ? (
+                              <Timer className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <ArrowRight className="h-3 w-3" />
+                            )}
                           </Button>
                         </div>
                         <StatusChip 
@@ -351,20 +506,22 @@ export const SmartAISidebar = ({ selectedTask, tasks, onTaskAction }: SmartAISid
                 variant="outline" 
                 size="sm" 
                 className="w-full justify-start"
-                onClick={() => setIsGeneratingSummary(!isGeneratingSummary)}
-                disabled={isGeneratingSummary}
+                onClick={handleGenerateSummary}
+                disabled={isGeneratingSummary || !selectedTask}
               >
                 <Brain className="h-4 w-4 mr-2" />
-                {isGeneratingSummary ? 'Генерация...' : t.generateSummary}
+                {isGeneratingSummary ? 'Анализ...' : 'Анализ задачи'}
               </Button>
               
               <Button 
                 variant="outline" 
                 size="sm" 
                 className="w-full justify-start"
+                onClick={handleGenerateSubtasks}
+                disabled={isGeneratingSubtasks || !selectedTask}
               >
                 <Target className="h-4 w-4 mr-2" />
-                {t.suggestSubtasks}
+                {isGeneratingSubtasks ? 'Генерация...' : 'Предложить подзадачи'}
               </Button>
               
               <Button 
