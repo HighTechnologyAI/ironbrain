@@ -21,10 +21,24 @@ interface Drop {
   speed: number;
 }
 
+interface Drone {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  phase: number;
+  energy: number;
+  targetX: number;
+  targetY: number;
+  avoiding: boolean;
+}
+
 const CyberBackground = () => {
   const bgCanvasRef = useRef<HTMLCanvasElement>(null);
   const matrixCanvasRef = useRef<HTMLCanvasElement>(null);
   const hudCanvasRef = useRef<HTMLCanvasElement>(null);
+  const dronesCanvasRef = useRef<HTMLCanvasElement>(null);
   const krakenCanvasRef = useRef<HTMLCanvasElement>(null);
   
   const animationRef = useRef<number>();
@@ -32,6 +46,7 @@ const CyberBackground = () => {
   const nodesRef = useRef<Node[]>([]);
   const tentaclesRef = useRef<Tentacle[]>([]);
   const dropsRef = useRef<Drop[]>([]);
+  const dronesRef = useRef<Drone[]>([]);
   const krakenRef = useRef({ x: -400, y: 0, speed: 0.09, roll: 0, blinkTimer: 0 });
   const matrixRef = useRef({ fontSize: 16, cols: 0 });
 
@@ -63,6 +78,15 @@ const CyberBackground = () => {
     LIGHT_DIR: { x: -0.6, y: -0.8 },
     GLOW: true
   };
+
+  // SAFE-ZONE для авторизации (центр)
+  const SAFE = { x: 0.30, y: 0.25, w: 0.40, h: 0.50 };
+  const safeRect = (w: number, h: number) => ({ 
+    x: SAFE.x * w, 
+    y: SAFE.y * h, 
+    w: SAFE.w * w, 
+    h: SAFE.h * h 
+  });
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -122,6 +146,22 @@ const CyberBackground = () => {
       y: Math.random() * h,
       r: 2 + Math.random() * 2,
       phase: Math.random() * Math.PI * 2
+    }));
+  };
+
+  const setupDrones = (w: number, h: number) => {
+    const count = 24;
+    dronesRef.current = Array.from({ length: count }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 2,
+      vy: (Math.random() - 0.5) * 2,
+      size: 2 + Math.random() * 3,
+      phase: Math.random() * Math.PI * 2,
+      energy: Math.random(),
+      targetX: 0,
+      targetY: 0,
+      avoiding: false
     }));
   };
 
@@ -275,6 +315,159 @@ const CyberBackground = () => {
   };
 
   const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+  const drawDrones = (ctx: CanvasRenderingContext2D, w: number, h: number, t: number) => {
+    if (prefersReduced) return;
+    
+    let drones = dronesRef.current;
+    if (!drones.length) {
+      setupDrones(w, h);
+      drones = dronesRef.current;
+    }
+    
+    ctx.clearRect(0, 0, w, h);
+    
+    const safe = safeRect(w, h);
+    const kraken = krakenRef.current;
+    const krakenX = kraken.x + 280;
+    const krakenY = kraken.y;
+    
+    // Update drone positions with boid behavior
+    for (let i = 0; i < drones.length; i++) {
+      const drone = drones[i];
+      
+      // Avoid safe zone
+      const distToSafe = Math.hypot(
+        drone.x - (safe.x + safe.w/2),
+        drone.y - (safe.y + safe.h/2)
+      );
+      
+      if (distToSafe < safe.w/2 + 100) {
+        const repelX = (drone.x - (safe.x + safe.w/2)) / distToSafe;
+        const repelY = (drone.y - (safe.y + safe.h/2)) / distToSafe;
+        drone.vx += repelX * 0.3;
+        drone.vy += repelY * 0.3;
+        drone.avoiding = true;
+      } else {
+        drone.avoiding = false;
+      }
+      
+      // Flock behavior
+      let sepX = 0, sepY = 0, alignX = 0, alignY = 0, cohX = 0, cohY = 0;
+      let sepCount = 0, alignCount = 0, cohCount = 0;
+      
+      for (let j = 0; j < drones.length; j++) {
+        if (i === j) continue;
+        const other = drones[j];
+        const dist = Math.hypot(drone.x - other.x, drone.y - other.y);
+        
+        // Separation
+        if (dist < 50 && dist > 0) {
+          sepX += (drone.x - other.x) / dist;
+          sepY += (drone.y - other.y) / dist;
+          sepCount++;
+        }
+        
+        // Alignment & Cohesion
+        if (dist < 100) {
+          alignX += other.vx;
+          alignY += other.vy;
+          alignCount++;
+          
+          cohX += other.x;
+          cohY += other.y;
+          cohCount++;
+        }
+      }
+      
+      if (sepCount > 0) {
+        drone.vx += (sepX / sepCount) * 0.15;
+        drone.vy += (sepY / sepCount) * 0.15;
+      }
+      
+      if (alignCount > 0) {
+        drone.vx += ((alignX / alignCount) - drone.vx) * 0.05;
+        drone.vy += ((alignY / alignCount) - drone.vy) * 0.05;
+      }
+      
+      if (cohCount > 0) {
+        drone.vx += ((cohX / cohCount) - drone.x) * 0.002;
+        drone.vy += ((cohY / cohCount) - drone.y) * 0.002;
+      }
+      
+      // Kraken attraction (weak)
+      const distToKraken = Math.hypot(drone.x - krakenX, drone.y - krakenY);
+      if (distToKraken > 200 && !drone.avoiding) {
+        drone.vx += (krakenX - drone.x) * 0.0005;
+        drone.vy += (krakenY - drone.y) * 0.0005;
+      }
+      
+      // Limit velocity
+      const speed = Math.hypot(drone.vx, drone.vy);
+      if (speed > 3) {
+        drone.vx = (drone.vx / speed) * 3;
+        drone.vy = (drone.vy / speed) * 3;
+      }
+      
+      // Update position
+      drone.x += drone.vx;
+      drone.y += drone.vy;
+      
+      // Wrap around screen
+      if (drone.x < 0) drone.x = w;
+      if (drone.x > w) drone.x = 0;
+      if (drone.y < 0) drone.y = h;
+      if (drone.y > h) drone.y = 0;
+      
+      // Draw drone
+      const pulse = 0.5 + 0.5 * Math.sin(t * 0.005 + drone.phase);
+      const alpha = drone.avoiding ? 0.8 : 0.4 + pulse * 0.4;
+      
+      ctx.save();
+      ctx.translate(drone.x, drone.y);
+      
+      // Drone body
+      ctx.fillStyle = `rgba(255,211,0,${alpha})`;
+      ctx.beginPath();
+      ctx.arc(0, 0, drone.size, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Direction indicator
+      const angle = Math.atan2(drone.vy, drone.vx);
+      ctx.strokeStyle = COLORS.Y25;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(angle) * (drone.size + 8), Math.sin(angle) * (drone.size + 8));
+      ctx.stroke();
+      
+      // Energy trails
+      if (drone.energy > 0.7) {
+        ctx.strokeStyle = COLORS.VIVAD_YELLOW;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(-Math.cos(angle) * 10, -Math.sin(angle) * 10);
+        ctx.lineTo(-Math.cos(angle) * 20, -Math.sin(angle) * 20);
+        ctx.stroke();
+      }
+      
+      ctx.restore();
+      
+      // Data tethers to nearby drones
+      for (let j = i + 1; j < drones.length; j++) {
+        const other = drones[j];
+        const dist = Math.hypot(drone.x - other.x, drone.y - other.y);
+        if (dist < 80) {
+          ctx.strokeStyle = `rgba(255,211,0,${0.1 * (1 - dist/80)})`;
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(drone.x, drone.y);
+          ctx.lineTo(other.x, other.y);
+          ctx.stroke();
+        }
+      }
+    }
+  };
 
   const drawKraken = (ctx: CanvasRenderingContext2D, w: number, h: number, t: number) => {
     const kraken = krakenRef.current;
@@ -535,16 +728,18 @@ const CyberBackground = () => {
     const bgCanvas = bgCanvasRef.current;
     const matrixCanvas = matrixCanvasRef.current;
     const hudCanvas = hudCanvasRef.current;
+    const dronesCanvas = dronesCanvasRef.current;
     const krakenCanvas = krakenCanvasRef.current;
 
-    if (!bgCanvas || !matrixCanvas || !hudCanvas || !krakenCanvas) return;
+    if (!bgCanvas || !matrixCanvas || !hudCanvas || !dronesCanvas || !krakenCanvas) return;
 
     const bgCtx = createCtx(bgCanvas);
     const matrixCtx = createCtx(matrixCanvas);
     const hudCtx = createCtx(hudCanvas);
+    const dronesCtx = createCtx(dronesCanvas);
     const krakenCtx = createCtx(krakenCanvas);
 
-    if (!bgCtx || !matrixCtx || !hudCtx || !krakenCtx) return;
+    if (!bgCtx || !matrixCtx || !hudCtx || !dronesCtx || !krakenCtx) return;
 
     const getSize = () => ({
       w: bgCanvas.clientWidth,
@@ -569,9 +764,11 @@ const CyberBackground = () => {
         bgCtx.resize();
         matrixCtx.resize();
         hudCtx.resize();
+        dronesCtx.resize();
         krakenCtx.resize();
         setupMatrix(w);
         setupNodes(w, h);
+        setupDrones(w, h);
         setupKraken(w, h);
       }
     };
@@ -581,6 +778,7 @@ const CyberBackground = () => {
       if (!prefersReduced) {
         drawMatrix(matrixCtx.ctx, w, h, t);
         drawHUD(hudCtx.ctx, w, h, t);
+        drawDrones(dronesCtx.ctx, w, h, t);
         drawKraken(krakenCtx.ctx, w, h, t);
       }
       animationRef.current = requestAnimationFrame(animate);
@@ -618,6 +816,10 @@ const CyberBackground = () => {
       />
       <canvas
         ref={hudCanvasRef}
+        className="absolute inset-0 w-full h-full"
+      />
+      <canvas
+        ref={dronesCanvasRef}
         className="absolute inset-0 w-full h-full"
       />
       <canvas
