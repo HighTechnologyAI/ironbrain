@@ -90,36 +90,50 @@ export interface Translations {
   operatorsOnline: string;
   lastUpdateTime: string;
   
-  // Auth & Forms
-  auth: string;
-  signIn: string;
-  signUp: string;
-  registration: string;
-  email: string;
-  password: string;
-  fullName: string;
-  position: string;
-  department: string;
-  phone: string;
-  telegram: string;
-  signingIn: string;
-  registering: string;
-  enterSystem: string;
-  successLogin: string;
-  welcomeToTiger: string;
-  loginError: string;
-  registrationSuccess: string;
-  checkEmail: string;
-  registrationError: string;
-  invalidCredentials: string;
-  emailNotConfirmed: string;
-  userExists: string;
-  weakPassword: string;
-  loginErrorGeneric: string;
-  registrationErrorGeneric: string;
-  selectDepartment: string;
-  minPassword: string;
-  systemDesc: string;
+  // Auth structure
+  auth: {
+    title: string;
+    systemDesc: string;
+    auth: string;
+    enterSystem: string;
+    signIn: string;
+    signUp: string;
+    email: string;
+    password: string;
+    fullName: string;
+    position: string;
+    department: string;
+    selectDepartment: string;
+    phone: string;
+    telegram: string;
+    minPassword: string;
+    signingIn: string;
+    registering: string;
+    testAnimation: string;
+    successLogin: string;
+    welcomeToTiger: string;
+    loginErrorGeneric: string;
+    invalidCredentials: string;
+    emailNotConfirmed: string;
+    loginError: string;
+    registrationSuccess: string;
+    checkEmail: string;
+    registrationErrorGeneric: string;
+    userExists: string;
+    weakPassword: string;
+    registrationError: string;
+  };
+  
+  // Departments
+  departments: {
+    management: string;
+    marketing: string;
+    expertise: string;
+    production: string;
+    leadership: string;
+    it: string;
+    consulting: string;
+  };
   
   // All missing keys with fallback to prevent build errors
   notifications: string;
@@ -527,36 +541,50 @@ const baseTranslations: Translations = {
   operatorsOnline: 'Operators online',
   lastUpdateTime: 'Last update',
   
-  // Auth & Forms
-  auth: 'Authorization',
-  signIn: 'Sign In',
-  signUp: 'Sign Up',
-  registration: 'Registration',
-  email: 'Email',
-  password: 'Password',
-  fullName: 'Full Name',
-  position: 'Position',
-  department: 'Department',
-  phone: 'Phone',
-  telegram: 'Telegram',
-  signingIn: 'Signing in...',
-  registering: 'Registering...',
-  enterSystem: 'Enter the system or create a new account',
-  successLogin: 'Successful login',
-  welcomeToTiger: 'Welcome to Tiger CRM!',
-  loginError: 'Login error',
-  registrationSuccess: 'Registration successful!',
-  checkEmail: 'Check your email to confirm your account (or login immediately if confirmation is disabled)',
-  registrationError: 'Registration error',
-  invalidCredentials: 'Invalid email or password',
-  emailNotConfirmed: 'Confirm your email before logging in',
-  userExists: 'User with this email already exists',
-  weakPassword: 'Password is too weak. Minimum 6 characters',
-  loginErrorGeneric: 'An error occurred during login',
-  registrationErrorGeneric: 'An error occurred during registration',
-  selectDepartment: 'Select department',
-  minPassword: 'Minimum 6 characters',
-  systemDesc: 'Company Results Achievement System',
+  // Auth structure object
+  auth: {
+    title: 'TIGER CRM',
+    systemDesc: 'Advanced mission control and project management system',
+    auth: 'Authentication',
+    enterSystem: 'Enter the system',
+    signIn: 'Sign In',
+    signUp: 'Sign Up',
+    email: 'Email',
+    password: 'Password',
+    fullName: 'Full Name',
+    position: 'Position',
+    department: 'Department',
+    selectDepartment: 'Select department',
+    phone: 'Phone',
+    telegram: 'Telegram',
+    minPassword: 'Minimum 6 characters',
+    signingIn: 'Signing in...',
+    registering: 'Registering...',
+    testAnimation: 'Test Animation',
+    successLogin: 'Login successful',
+    welcomeToTiger: 'Welcome to TIGER CRM',
+    loginErrorGeneric: 'Login error occurred',
+    invalidCredentials: 'Invalid email or password',
+    emailNotConfirmed: 'Please confirm your email',
+    loginError: 'Login error',
+    registrationSuccess: 'Registration successful',
+    checkEmail: 'Check your email for confirmation',
+    registrationErrorGeneric: 'Registration error occurred',
+    userExists: 'User already exists',
+    weakPassword: 'Password must be at least 6 characters',
+    registrationError: 'Registration error'
+  },
+  
+  // Departments structure object  
+  departments: {
+    management: 'Management',
+    marketing: 'Marketing',
+    expertise: 'Expertise',
+    production: 'Production',
+    leadership: 'Leadership',
+    it: 'IT',
+    consulting: 'Consulting'
+  },
   
   notifications: 'Notifications',
   noNotifications: 'No notifications',
@@ -938,36 +966,49 @@ export const translations: Record<string, Translations> = {
     lastUpdateTime: 'Последнее обновление',
     technicalStatus: 'Техническое состояние',
     
-    // Auth & Forms Russian
-    auth: 'Авторизация',
-    signIn: 'Вход',
-    signUp: 'Регистрация',
-    registration: 'Регистрация',
-    email: 'Email',
-    password: 'Пароль',
-    fullName: 'Полное имя',
-    position: 'Должность',
-    department: 'Подразделение',
-    phone: 'Телефон',
-    telegram: 'Telegram',
-    signingIn: 'Вход...',
-    registering: 'Регистрация...',
-    enterSystem: 'Войдите в систему или создайте новый аккаунт',
-    successLogin: 'Успешный вход',
-    welcomeToTiger: 'Добро пожаловать в Tiger CRM!',
-    loginError: 'Ошибка входа',
-    registrationSuccess: 'Регистрация успешна!',
-    checkEmail: 'Проверьте email для подтверждения аккаунта (или войдите сразу если отключено подтверждение)',
-    registrationError: 'Ошибка регистрации',
-    invalidCredentials: 'Неверный email или пароль',
-    emailNotConfirmed: 'Подтвердите email перед входом',
-    userExists: 'Пользователь с таким email уже существует',
-    weakPassword: 'Пароль слишком слабый. Минимум 6 символов',
-    loginErrorGeneric: 'Произошла ошибка при входе',
-    registrationErrorGeneric: 'Произошла ошибка при регистрации',
-    selectDepartment: 'Выберите подразделение',
-    minPassword: 'Минимум 6 символов',
-    systemDesc: 'Система достижения результатов компании',
+    // Auth & Forms Russian - override with object structure
+    auth: {
+      title: 'TIGER CRM',
+      systemDesc: 'Продвинутая система управления миссиями и проектами',
+      auth: 'Аутентификация',
+      enterSystem: 'Войти в систему',
+      signIn: 'Войти',
+      signUp: 'Регистрация',
+      email: 'Email',
+      password: 'Пароль',
+      fullName: 'Полное имя',
+      position: 'Должность',
+      department: 'Отдел',
+      selectDepartment: 'Выберите отдел',
+      phone: 'Телефон',
+      telegram: 'Телеграм',
+      minPassword: 'Минимум 6 символов',
+      signingIn: 'Вход...',
+      registering: 'Регистрация...',
+      testAnimation: 'Тест анимации',
+      successLogin: 'Успешный вход',
+      welcomeToTiger: 'Добро пожаловать в TIGER CRM',
+      loginErrorGeneric: 'Произошла ошибка входа',
+      invalidCredentials: 'Неверный email или пароль',
+      emailNotConfirmed: 'Пожалуйста, подтвердите email',
+      loginError: 'Ошибка входа',
+      registrationSuccess: 'Успешная регистрация',
+      checkEmail: 'Проверьте email для подтверждения',
+      registrationErrorGeneric: 'Произошла ошибка регистрации',
+      userExists: 'Пользователь уже существует',
+      weakPassword: 'Пароль должен содержать минимум 6 символов',
+      registrationError: 'Ошибка регистрации'
+    },
+    
+    departments: {
+      management: 'Управление',
+      marketing: 'Маркетинг',
+      expertise: 'Экспертиза',
+      production: 'Производство',
+      leadership: 'Руководство',
+      it: 'ИТ',
+      consulting: 'Консультации'
+    },
   },
   
   bg: {
@@ -1011,35 +1052,48 @@ export const translations: Record<string, Translations> = {
     lastUpdateTime: 'Последна актуализация',
     technicalStatus: 'Техническо състояние',
     
-    // Auth & Forms Bulgarian
-    auth: 'Оторизация',
-    signIn: 'Влизане',
-    signUp: 'Регистрация',
-    registration: 'Регистрация',
-    email: 'Email',
-    password: 'Парола',
-    fullName: 'Пълно име',
-    position: 'Длъжност',
-    department: 'Отдел',
-    phone: 'Телефон',
-    telegram: 'Telegram',
-    signingIn: 'Влизане...',
-    registering: 'Регистрация...',
-    enterSystem: 'Влезте в системата или създайте нов акаунт',
-    successLogin: 'Успешно влизане',
-    welcomeToTiger: 'Добре дошли в Tiger CRM!',
-    loginError: 'Грешка при влизане',
-    registrationSuccess: 'Регистрацията е успешна!',
-    checkEmail: 'Проверете email-а си за потвърждение на акаунта (или влезте веднага ако потвърждението е изключено)',
-    registrationError: 'Грешка при регистрация',
-    invalidCredentials: 'Неправилен email или парола',
-    emailNotConfirmed: 'Потвърдете email-а си преди влизане',
-    userExists: 'Потребител с този email вече съществува',
-    weakPassword: 'Паролата е твърде слаба. Минимум 6 символа',
-    loginErrorGeneric: 'Възникна грешка при влизане',
-    registrationErrorGeneric: 'Възникна грешка при регистрация',
-    selectDepartment: 'Изберете отдел',
-    minPassword: 'Минимум 6 символа',
-    systemDesc: 'Система за постигане на резултати от компанията',
+    // Auth & Forms Bulgarian - override with object structure
+    auth: {
+      title: 'TIGER CRM',
+      systemDesc: 'Разширена система за контрол на мисии и управление на проекти',
+      auth: 'Удостоверяване',
+      enterSystem: 'Влез в системата',
+      signIn: 'Влез',
+      signUp: 'Регистрирай се',
+      email: 'Имейл',
+      password: 'Парола',
+      fullName: 'Пълно име',
+      position: 'Позиция',
+      department: 'Отдел',
+      selectDepartment: 'Избери отдел',
+      phone: 'Телефон',
+      telegram: 'Телеграм',
+      minPassword: 'Минимум 6 символа',
+      signingIn: 'Влизане...',
+      registering: 'Регистриране...',
+      testAnimation: 'Тест анимация',
+      successLogin: 'Успешно влизане',
+      welcomeToTiger: 'Добре дошли в TIGER CRM',
+      loginErrorGeneric: 'Възникна грешка при влизане',
+      invalidCredentials: 'Невалиден имейл или парола',
+      emailNotConfirmed: 'Моля потвърдете вашия имейл',
+      loginError: 'Грешка при влизане',
+      registrationSuccess: 'Успешна регистрация',
+      checkEmail: 'Проверете имейла си за потвърждение',
+      registrationErrorGeneric: 'Възникна грешка при регистрация',
+      userExists: 'Потребителят вече съществува',
+      weakPassword: 'Паролата трябва да бъде поне 6 символа',
+      registrationError: 'Грешка при регистрация'
+    },
+    
+    departments: {
+      management: 'Управление',
+      marketing: 'Маркетинг',
+      expertise: 'Експертиза',
+      production: 'Производство',
+      leadership: 'Ръководство',
+      it: 'ИТ',
+      consulting: 'Консултации'
+    },
   }
 };

@@ -82,24 +82,24 @@ const Auth = () => {
 
       if (data.user) {
         toast({
-          title: t.successLogin,
-          description: t.welcomeToTiger,
+          title: t.auth.successLogin,
+          description: t.auth.welcomeToTiger,
         });
         
         // Start transition animation instead of direct navigation
         setIsTransitioning(true);
       }
     } catch (error: any) {
-      let errorMessage = t.loginErrorGeneric;
+      let errorMessage = t.auth.loginErrorGeneric;
       
       if (error.message.includes("Invalid login credentials")) {
-        errorMessage = t.invalidCredentials;
+        errorMessage = t.auth.invalidCredentials;
       } else if (error.message.includes("Email not confirmed")) {
-        errorMessage = t.emailNotConfirmed;
+        errorMessage = t.auth.emailNotConfirmed;
       }
 
       toast({
-        title: t.loginError,
+        title: t.auth.loginError,
         description: errorMessage,
         variant: "destructive",
       });
@@ -136,21 +136,21 @@ const Auth = () => {
 
       if (data.user) {
         toast({
-          title: t.registrationSuccess,
-          description: t.checkEmail,
+          title: t.auth.registrationSuccess,
+          description: t.auth.checkEmail,
         });
       }
     } catch (error: any) {
-      let errorMessage = t.registrationErrorGeneric;
+      let errorMessage = t.auth.registrationErrorGeneric;
       
       if (error.message.includes("User already registered")) {
-        errorMessage = t.userExists;
+        errorMessage = t.auth.userExists;
       } else if (error.message.includes("Password should be")) {
-        errorMessage = t.weakPassword;
+        errorMessage = t.auth.weakPassword;
       }
 
       toast({
-        title: t.registrationError,
+        title: t.auth.registrationError,
         description: errorMessage,
         variant: "destructive",
       });
@@ -185,7 +185,7 @@ const Auth = () => {
           onClick={testAnimation}
           className="fixed top-20 right-4 z-50 px-4 py-2 bg-primary text-black rounded-lg hover:bg-primary/80 transition-colors"
         >
-          Test Animation
+          {t.auth.testAnimation}
         </button>
 
         {/* Language Switcher */}
@@ -199,10 +199,10 @@ const Auth = () => {
               <Zap className="text-primary h-12 w-12 cyber-glow animate-pulse" />
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-full blur-xl"></div>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-yellow-400 bg-clip-text text-transparent">{t.title}</h1>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-yellow-400 bg-clip-text text-transparent">{t.auth.title}</h1>
           </div>
           <p className="text-foreground/80 font-mono text-sm tracking-wider">
-            {t.systemDesc}
+            {t.auth.systemDesc}
           </p>
         </div>
 
@@ -210,10 +210,10 @@ const Auth = () => {
           <CardHeader>
             <CardTitle className="text-center flex items-center justify-center gap-2 text-foreground">
               <Shield className="h-5 w-5 text-primary" />
-              {t.auth}
+              {t.auth.auth}
             </CardTitle>
             <CardDescription className="text-center text-foreground/70">
-              {t.enterSystem}
+              {t.auth.enterSystem}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -223,13 +223,13 @@ const Auth = () => {
                   value="signin"
                   className="text-foreground/70 data-[state=active]:bg-primary data-[state=active]:text-black data-[state=active]:font-semibold transition-all"
                 >
-                  {t.signIn}
+                  {t.auth.signIn}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="signup"
                   className="text-foreground/70 data-[state=active]:bg-primary data-[state=active]:text-black data-[state=active]:font-semibold transition-all"
                 >
-                  {t.signUp}
+                  {t.auth.signUp}
                 </TabsTrigger>
               </TabsList>
               
@@ -237,8 +237,8 @@ const Auth = () => {
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signin-email" className="flex items-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      {t.email}
+                       <Mail className="h-4 w-4" />
+                       {t.auth.email}
                     </Label>
                     <Input
                       id="signin-email"
@@ -252,9 +252,9 @@ const Auth = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signin-password" className="flex items-center gap-2">
-                      <Lock className="h-4 w-4" />
-                      {t.password}
+                     <Label htmlFor="signin-password" className="flex items-center gap-2">
+                       <Lock className="h-4 w-4" />
+                       {t.auth.password}
                     </Label>
                     <div className="relative">
                       <Input
@@ -282,8 +282,8 @@ const Auth = () => {
                     type="submit"
                     className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold transition-all duration-200"
                     disabled={isLoading}
-                  >
-                    {isLoading ? t.signingIn : t.signIn}
+                   >
+                     {isLoading ? t.auth.signingIn : t.auth.signIn}
                   </Button>
                 </form>
               </TabsContent>
@@ -291,9 +291,9 @@ const Auth = () => {
               <TabsContent value="signup" className="space-y-4 mt-4">
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-fullname" className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      {t.fullName}
+                     <Label htmlFor="signup-fullname" className="flex items-center gap-2">
+                       <User className="h-4 w-4" />
+                       {t.auth.fullName}
                     </Label>
                     <Input
                       id="signup-fullname"
@@ -307,9 +307,9 @@ const Auth = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-position" className="flex items-center gap-2">
-                      <Briefcase className="h-4 w-4" />
-                      {t.position}
+                     <Label htmlFor="signup-position" className="flex items-center gap-2">
+                       <Briefcase className="h-4 w-4" />
+                       {t.auth.position}
                     </Label>
                     <Input
                       id="signup-position"
@@ -323,29 +323,29 @@ const Auth = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-department" className="flex items-center gap-2">
-                      <Building className="h-4 w-4" />
-                      {t.department}
-                    </Label>
-                    <Select onValueChange={(value) => handleSelectChange('department', value)} disabled={isLoading}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t.selectDepartment} />
+                     <Label htmlFor="signup-department" className="flex items-center gap-2">
+                       <Building className="h-4 w-4" />
+                       {t.auth.department}
+                     </Label>
+                     <Select onValueChange={(value) => handleSelectChange('department', value)} disabled={isLoading}>
+                       <SelectTrigger>
+                         <SelectValue placeholder={t.auth.selectDepartment} />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Управление">Управление</SelectItem>
-                        <SelectItem value="Маркетинг">Маркетинг</SelectItem>
-                        <SelectItem value="Экспертиза">Экспертиза</SelectItem>
-                        <SelectItem value="Производство">Производство</SelectItem>
-                        <SelectItem value="Руководство">Руководство</SelectItem>
-                        <SelectItem value="IT">IT</SelectItem>
-                        <SelectItem value="Консультации">Консультации</SelectItem>
-                      </SelectContent>
+                       <SelectContent>
+                         <SelectItem value="Управление">{t.departments.management}</SelectItem>
+                         <SelectItem value="Маркетинг">{t.departments.marketing}</SelectItem>
+                         <SelectItem value="Экспертиза">{t.departments.expertise}</SelectItem>
+                         <SelectItem value="Производство">{t.departments.production}</SelectItem>
+                         <SelectItem value="Руководство">{t.departments.leadership}</SelectItem>
+                         <SelectItem value="IT">{t.departments.it}</SelectItem>
+                         <SelectItem value="Консультации">{t.departments.consulting}</SelectItem>
+                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-phone" className="flex items-center gap-2">
-                      <Phone className="h-4 w-4" />
-                      {t.phone}
+                     <Label htmlFor="signup-phone" className="flex items-center gap-2">
+                       <Phone className="h-4 w-4" />
+                       {t.auth.phone}
                     </Label>
                     <Input
                       id="signup-phone"
@@ -359,9 +359,9 @@ const Auth = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-telegram" className="flex items-center gap-2">
-                      <MessageCircle className="h-4 w-4" />
-                      {t.telegram}
+                     <Label htmlFor="signup-telegram" className="flex items-center gap-2">
+                       <MessageCircle className="h-4 w-4" />
+                       {t.auth.telegram}
                     </Label>
                     <Input
                       id="signup-telegram"
@@ -375,9 +375,9 @@ const Auth = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email" className="flex items-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      {t.email}
+                     <Label htmlFor="signup-email" className="flex items-center gap-2">
+                       <Mail className="h-4 w-4" />
+                       {t.auth.email}
                     </Label>
                     <Input
                       id="signup-email"
@@ -391,16 +391,16 @@ const Auth = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password" className="flex items-center gap-2">
-                      <Lock className="h-4 w-4" />
-                      {t.password}
+                     <Label htmlFor="signup-password" className="flex items-center gap-2">
+                       <Lock className="h-4 w-4" />
+                       {t.auth.password}
                     </Label>
                     <div className="relative">
                       <Input
                         id="signup-password"
                         name="password"
                         type={showPassword ? "text" : "password"}
-                        placeholder={t.minPassword}
+                        placeholder={t.auth.minPassword}
                         value={formData.password}
                         onChange={handleInputChange}
                         required
@@ -422,8 +422,8 @@ const Auth = () => {
                     type="submit"
                     className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold transition-all duration-200"
                     disabled={isLoading}
-                  >
-                    {isLoading ? t.registering : t.signUp}
+                   >
+                     {isLoading ? t.auth.registering : t.auth.signUp}
                   </Button>
                 </form>
               </TabsContent>
