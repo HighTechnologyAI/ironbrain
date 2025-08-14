@@ -4,8 +4,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { useMissions } from '@/hooks/use-missions';
 import { useDrones } from '@/hooks/use-drones';
 import { useWeather } from '@/hooks/use-weather';
-import TacticalMapbox from '@/components/TacticalMapbox';
-import TacticalSVG from '@/components/TacticalSVG';
+import TacticalMapModal from '@/components/TacticalMapModal';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusChip } from '@/components/neon/StatusChip';
@@ -31,7 +30,6 @@ import {
 const MissionControl = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [mapType, setMapType] = useState<'svg' | 'mapbox'>('svg');
   
   const { missions, loading: missionsLoading, error: missionsError } = useMissions();
   const { drones, loading: dronesLoading, error: dronesError } = useDrones();
@@ -360,43 +358,16 @@ const MissionControl = () => {
         {/* Tactical Map */}
         <Card className="bg-surface-1 border-border">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="font-ui flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-primary" />
-                Тактическая карта
-              </CardTitle>
-              <div className="flex gap-2">
-                <Button
-                  variant={mapType === 'svg' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setMapType('svg')}
-                  className="text-xs"
-                >
-                  Кибер SVG
-                </Button>
-                <Button
-                  variant={mapType === 'mapbox' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setMapType('mapbox')}
-                  className="text-xs"
-                >
-                  Mapbox Спутник
-                </Button>
-              </div>
-            </div>
+            <CardTitle className="font-ui flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-primary" />
+              Тактическая карта
+            </CardTitle>
             <CardDescription className="text-xs text-muted-foreground">
-              {mapType === 'svg' 
-                ? 'Интерактивная кибер-карта с реальным временем отслеживания дронов'
-                : 'Спутниковая карта Mapbox с реальными координатами (требуется токен)'
-              }
+              Нажмите для открытия полноэкранной интерактивной карты с позициями дронов
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-0">
-            {mapType === 'svg' ? (
-              <TacticalSVG drones={drones} className="w-full" />
-            ) : (
-              <TacticalMapbox drones={drones} className="w-full" />
-            )}
+          <CardContent>
+            <TacticalMapModal drones={drones} />
           </CardContent>
         </Card>
       </div>
