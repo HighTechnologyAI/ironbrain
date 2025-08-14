@@ -203,13 +203,13 @@ const UAVDashboard = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Button 
             variant="outline" 
-            className="h-16 flex-col gap-2"
+            className="h-16 flex-col gap-2 relative"
             onClick={() => navigate('/tasks')}
           >
             <CheckSquare className="h-5 w-5" />
             <span className="text-sm">{t.tasks}</span>
             {performanceData.pendingTasks > 0 && (
-              <Badge variant="default" className="text-xs">
+              <Badge variant="default" className="absolute -top-1 -right-1 min-w-6 h-6 flex items-center justify-center px-2 text-xs font-semibold">
                 {performanceData.pendingTasks}
               </Badge>
             )}
@@ -235,13 +235,13 @@ const UAVDashboard = () => {
           
           <Button 
             variant="outline" 
-            className="h-16 flex-col gap-2"
+            className="h-16 flex-col gap-2 relative"
             onClick={() => navigate('/issues')}
           >
             <AlertTriangle className="h-5 w-5" />
             <span className="text-sm">{t.issues}</span>
             {performanceData.overdueTasks > 0 && (
-              <Badge variant="critical" className="text-xs">
+              <Badge variant="critical" className="absolute -top-1 -right-1 min-w-6 h-6 flex items-center justify-center px-2 text-xs font-semibold">
                 {performanceData.overdueTasks}
               </Badge>
             )}
