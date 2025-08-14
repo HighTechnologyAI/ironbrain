@@ -9,6 +9,7 @@ import { AIAnalysisHistory } from '@/components/AIAnalysisHistory';
 import AIPredictiveAnalytics from '@/components/AIPredictiveAnalytics';
 import AIReportGenerator from '@/components/AIReportGenerator';
 import AISystemMetrics from '@/components/AISystemMetrics';
+import AIVisualAnalytics from '@/components/AIVisualAnalytics';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
 import { 
@@ -20,7 +21,8 @@ import {
   Clock,
   TrendingUp,
   FileText,
-  Monitor
+  Monitor,
+  Image
 } from 'lucide-react';
 
 const AIAssistantPage: React.FC = () => {
@@ -54,7 +56,7 @@ const AIAssistantPage: React.FC = () => {
 
       {/* AI Tools */}
       <Tabs defaultValue="enhanced" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="enhanced" className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             Enhanced AI
@@ -78,6 +80,10 @@ const AIAssistantPage: React.FC = () => {
           <TabsTrigger value="reports" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Reports
+          </TabsTrigger>
+          <TabsTrigger value="visuals" className="flex items-center gap-2">
+            <Image className="h-4 w-4" />
+            Visuals
           </TabsTrigger>
           <TabsTrigger value="metrics" className="flex items-center gap-2">
             <Monitor className="h-4 w-4" />
@@ -107,6 +113,10 @@ const AIAssistantPage: React.FC = () => {
 
         <TabsContent value="reports" className="space-y-6">
           <AIReportGenerator />
+        </TabsContent>
+
+        <TabsContent value="visuals" className="space-y-6">
+          <AIVisualAnalytics />
         </TabsContent>
 
         <TabsContent value="metrics" className="space-y-6">
