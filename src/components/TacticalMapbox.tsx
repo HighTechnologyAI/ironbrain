@@ -131,13 +131,16 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
         
         let tokenData;
         try {
+          console.log('📡 Вызываем edge function...');
           const result = await supabase.functions.invoke('get-mapbox-token', {
             body: { 
               token: 'pk.eyJ1IjoiaGlnaHRlY2hhaSIsImEiOiJjbWViZTBoaW0wbzVwMmpxdmFpeTVnbWdsIn0.8-x4oZ4TfetTTa5BEAXDYg' 
             }
           });
+          console.log('📡 RAW result от edge function:', result);
+          console.log('📡 result.data:', result.data);
+          console.log('📡 result.error:', result.error);
           tokenData = result;
-          console.log('📡 Результат edge function:', tokenData);
         } catch (funcError) {
           console.error('📡 Ошибка edge function:', funcError);
           setShowTokenInput(true);
@@ -152,17 +155,35 @@ const TacticalMapbox: React.FC<TacticalMapboxProps> = ({ drones, className = '' 
           return;
         }
 
-        if (!tokenData.data?.token) {
-          console.error('❌ Токен не найден:', tokenData.data);
-          setShowTokenInput(true);
-          setLoading(false);
-          return;
+        // Проверяем ответ правильно
+        console.log('🔍 Проверка данных tokenData:', tokenData);
+        
+        if (!tokenData.data?.token && !tokenData.data?.success) {
+          console.error('❌ Токен не найден в data, проверяем прямой доступ...');
+          
+          // Может быть токен лежит прямо в data
+          if (typeof tokenData.data === 'string' && tokenData.data.startsWith('pk.')) {
+            console.log('✅ Найден токен напрямую в data');
+            const token = tokenData.data;
+            setMapboxToken(token);
+            mapboxgl.accessToken = token;
+          } else if (tokenData.data?.token) {
+            console.log('✅ Найден токен в data.token');
+            const token = tokenData.data.token;
+            setMapboxToken(token);
+            mapboxgl.accessToken = token;
+          } else {
+            console.log('❌ Токен не найден, показываем ввод');
+            setShowTokenInput(true);
+            setLoading(false);
+            return;
+          }
+        } else {
+          console.log('✅ Токен найден стандартным способом');
+          const token = tokenData.data.token;
+          setMapboxToken(token);
+          mapboxgl.accessToken = token;
         }
-
-        const token = tokenData.data.token;
-        console.log('✅ Токен получен');
-        setMapboxToken(token);
-        mapboxgl.accessToken = token;
 
         console.log('🗺️ Создание карты...');
         // Инициализируем карту

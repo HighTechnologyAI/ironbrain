@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Map, Maximize2, X } from 'lucide-react';
 import TacticalMapbox from './TacticalMapbox';
@@ -35,9 +35,9 @@ const TacticalMapModal: React.FC<TacticalMapModalProps> = ({ drones, trigger }) 
               <DialogTitle className="text-xl font-bold font-ui text-foreground">
                 Тактическая карта - Реальное время
               </DialogTitle>
-              <p className="text-sm text-muted-foreground mt-1">
+              <DialogDescription className="text-sm text-muted-foreground mt-1">
                 Интерактивная карта с позициями дронов и навигацией
-              </p>
+              </DialogDescription>
             </div>
             <Button 
               variant="ghost" 
