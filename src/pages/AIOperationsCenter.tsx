@@ -17,6 +17,7 @@ import AIAutomatedInsights from '@/components/AIAutomatedInsights';
 import AIVoiceAssistant from '@/components/AIVoiceAssistant';
 import AIEnhancedVoice from '@/components/AIEnhancedVoice';
 import AIPlatformMonitoring from '@/components/AIPlatformMonitoring';
+import { AISystemStatus } from '@/components/AISystemStatus';
 import { UAVMetricsWidget } from '@/components/UAVMetricsWidget';
 import { RecentEventsWidget } from '@/components/RecentEventsWidget';
 import { 
@@ -69,7 +70,7 @@ const AIAssistantPage: React.FC = () => {
 
       {/* AI Tools */}
       <Tabs defaultValue="enhanced" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-8 lg:grid-cols-15">
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-16">
           <TabsTrigger value="enhanced" className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             Enhanced AI
@@ -129,6 +130,10 @@ const AIAssistantPage: React.FC = () => {
           <TabsTrigger value="metrics" className="flex items-center gap-2">
             <Monitor className="h-4 w-4" />
             Metrics
+          </TabsTrigger>
+          <TabsTrigger value="status" className="flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            Status
           </TabsTrigger>
         </TabsList>
 
@@ -190,6 +195,10 @@ const AIAssistantPage: React.FC = () => {
 
         <TabsContent value="metrics" className="space-y-6">
           <AISystemMetrics />
+        </TabsContent>
+
+        <TabsContent value="status" className="space-y-6">
+          <AISystemStatus />
         </TabsContent>
       </Tabs>
     </div>
