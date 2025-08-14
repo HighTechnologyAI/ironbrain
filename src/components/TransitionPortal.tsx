@@ -57,7 +57,7 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
       window.addEventListener('resize', resize);
 
       let startTime = Date.now();
-      const PHASE_DURATION = 1500; // Оптимальное время
+      const PHASE_DURATION = 3000; // Увеличено время для полного просмотра анимации
 
       console.log('Animation started, phase:', phase);
 
@@ -94,12 +94,16 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
       } else if (phase === 'consume') {
         drawConsumption(ctx, w, h, phaseProgress);
         if (phaseProgress >= 1) {
-          console.log('Animation complete, navigating...');
+          console.log('Animation complete, waiting before navigation...');
           setPhase('complete');
-          navigate('/');
+          // Даем время для полного завершения анимации перед переходом
           setTimeout(() => {
-            onComplete();
-          }, 500);
+            console.log('Navigating to dashboard...');
+            navigate('/');
+            setTimeout(() => {
+              onComplete();
+            }, 1000);
+          }, 1500);
           return;
         }
       }
