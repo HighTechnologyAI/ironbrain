@@ -48,27 +48,41 @@ export const SimpleVoiceButton: React.FC = () => {
 
       console.log('✅ TTS Response received');
 
-      // Создаем аудио из blob данных
+      // Создаем аудио из ArrayBuffer
       const audioBlob = new Blob([data], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
+      const audio = new Audio();
       
-      audio.onloadstart = () => console.log('🎵 Audio loading started');
-      audio.oncanplay = () => console.log('🎵 Audio can play');
-      audio.onplay = () => console.log('🎵 Audio started playing');
-      audio.onended = () => {
+      // Устанавливаем источник
+      audio.src = audioUrl;
+      audio.preload = 'auto';
+      
+      // Добавляем обработчики событий
+      audio.addEventListener('loadstart', () => console.log('🎵 Audio loading started'));
+      audio.addEventListener('canplay', () => console.log('🎵 Audio can play'));
+      audio.addEventListener('play', () => console.log('🎵 Audio started playing'));
+      audio.addEventListener('ended', () => {
         console.log('🎵 Audio finished playing');
         URL.revokeObjectURL(audioUrl);
-      };
+      });
       
-      audio.onerror = (e) => {
+      audio.addEventListener('error', (e) => {
         console.error('❌ Audio playback error:', e);
+        console.error('❌ Audio error details:', audio.error);
         URL.revokeObjectURL(audioUrl);
         fallbackSpeak(text);
-      };
-      
-      await audio.play();
-      console.log('🎵 Live voice audio playing...');
+      });
+
+      // Пытаемся загрузить и воспроизвести
+      try {
+        await audio.load();
+        await audio.play();
+        console.log('🎵 Live voice audio playing...');
+      } catch (playError) {
+        console.error('❌ Play error:', playError);
+        URL.revokeObjectURL(audioUrl);
+        fallbackSpeak(text);
+      }
       
     } catch (error) {
       console.error('❌ Speech error:', error);
