@@ -139,8 +139,8 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
               const updatedObjective = payload.new as Objective;
               console.log('📡 Broadcasting update to UI:', updatedObjective);
               
-              // Проверяем что это наша цель по ID или статусу
-              if (objective && updatedObjective.id === objective.id) {
+              // Проверяем что это наша стратегическая цель по названию
+              if (updatedObjective.title === STRATEGIC_TITLE || updatedObjective.title.includes('ДРОН-ШОУ')) {
                 // Моментально обновляем UI для всех пользователей
                 setObjective(updatedObjective);
                 setSyncStatus('connected');
@@ -153,7 +153,7 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
               
             } else if (payload.eventType === 'INSERT' && payload.new) {
               const newObjective = payload.new as Objective;
-              if (newObjective.status === 'active') {
+              if (newObjective.title === STRATEGIC_TITLE || newObjective.title.includes('ДРОН-ШОУ')) {
                 console.log('🆕 New strategic objective created:', newObjective);
                 setObjective(newObjective);
                 await saveToCache(newObjective);
@@ -224,13 +224,13 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
 
         // 3. ALWAYS load fresh data from Supabase for accuracy
         console.log('🌐 Loading fresh data from Supabase...');
-        // Ищем по ID или по статусу 'active' + created_by админа, а не по названию
+        // Ищем по точному названию константы STRATEGIC_TITLE для всех пользователей
         const { data: existingObjs, error: loadErr } = await supabase
           .from('objectives')
           .select('*')
+          .eq('title', STRATEGIC_TITLE)
           .eq('status', 'active')
-          .eq('created_by', ownerId || profile?.id)
-          .order('created_at', { ascending: false })
+          .order('updated_at', { ascending: false })
           .limit(1);
 
         if (loadErr) {
