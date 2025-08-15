@@ -25,6 +25,7 @@ import {
   Wifi
 } from "lucide-react";
 import AppNavigation from "@/components/AppNavigation";
+import StrategicBanner from "@/components/StrategicBanner";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
 import { usePerformanceData } from "@/hooks/use-performance-data";
@@ -42,10 +43,6 @@ const UAVDashboard = () => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-
-  // OKR Block Data
-  const currentQuarter = `Q${Math.ceil((new Date().getMonth() + 1) / 3)} ${new Date().getFullYear()}`;
-  const objectiveProgress = 73; // Example progress
 
   // KPI Cards Data
   const kpiCards = [
@@ -134,47 +131,8 @@ const UAVDashboard = () => {
           </Button>
         </div>
 
-        {/* OKR Block - Large Strategic Focus */}
-        <Card 
-          className="bg-surface-1 border-border cursor-pointer hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.01] transition-all duration-300"
-          onClick={() => navigate('/tasks')}
-        >
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-xl font-ui">{t.dashboard.strategicGoal}</CardTitle>
-                <CardDescription className="font-mono text-sm">
-                  {t.dashboard.increaseCapacity}
-                </CardDescription>
-              </div>
-              <StatusChip variant="ready">{t.dashboard.onTrack}</StatusChip>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-lg font-semibold">{objectiveProgress}% {t.dashboard.completion}</span>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <TrendingUp className="h-4 w-4 text-success" />
-                <span>+12% {t.dashboard.monthlyGrowth}</span>
-              </div>
-            </div>
-            <Progress value={objectiveProgress} className="h-3" />
-            <div className="grid grid-cols-3 gap-4 text-sm">
-              <div>
-                <span className="text-muted-foreground">{t.dashboard.production}:</span>
-                <div className="font-mono font-semibold">78 {t.dashboard.unitsMonth}</div>
-              </div>
-              <div>
-                <span className="text-muted-foreground">{t.dashboard.quality}:</span>
-                <div className="font-mono font-semibold">99.2%</div>
-              </div>
-              <div>
-                <span className="text-muted-foreground">{t.dashboard.deadline}:</span>
-                <div className="font-mono font-semibold">31 дек</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Strategic Banner - Дрон-шоу 2025 */}
+        <StrategicBanner />
 
         {/* KPI Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
