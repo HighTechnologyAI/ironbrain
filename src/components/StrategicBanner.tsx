@@ -7,7 +7,7 @@ import { useLanguage } from "@/hooks/use-language";
 import { useAdmin } from "@/hooks/use-admin";
 import { Calendar, Wallet, Edit3, Target, TrendingUp, Wifi, WifiOff, Clock } from "lucide-react";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StatusChip } from "@/components/ui/status-chip";
 
 export default function StrategicBanner() {
@@ -74,6 +74,13 @@ export default function StrategicBanner() {
   
   const isStrategic = objective?.title === STRATEGIC_TITLE;
   const loc = (localized as any)[language] || localized.ru;
+
+  // Force re-render when objective updates
+  useEffect(() => {
+    if (objective) {
+      console.log('📊 Strategic Banner updated with new objective:', objective.title);
+    }
+  }, [objective]);
 
   const handleEditOpen = () => {
     const displayTitle = objective?.title || '';
@@ -199,8 +206,8 @@ export default function StrategicBanner() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold font-mono text-foreground mb-2">
-            {displayTitle}
+          <div className="text-2xl font-bold font-mono text-foreground mb-2" key={objective?.id || 'loading'}>
+            {objective?.title || loc.title}
           </div>
           <div className="flex items-center justify-between mt-2 mb-3">
             <div className="flex items-center gap-1 text-xs">
