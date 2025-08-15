@@ -6,6 +6,7 @@ import StrategicObjectiveEditor from "./StrategicObjectiveEditor";
 import { useStrategy, STRATEGIC_TITLE } from "@/hooks/use-strategy";
 import { useLanguage } from "@/hooks/use-language";
 import { useAdmin } from "@/hooks/use-admin";
+import { useKRProgress } from "@/hooks/use-kr-progress";
 import { 
   Calendar, 
   Wallet, 
@@ -40,6 +41,7 @@ export default function DetailedStrategicBanner() {
   const { loading, error, objective, updateObjective, syncStatus, saveStatus } = useStrategy(true);
   const { t, language } = useLanguage();
   const { isAdmin } = useAdmin();
+  const { progress: krProgress, loading: krLoading } = useKRProgress();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editData, setEditData] = useState({
     title: '',
@@ -50,14 +52,14 @@ export default function DetailedStrategicBanner() {
     tags: [] as string[]
   });
 
-  // Данные ключевых результатов из скриншота
+  // Данные ключевых результатов с динамическим прогрессом
   const keyResults: KeyResult[] = [
     {
       id: 'kr1',
       title: 'Успешное проведение шоу',
       description: '45-минутная программа, болгарский флаг → логотип Tiger, 3 этапа повествования, военная трансформация-процесс',
-      progress: 0,
-      status: 'on_track',
+      progress: krProgress.kr1,
+      status: krProgress.kr1 >= 80 ? 'on_track' : krProgress.kr1 >= 50 ? 'at_risk' : 'behind',
       targets: {
         current: '1 show',
         target: '0 show'
@@ -67,8 +69,8 @@ export default function DetailedStrategicBanner() {
       id: 'kr2', 
       title: 'VIP-аудитория 20+',
       description: 'Министры, руководители служб, зарубежные представители, инвесторы; VIP-сопровождение',
-      progress: 0,
-      status: 'on_track',
+      progress: krProgress.kr2,
+      status: krProgress.kr2 >= 80 ? 'on_track' : krProgress.kr2 >= 50 ? 'at_risk' : 'behind',
       targets: {
         current: '20 guests',
         target: '0 guests'
@@ -78,8 +80,8 @@ export default function DetailedStrategicBanner() {
       id: 'kr3',
       title: 'Ключевой контракт 2+ млн лв',
       description: 'Гос. или корпоративный клиент, 30%+ предоплата, долгосрочное партнёрство, потенциал +50%',
-      progress: 0,
-      status: 'on_track',
+      progress: krProgress.kr3,
+      status: krProgress.kr3 >= 80 ? 'on_track' : krProgress.kr3 >= 50 ? 'at_risk' : 'behind',
       targets: {
         current: '2 M BGN',
         target: '0 M BGN'
@@ -89,8 +91,8 @@ export default function DetailedStrategicBanner() {
       id: 'kr4',
       title: 'Медиа-охват 100,000+',
       description: '5+ публикаций в нац. СМИ, документальный фильм, международное признание, 50+ лидов',
-      progress: 0,
-      status: 'on_track',
+      progress: krProgress.kr4,
+      status: krProgress.kr4 >= 80 ? 'on_track' : krProgress.kr4 >= 50 ? 'at_risk' : 'behind',
       targets: {
         current: '100000 reach',
         target: '0 reach'
