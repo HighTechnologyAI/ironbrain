@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { useState } from "react";
 
 export default function StrategicBanner() {
+  console.log('StrategicBanner rendering...'); // Debug log
   const { loading, error, objective } = useStrategy(true);
   const { t, language } = useLanguage();
   const { isAdmin } = useAdmin();
