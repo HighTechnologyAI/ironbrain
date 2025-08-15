@@ -489,6 +489,48 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
     return () => clearTimeout(autoSaveTimer);
   }, [objective, autoSave]);
 
+  // Enhanced save with retry mechanism
+  const saveWithRetry = useCallback(async (updates: Objective, retries = 3): Promise<boolean> => {
+    try {
+      // Always save to cache first (instant)
+      await saveToCache(updates);
+      
+      // Try to save to Supabase
+      const { error } = await supabase
+        .from('objectives')
+        .update({
+          title: updates.title,
+          description: updates.description,
+          budget_planned: updates.budget_planned,
+          target_date: updates.target_date,
+          tags: updates.tags,
+          currency: updates.currency,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', updates.id);
+        
+      if (error) throw error;
+      return true;
+      
+    } catch (err: any) {
+      console.error(`Save attempt failed (${retries} retries left):`, err);
+      
+      if (retries > 0) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        return saveWithRetry(updates, retries - 1);
+      } else {
+        // Emergency save to sessionStorage
+        try {
+          sessionStorage.setItem('tiger_emergency_save', JSON.stringify(updates));
+          console.log('💾 Emergency save to sessionStorage successful');
+        } catch (sessionErr) {
+          console.error('❌ Emergency save failed:', sessionErr);
+        }
+        return false;
+      }
+    }
+  }, [saveToCache]);
+
   // Save on page unload
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -496,6 +538,7 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
         // Synchronous save to sessionStorage as fallback
         try {
           sessionStorage.setItem('tiger_draft_objective', JSON.stringify(objective));
+          console.log('💾 Page unload save to sessionStorage');
         } catch (err) {
           console.warn('Session storage save failed:', err);
         }
@@ -505,6 +548,36 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [objective, saveStatus]);
+
+  // Recovery from sessionStorage on init
+  useEffect(() => {
+    const recoverFromSession = async () => {
+      try {
+        const draftData = sessionStorage.getItem('tiger_draft_objective');
+        const emergencyData = sessionStorage.getItem('tiger_emergency_save');
+        
+        if (emergencyData && !objective) {
+          const recoveredObj = JSON.parse(emergencyData);
+          console.log('🔄 Recovered from emergency save:', recoveredObj.title);
+          setObjective(recoveredObj);
+          await saveToCache(recoveredObj);
+          sessionStorage.removeItem('tiger_emergency_save');
+        } else if (draftData && !objective) {
+          const draftObj = JSON.parse(draftData);
+          console.log('🔄 Recovered from draft save:', draftObj.title);
+          setObjective(draftObj);
+          await saveToCache(draftObj);
+          sessionStorage.removeItem('tiger_draft_objective');
+        }
+      } catch (err) {
+        console.warn('Recovery from sessionStorage failed:', err);
+      }
+    };
+
+    if (user && !loading) {
+      recoverFromSession();
+    }
+  }, [user, loading, objective, saveToCache]);
 
   return { loading, error, objective, krs, syncStatus, saveStatus, updateObjective };
 }
