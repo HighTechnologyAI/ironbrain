@@ -30,23 +30,13 @@ const TacticalMapModal: React.FC<TacticalMapModalProps> = ({ drones, trigger }) 
       </DialogTrigger>
       <DialogContent className="max-w-7xl h-[90vh] p-0 bg-surface-1 border-border">
         <DialogHeader className="px-6 py-4 border-b border-border bg-surface-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <DialogTitle className="text-xl font-bold font-ui text-foreground">
-                Тактическая карта - Реальное время
-              </DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground mt-1">
-                Интерактивная карта с позициями дронов и навигацией
-              </DialogDescription>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setIsOpen(false)}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+          <div>
+            <DialogTitle className="text-xl font-bold font-ui text-foreground">
+              Тактическая карта - Реальное время
+            </DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-1">
+              Интерактивная карта с позициями дронов и навигацией
+            </DialogDescription>
           </div>
         </DialogHeader>
         
