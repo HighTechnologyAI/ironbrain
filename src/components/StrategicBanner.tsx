@@ -71,9 +71,9 @@ export default function StrategicBanner() {
   const loc = (localized as any)[language] || localized.ru;
 
   const handleEditOpen = () => {
-    const displayTitle = isStrategic ? loc.title : objective?.title || '';
-    const displayDescription = isStrategic ? loc.description : (objective?.description || loc.description);
-    const displayDate = isStrategic ? loc.date : (objective?.target_date ? format(new Date(objective.target_date), 'dd.MM.yyyy') : '');
+    const displayTitle = objective?.title || '';
+    const displayDescription = objective?.description || '';
+    const displayDate = objective?.target_date ? format(new Date(objective.target_date), 'dd.MM.yyyy') : '';
     const displayBudget = objective?.budget_planned;
 
     setEditData({
@@ -113,17 +113,14 @@ export default function StrategicBanner() {
       }
     }
     
-    // Only update title and description for non-strategic objectives
-    if (!isStrategic) {
-      if (editData.title) updates.title = editData.title;
-      if (editData.description) updates.description = editData.description;
-    }
+    // Update title and description for all objectives including strategic
+    if (editData.title) updates.title = editData.title;
+    if (editData.description) updates.description = editData.description;
     
     const success = await updateObjective(updates);
     if (success) {
-      // Force re-render by updating the state
       setIsEditOpen(false);
-      window.location.reload(); // Temporary fix to ensure UI updates
+      // No page reload needed - state will update automatically
     }
   };
 
@@ -159,9 +156,9 @@ export default function StrategicBanner() {
     );
   }
 
-  const displayTitle = isStrategic ? loc.title : objective.title;
-  const displayDescription = isStrategic ? loc.description : (objective.description || loc.description);
-  const displayDate = isStrategic ? loc.date : (objective.target_date ? format(new Date(objective.target_date), 'dd.MM.yyyy, HH:mm') : null);
+  const displayTitle = objective.title;
+  const displayDescription = objective.description || loc.description;
+  const displayDate = objective.target_date ? format(new Date(objective.target_date), 'dd.MM.yyyy, HH:mm') : null;
   const displayBudget = objective.budget_planned;
 
   return (
