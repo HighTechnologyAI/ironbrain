@@ -11,6 +11,8 @@ export interface Objective {
   budget_planned: number | null;
   strategic_importance: string | null;
   status: string;
+  tags: string[] | null;
+  currency: string | null;
 }
 
 export interface KeyResult {
@@ -36,6 +38,8 @@ interface UseStrategyReturn {
     description?: string;
     budget_planned?: number;
     target_date?: string;
+    tags?: string[];
+    currency?: string;
   }) => Promise<boolean>;
 }
 
@@ -50,6 +54,25 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
 
   useEffect(() => {
     let isMounted = true;
+
+    // Set up real-time subscription for objectives updates
+    const channel = supabase
+      .channel('objectives-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'objectives',
+          filter: `title=eq.${STRATEGIC_TITLE}`
+        },
+        (payload) => {
+          if (isMounted && payload.new) {
+            setObjective(payload.new as Objective);
+          }
+        }
+      )
+      .subscribe();
 
     async function init() {
       try {
@@ -211,7 +234,10 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
     }
 
     init();
-    return () => { isMounted = false; };
+    return () => { 
+      isMounted = false; 
+      supabase.removeChannel(channel);
+    };
   }, [user, autoSeed]);
 
   const updateObjective = async (updates: {
@@ -219,6 +245,8 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
     description?: string;
     budget_planned?: number;
     target_date?: string;
+    tags?: string[];
+    currency?: string;
   }) => {
     if (!objective) return false;
     

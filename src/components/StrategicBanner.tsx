@@ -1,10 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import StrategicObjectiveEditor from "./StrategicObjectiveEditor";
 import { useStrategy, STRATEGIC_TITLE } from "@/hooks/use-strategy";
 import { useLanguage } from "@/hooks/use-language";
 import { useAdmin } from "@/hooks/use-admin";
@@ -23,7 +20,8 @@ export default function StrategicBanner() {
     description: '',
     budget: '',
     date: '',
-    currency: 'BGN'
+    currency: 'BGN',
+    tags: [] as string[]
   });
   
   const localized = {
@@ -38,7 +36,9 @@ export default function StrategicBanner() {
       descriptionLabel: 'Описание',
       budgetLabel: 'Бюджет (лв)',
       dateLabel: 'Дата',
-      strategicGoal: 'Стратегическая цель'
+      strategicGoal: 'Стратегическая цель',
+      tagsLabel: 'Теги',
+      addTag: 'Добавить тег...'
     },
     en: {
       title: 'DRONE SHOW 2025',
@@ -51,7 +51,9 @@ export default function StrategicBanner() {
       descriptionLabel: 'Description',
       budgetLabel: 'Budget (BGN)',
       dateLabel: 'Date',
-      strategicGoal: 'Strategic Goal'
+      strategicGoal: 'Strategic Goal',
+      tagsLabel: 'Tags',
+      addTag: 'Add tag...'
     },
     bg: {
       title: 'ДРОН ШОУ 2025',
@@ -64,7 +66,9 @@ export default function StrategicBanner() {
       descriptionLabel: 'Описание',
       budgetLabel: 'Бюджет (лв)',
       dateLabel: 'Дата',
-      strategicGoal: 'Стратегическа цел'
+      strategicGoal: 'Стратегическа цел',
+      tagsLabel: 'Етикети',
+      addTag: 'Добави етикет...'
     }
   } as const;
   
@@ -76,53 +80,62 @@ export default function StrategicBanner() {
     const displayDescription = objective?.description || '';
     const displayDate = objective?.target_date ? format(new Date(objective.target_date), 'dd.MM.yyyy') : '';
     const displayBudget = objective?.budget_planned;
+    const displayCurrency = objective?.currency || 'BGN';
+    const displayTags = objective?.tags || [];
 
     setEditData({
       title: displayTitle,
       description: displayDescription,
       budget: displayBudget?.toString() || '75000',
       date: displayDate,
-      currency: 'BGN'
+      currency: displayCurrency,
+      tags: displayTags
     });
     setIsEditOpen(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = async (data: {
+    title: string;
+    description: string;
+    budget: string;
+    currency: string;
+    date: string;
+    tags: string[];
+  }) => {
     if (!updateObjective) return;
     
     const updates: any = {};
     
     // Parse budget if it's a number
-    if (editData.budget && !isNaN(Number(editData.budget))) {
-      updates.budget_planned = Number(editData.budget);
+    if (data.budget && !isNaN(Number(data.budget))) {
+      updates.budget_planned = Number(data.budget);
     }
     
     // Parse date if it's provided
-    if (editData.date) {
+    if (data.date) {
       try {
-        // For strategic objectives, try to keep the original date format
-        if (isStrategic) {
-          // Keep the display date as is, but try to extract a valid date for DB
-          updates.target_date = '2025-08-20'; // Fixed date for strategic objective
-        } else {
-          const parsedDate = new Date(editData.date);
+        // Parse DD.MM.YYYY format
+        const [day, month, year] = data.date.split('.');
+        if (day && month && year) {
+          const parsedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
           if (!isNaN(parsedDate.getTime())) {
             updates.target_date = parsedDate.toISOString().split('T')[0];
           }
         }
       } catch (e) {
-        console.warn('Could not parse date:', editData.date);
+        console.warn('Could not parse date:', data.date);
       }
     }
     
-    // Update title and description for all objectives including strategic
-    if (editData.title) updates.title = editData.title;
-    if (editData.description) updates.description = editData.description;
+    // Update all fields
+    if (data.title) updates.title = data.title;
+    if (data.description) updates.description = data.description;
+    if (data.currency) updates.currency = data.currency;
+    if (data.tags) updates.tags = data.tags;
     
     const success = await updateObjective(updates);
     if (success) {
       setIsEditOpen(false);
-      // No page reload needed - state will update automatically
     }
   };
 
@@ -160,8 +173,10 @@ export default function StrategicBanner() {
 
   const displayTitle = objective.title;
   const displayDescription = objective.description || loc.description;
-  const displayDate = objective.target_date ? format(new Date(objective.target_date), 'dd.MM.yyyy, HH:mm') : null;
+  const displayDate = objective.target_date ? format(new Date(objective.target_date), 'dd.MM.yyyy') : null;
   const displayBudget = objective.budget_planned;
+  const displayCurrency = objective.currency || 'BGN';
+  const displayTags = objective.tags || [];
 
   return (
     <>
@@ -173,87 +188,14 @@ export default function StrategicBanner() {
           <div className="flex items-center gap-2">
             <Target className="h-5 w-5 text-primary" />
             {isAdmin && (
-              <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <DialogTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="h-6 w-6 p-0 text-muted-foreground hover:text-primary opacity-70 hover:opacity-100 transition-opacity"
-                    onClick={handleEditOpen}
-                  >
-                    <Edit3 className="h-3 w-3" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>{loc.editTitle}</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="title">{loc.titleLabel}</Label>
-                      <Input 
-                        id="title"
-                        value={editData.title}
-                        onChange={(e) => setEditData(prev => ({ ...prev, title: e.target.value }))}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="description">{loc.descriptionLabel}</Label>
-                      <Textarea 
-                        id="description"
-                        value={editData.description}
-                        onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
-                        rows={3}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <Label htmlFor="budget">{loc.budgetLabel}</Label>
-                        <Input 
-                          id="budget"
-                          value={editData.budget}
-                          onChange={(e) => setEditData(prev => ({ ...prev, budget: e.target.value }))}
-                          className="mt-1"
-                          placeholder="75000"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="currency">Валюта</Label>
-                        <select 
-                          id="currency"
-                          value={editData.currency}
-                          onChange={(e) => setEditData(prev => ({ ...prev, currency: e.target.value }))}
-                          className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                        >
-                          <option value="BGN">BGN</option>
-                          <option value="USD">USD</option>
-                          <option value="EUR">EUR</option>
-                          <option value="UAH">UAH</option>
-                        </select>
-                      </div>
-                      <div>
-                        <Label htmlFor="date">{loc.dateLabel}</Label>
-                        <Input 
-                          id="date"
-                          value={editData.date}
-                          onChange={(e) => setEditData(prev => ({ ...prev, date: e.target.value }))}
-                          className="mt-1"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex justify-end gap-2 pt-4">
-                      <Button variant="outline" onClick={() => setIsEditOpen(false)}>
-                        {loc.cancel}
-                      </Button>
-                      <Button onClick={handleSave}>
-                        {loc.saveChanges}
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="h-6 w-6 p-0 text-muted-foreground hover:text-primary opacity-70 hover:opacity-100 transition-opacity"
+                onClick={handleEditOpen}
+              >
+                <Edit3 className="h-3 w-3" />
+              </Button>
             )}
           </div>
         </CardHeader>
@@ -281,6 +223,18 @@ export default function StrategicBanner() {
           <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
             {displayDescription}
           </p>
+          
+          {/* Tags */}
+          {displayTags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-3">
+              {displayTags.map((tag, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
+          
           <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
             {displayDate && (
               <div className="flex items-center gap-1">
@@ -291,12 +245,26 @@ export default function StrategicBanner() {
             {displayBudget != null && (
               <div className="flex items-center gap-1">
                 <Wallet className="h-3 w-3 text-primary" />
-                <span className="font-mono">{displayBudget.toLocaleString()} {editData.currency || 'BGN'}</span>
+                <span className="font-mono">{displayBudget.toLocaleString()} {displayCurrency}</span>
               </div>
             )}
           </div>
         </CardContent>
       </Card>
+      
+      <StrategicObjectiveEditor
+        isOpen={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        title={editData.title}
+        description={editData.description}
+        budget={editData.budget}
+        currency={editData.currency}
+        date={editData.date}
+        tags={editData.tags}
+        onSave={handleSave}
+        onCancel={() => setIsEditOpen(false)}
+        localized={loc}
+      />
     </>
   );
 }

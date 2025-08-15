@@ -762,11 +762,13 @@ export type Database = {
           company_id: string | null
           created_at: string
           created_by: string | null
+          currency: string | null
           description: string | null
           id: string
           location: string | null
           status: Database["public"]["Enums"]["objective_status"]
           strategic_importance: string | null
+          tags: string[] | null
           target_date: string | null
           title: string
           updated_at: string
@@ -776,11 +778,13 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           created_by?: string | null
+          currency?: string | null
           description?: string | null
           id?: string
           location?: string | null
           status?: Database["public"]["Enums"]["objective_status"]
           strategic_importance?: string | null
+          tags?: string[] | null
           target_date?: string | null
           title: string
           updated_at?: string
@@ -790,11 +794,13 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           created_by?: string | null
+          currency?: string | null
           description?: string | null
           id?: string
           location?: string | null
           status?: Database["public"]["Enums"]["objective_status"]
           strategic_importance?: string | null
+          tags?: string[] | null
           target_date?: string | null
           title?: string
           updated_at?: string
