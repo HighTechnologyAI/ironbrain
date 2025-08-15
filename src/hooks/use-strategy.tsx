@@ -128,8 +128,8 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
         {
           event: '*',
           schema: 'public',
-          table: 'objectives',
-          filter: `title=eq.${STRATEGIC_TITLE}`
+          table: 'objectives'
+          // Убираем фильтр по title чтобы получать все изменения
         },
         async (payload) => {
           if (isMounted) {
