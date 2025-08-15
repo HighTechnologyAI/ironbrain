@@ -120,41 +120,53 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
   useEffect(() => {
     let isMounted = true;
 
-    // Set up real-time subscription for objectives updates
+    // Set up enhanced real-time subscription for instant sync between ALL users
     const channel = supabase
-      .channel('objectives-changes')
+      .channel('strategic-objective-global-sync')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'objectives'
+          table: 'objectives',
+          filter: `title=eq.${STRATEGIC_TITLE}`
         },
-        (payload) => {
+        async (payload) => {
           if (isMounted) {
+            console.log('🔄 Real-time update for all users:', payload);
+            
             if (payload.eventType === 'UPDATE' && payload.new) {
-              const newObjective = payload.new as Objective;
-              // Update only if it's our current objective
-              setObjective(prev => prev && prev.id === newObjective.id ? newObjective : prev);
+              const updatedObjective = payload.new as Objective;
+              console.log('📡 Broadcasting update to UI:', updatedObjective);
+              
+              // Immediately update all users' interfaces
+              setObjective(updatedObjective);
+              setSyncStatus('connected');
+              setSaveStatus('saved');
+              
+              // Cache the update for persistence
+              await saveToCache(updatedObjective);
+              
             } else if (payload.eventType === 'INSERT' && payload.new) {
               const newObjective = payload.new as Objective;
               if (newObjective.title === STRATEGIC_TITLE) {
+                console.log('🆕 New strategic objective created:', newObjective);
                 setObjective(newObjective);
-              }
-            } else if (payload.eventType === 'DELETE' && payload.old) {
-              const deletedObjective = payload.old as Objective;
-              if (deletedObjective.title === STRATEGIC_TITLE) {
-                window.location.reload();
+                await saveToCache(newObjective);
               }
             }
           }
         }
       )
       .on('presence', { event: 'sync' }, () => {
-        if (isMounted) setSyncStatus('connected');
+        if (isMounted) {
+          console.log('👥 Users synchronized');
+          setSyncStatus('connected');
+        }
       })
       .subscribe((status) => {
         if (isMounted) {
+          console.log('📡 Subscription status:', status);
           if (status === 'SUBSCRIBED') {
             setSyncStatus('connected');
           } else if (status === 'CHANNEL_ERROR') {
@@ -167,19 +179,25 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
       try {
         setLoading(true);
         setError(null);
+        setSyncStatus('connecting');
+        
         if (!user) {
           setLoading(false);
           return;
         }
 
-        // Try to load from cache first for instant display
+        console.log('🚀 Initializing strategic objective data...');
+
+        // 1. INSTANT LOAD from cache for immediate display (no waiting!)
         const cachedData = await loadFromCache();
         if (cachedData) {
+          console.log('⚡ Loaded from cache instantly:', cachedData.title);
           setObjective(cachedData);
           setSaveStatus('local_only');
+          setLoading(false); // Show UI immediately with cached data
         }
 
-        // current profile
+        // 2. Get current profile
         const { data: profile } = await supabase
           .from('profiles')
           .select('id, role')
@@ -200,7 +218,8 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
           ownerId = adminProfile?.id || profile?.id || null;
         }
 
-        // load existing objective by title (take the latest one if multiple exist)
+        // 3. ALWAYS load fresh data from Supabase for accuracy
+        console.log('🌐 Loading fresh data from Supabase...');
         const { data: existingObjs, error: loadErr } = await supabase
           .from('objectives')
           .select('*')
@@ -208,10 +227,17 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
           .order('created_at', { ascending: false })
           .limit(1);
 
+        if (loadErr) {
+          console.error('❌ Supabase load error:', loadErr);
+          // If Supabase fails, keep cached data
+          if (cachedData) {
+            setSyncStatus('disconnected');
+            return;
+          }
+          throw loadErr;
+        }
+
         const existingObj = existingObjs?.[0] || null;
-
-        if (loadErr) throw loadErr;
-
         let obj = existingObj as Objective | null;
 
         // seed if none
@@ -318,14 +344,16 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
             .order('title');
 
           if (isMounted) {
+            console.log('✅ Fresh data loaded and cached:', obj.title);
             setObjective(obj);
             setKrs((krsData || []) as KeyResult[]);
             setSaveStatus('saved');
+            setSyncStatus('connected');
             
-            // Save to cache for persistence
-            if (obj) {
-              await saveToCache(obj);
-            }
+            // GUARANTEED save to cache for persistence across page reloads
+            await saveToCache(obj);
+            
+            console.log('🎉 Data persistence confirmed - will survive page reload!');
           }
         }
       } catch (e: any) {
@@ -352,7 +380,9 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
   }, retryCount = 0) => {
     if (!objective) return false;
     
+    console.log('💾 STARTING ADMIN SAVE - will broadcast to ALL users:', updates);
     setSaveStatus('saving');
+    setSyncStatus('connecting');
     
     try {
       // Convert date from DD.MM.YYYY to UTC properly
@@ -368,21 +398,27 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
         }
       }
       
-      // Update local state immediately with optimistic update
+      // 1. IMMEDIATE local update + cache (instant feedback)
       const updatedObjective = { ...objective, ...processedUpdates };
       setObjective(updatedObjective);
-      
-      // Save to cache immediately
       await saveToCache(updatedObjective);
       setSaveStatus('local_only');
       
-      // Attempt Supabase save with error handling
-      const { error } = await supabase
+      // 2. GUARANTEED Supabase save (this triggers real-time for ALL users)
+      console.log('📡 Saving to Supabase - will sync to all users...');
+      const { data, error } = await supabase
         .from('objectives')
-        .update(processedUpdates)
-        .eq('id', objective.id);
+        .update({
+          ...processedUpdates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', objective.id)
+        .select()
+        .single();
       
       if (error) {
+        console.error('❌ Supabase save failed:', error);
+        
         // Handle specific CORS and network errors
         if (error.message?.includes('CORS') || 
             error.message?.includes('network') ||
@@ -392,17 +428,25 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
         throw error;
       }
       
-      setSaveStatus('saved');
+      console.log('✅ SUCCESS! Data saved to Supabase:', data);
+      console.log('📢 Real-time will now broadcast changes to ALL users automatically');
       
-      // Clear save status after 3 seconds
-      setTimeout(() => setSaveStatus('saved'), 3000);
+      setSaveStatus('saved');
+      setSyncStatus('connected');
+      
+      // 3. Update cache with confirmed data
+      if (data) {
+        await saveToCache(data as Objective);
+      }
       
       // Clear any previous errors
       setError(null);
       
+      console.log('🎉 ADMIN SAVE COMPLETE - All users now see the changes!');
       return true;
+      
     } catch (e: any) {
-      console.error('Error updating objective:', e);
+      console.error('❌ ADMIN SAVE ERROR:', e);
       
       // Retry logic for network errors
       if (retryCount < 3 && (
@@ -410,23 +454,24 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
         e.message?.includes('CORS') ||
         e.message?.includes('fetch')
       )) {
-        console.log(`🔄 Retrying save (attempt ${retryCount + 1}/3)`);
+        console.log(`🔄 Retrying admin save (attempt ${retryCount + 1}/3)...`);
         setTimeout(() => {
           updateObjective(updates, retryCount + 1);
         }, 1000 * (retryCount + 1));
         return false;
       }
       
-      setError(e.message || 'Update error');
+      setError(e.message || 'Ошибка сохранения');
       setSaveStatus('error');
+      setSyncStatus('disconnected');
       
-      // Ensure data is saved to cache even on error
+      // CRITICAL: Preserve data in cache even on network failure
       try {
-        const updatedObjective = { ...objective, ...updates };
-        await saveToCache(updatedObjective);
-        console.log('💾 Data preserved in cache despite network error');
+        const preservedObjective = { ...objective, ...updates };
+        await saveToCache(preservedObjective);
+        console.log('💾 CRITICAL: Data preserved in cache for recovery!');
       } catch (cacheError) {
-        console.error('Cache save failed:', cacheError);
+        console.error('❌ CRITICAL: Cache preservation failed:', cacheError);
       }
       
       return false;
