@@ -33,6 +33,7 @@ interface UseStrategyReturn {
   error: string | null;
   objective: Objective | null;
   krs: KeyResult[];
+  syncStatus: 'connected' | 'connecting' | 'disconnected';
   updateObjective?: (updates: {
     title?: string;
     description?: string;
@@ -51,6 +52,7 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
   const [error, setError] = useState<string | null>(null);
   const [objective, setObjective] = useState<Objective | null>(null);
   const [krs, setKrs] = useState<KeyResult[]>([]);
+  const [syncStatus, setSyncStatus] = useState<'connected' | 'connecting' | 'disconnected'>('connecting');
 
   useEffect(() => {
     let isMounted = true;
@@ -85,7 +87,18 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
           }
         }
       )
-      .subscribe();
+      .on('presence', { event: 'sync' }, () => {
+        if (isMounted) setSyncStatus('connected');
+      })
+      .subscribe((status) => {
+        if (isMounted) {
+          if (status === 'SUBSCRIBED') {
+            setSyncStatus('connected');
+          } else if (status === 'CHANNEL_ERROR') {
+            setSyncStatus('disconnected');
+          }
+        }
+      });
 
     async function init() {
       try {
@@ -264,15 +277,28 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
     if (!objective) return false;
     
     try {
+      // Convert date from DD.MM.YYYY to UTC properly
+      let processedUpdates = { ...updates };
+      if (processedUpdates.target_date && typeof processedUpdates.target_date === 'string') {
+        if (processedUpdates.target_date.includes('.')) {
+          const [day, month, year] = processedUpdates.target_date.split('.');
+          if (day && month && year) {
+            // Create date in UTC to avoid timezone shifts
+            const utcDate = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)));
+            processedUpdates.target_date = utcDate.toISOString().split('T')[0];
+          }
+        }
+      }
+      
       const { error } = await supabase
         .from('objectives')
-        .update(updates)
+        .update(processedUpdates)
         .eq('id', objective.id);
       
       if (error) throw error;
       
       // Update local state immediately for better UX
-      setObjective(prev => prev ? { ...prev, ...updates } : null);
+      setObjective(prev => prev ? { ...prev, ...processedUpdates } : null);
       
       // Clear any previous errors
       setError(null);
@@ -285,5 +311,5 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
     }
   };
 
-  return { loading, error, objective, krs, updateObjective };
+  return { loading, error, objective, krs, syncStatus, updateObjective };
 }

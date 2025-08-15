@@ -5,13 +5,13 @@ import StrategicObjectiveEditor from "./StrategicObjectiveEditor";
 import { useStrategy, STRATEGIC_TITLE } from "@/hooks/use-strategy";
 import { useLanguage } from "@/hooks/use-language";
 import { useAdmin } from "@/hooks/use-admin";
-import { Calendar, Wallet, Edit3, Target, TrendingUp } from "lucide-react";
+import { Calendar, Wallet, Edit3, Target, TrendingUp, Wifi, WifiOff, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
 import { StatusChip } from "@/components/ui/status-chip";
 
 export default function StrategicBanner() {
-  const { loading, error, objective, updateObjective } = useStrategy(true);
+  const { loading, error, objective, updateObjective, syncStatus } = useStrategy(true);
   const { t, language } = useLanguage();
   const { isAdmin } = useAdmin();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -111,20 +111,9 @@ export default function StrategicBanner() {
       updates.budget_planned = Number(data.budget);
     }
     
-    // Parse date if it's provided
+    // Handle date in DD.MM.YYYY format - let useStrategy handle UTC conversion
     if (data.date) {
-      try {
-        // Parse DD.MM.YYYY format
-        const [day, month, year] = data.date.split('.');
-        if (day && month && year) {
-          const parsedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-          if (!isNaN(parsedDate.getTime())) {
-            updates.target_date = parsedDate.toISOString().split('T')[0];
-          }
-        }
-      } catch (e) {
-        console.warn('Could not parse date:', data.date);
-      }
+      updates.target_date = data.date; // Pass directly, hook will handle conversion
     }
     
     // Update all fields
@@ -186,6 +175,16 @@ export default function StrategicBanner() {
             {loc.strategicGoal}
           </CardTitle>
           <div className="flex items-center gap-2">
+            {/* Sync Status Indicator */}
+            <div className={`transition-all duration-300 ${
+              syncStatus === 'connected' ? 'text-success' :
+              syncStatus === 'connecting' ? 'text-warning animate-pulse' :
+              'text-destructive'
+            }`}>
+              {syncStatus === 'connected' ? <Wifi className="h-4 w-4" /> :
+               syncStatus === 'connecting' ? <Clock className="h-4 w-4" /> :
+               <WifiOff className="h-4 w-4" />}
+            </div>
             <Target className="h-5 w-5 text-primary" />
             {isAdmin && (
               <Button 
@@ -263,6 +262,7 @@ export default function StrategicBanner() {
         tags={editData.tags}
         onSave={handleSave}
         onCancel={() => setIsEditOpen(false)}
+        syncStatus={syncStatus}
         localized={loc}
       />
     </>

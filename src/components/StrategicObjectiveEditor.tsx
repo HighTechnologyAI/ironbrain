@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { EnhancedDatePicker } from "@/components/ui/enhanced-date-picker";
 import { TagIconSelector } from "@/components/ui/tag-icon-selector";
 import { useState, useEffect } from "react";
-import { Calendar as CalendarIcon, DollarSign, Hash, X, Plus } from "lucide-react";
+import { Calendar as CalendarIcon, DollarSign, Hash, X, Plus, Wifi, WifiOff, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +21,7 @@ interface StrategicObjectiveEditorProps {
   currency: string;
   date: string;
   tags: string[];
+  syncStatus?: 'connected' | 'connecting' | 'disconnected';
   onSave: (data: {
     title: string;
     description: string;
@@ -52,6 +53,7 @@ export default function StrategicObjectiveEditor({
   currency,
   date,
   tags,
+  syncStatus = 'disconnected',
   onSave,
   onCancel,
   localized
@@ -148,8 +150,17 @@ export default function StrategicObjectiveEditor({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">
+          <DialogTitle className="text-xl font-semibold flex items-center gap-2">
             {localized.editTitle}
+            <div className={`transition-all duration-300 ${
+              syncStatus === 'connected' ? 'text-success' :
+              syncStatus === 'connecting' ? 'text-warning animate-pulse' :
+              'text-destructive'
+            }`}>
+              {syncStatus === 'connected' ? <Wifi className="h-4 w-4" /> :
+               syncStatus === 'connecting' ? <Clock className="h-4 w-4" /> :
+               <WifiOff className="h-4 w-4" />}
+            </div>
           </DialogTitle>
         </DialogHeader>
         
@@ -262,7 +273,7 @@ export default function StrategicObjectiveEditor({
               <div className="space-y-3">
                 <TagIconSelector 
                   onTagAdd={addTagWithIcon}
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-[1.02] flex items-center justify-center gap-2 py-3 rounded-lg"
+                  className="w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg flex items-center justify-center gap-2 py-3 rounded-lg shadow-sm"
                   buttonText="Создать интеллектуальный тег"
                 />
                 
@@ -303,9 +314,10 @@ export default function StrategicObjectiveEditor({
             </Button>
             <Button 
               onClick={handleSave}
-              className="transition-all duration-200 hover:scale-105"
+              disabled={syncStatus === 'disconnected'}
+              className="transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {localized.saveChanges}
+              {syncStatus === 'connecting' ? 'Синхронизация...' : localized.saveChanges}
             </Button>
           </div>
         </div>
