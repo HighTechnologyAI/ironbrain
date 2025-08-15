@@ -8,6 +8,12 @@ interface KRProgress {
   kr4: number; // Медиа-охват - задачи по маркетингу
 }
 
+interface KRStats {
+  total: number;
+  completed: number;
+  progress: number;
+}
+
 export function useKRProgress() {
   const [progress, setProgress] = useState<KRProgress>({
     kr1: 0,
@@ -15,14 +21,20 @@ export function useKRProgress() {
     kr3: 0,
     kr4: 0
   });
+  const [stats, setStats] = useState<Record<string, KRStats>>({
+    kr1: { total: 0, completed: 0, progress: 0 },
+    kr2: { total: 0, completed: 0, progress: 0 },
+    kr3: { total: 0, completed: 0, progress: 0 },
+    kr4: { total: 0, completed: 0, progress: 0 }
+  });
   const [loading, setLoading] = useState(true);
 
   const calculateProgress = async () => {
     try {
-      // Получаем все задачи
+      // Получаем все задачи с полем key_result
       const { data: tasks, error } = await supabase
         .from('tasks')
-        .select('id, title, status, tags')
+        .select('id, status, key_result')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -32,39 +44,32 @@ export function useKRProgress() {
 
       if (!tasks) return;
 
-      // Категории задач для каждого KR
-      const krCategories = {
-        kr1: ['шоу', 'дрон', 'перфоманс', 'программа', 'демонстрация', 'выступление'],
-        kr2: ['vip', 'гости', 'министр', 'делегация', 'приглашение', 'аудитория'],
-        kr3: ['контракт', 'продажи', 'клиент', 'договор', 'сделка', 'партнер'],
-        kr4: ['медиа', 'пресса', 'публикация', 'реклама', 'маркетинг', 'сми']
-      };
-
       // Подсчитываем прогресс для каждого KR
       const newProgress: KRProgress = { kr1: 0, kr2: 0, kr3: 0, kr4: 0 };
+      const newStats: Record<string, KRStats> = {
+        kr1: { total: 0, completed: 0, progress: 0 },
+        kr2: { total: 0, completed: 0, progress: 0 },
+        kr3: { total: 0, completed: 0, progress: 0 },
+        kr4: { total: 0, completed: 0, progress: 0 }
+      };
 
-      Object.entries(krCategories).forEach(([kr, keywords]) => {
-        // Фильтруем задачи по ключевым словам
-        const relevantTasks = tasks.filter(task => {
-          const titleLower = task.title.toLowerCase();
-          const tagsLower = (task.tags || []).join(' ').toLowerCase();
-          const searchText = `${titleLower} ${tagsLower}`;
-          
-          return keywords.some(keyword => searchText.includes(keyword));
-        });
+      ['kr1', 'kr2', 'kr3', 'kr4'].forEach(kr => {
+        // Фильтруем задачи по полю key_result
+        const relevantTasks = tasks.filter(task => task.key_result === kr);
+        const completedTasks = relevantTasks.filter(task => 
+          task.status === 'completed'
+        );
 
-        if (relevantTasks.length > 0) {
-          const completedTasks = relevantTasks.filter(task => 
-            task.status === 'completed'
-          );
-          
-          newProgress[kr as keyof KRProgress] = Math.round(
-            (completedTasks.length / relevantTasks.length) * 100
-          );
-        }
+        const total = relevantTasks.length;
+        const completed = completedTasks.length;
+        const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+        newProgress[kr as keyof KRProgress] = progress;
+        newStats[kr] = { total, completed, progress };
       });
 
       setProgress(newProgress);
+      setStats(newStats);
     } catch (error) {
       console.error('Error calculating KR progress:', error);
     } finally {
@@ -96,5 +101,5 @@ export function useKRProgress() {
     };
   }, []);
 
-  return { progress, loading, refresh: calculateProgress };
+  return { progress, stats, loading, refresh: calculateProgress };
 }

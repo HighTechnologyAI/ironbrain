@@ -48,6 +48,7 @@ const taskSchema = z.object({
   due_date: z.date().optional(),
   estimated_hours: z.number().min(1).max(100).optional(),
   tags: z.string().optional(),
+  key_result: z.string().optional(),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -155,6 +156,7 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
         estimated_hours: typeof data.estimated_hours === 'number' ? Math.round(data.estimated_hours) : null,
         tags: data.tags ? data.tags.split(',').map(tag => tag.trim()) : null,
         language: detectedLanguage !== 'unknown' ? detectedLanguage : null,
+        key_result: data.key_result || null,
       };
 
       const { error } = await supabase
@@ -368,6 +370,33 @@ const CreateTaskForm = ({ onTaskCreated }: CreateTaskFormProps) => {
                   </Popover>
                   <FormDescription>
                     Опционально: установите срок выполнения задачи
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="key_result"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ключевой результат</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Выберите ключевой результат (опционально)" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="cyber-border bg-surface-1 backdrop-blur-md z-50">
+                      <SelectItem value="kr1">KR1: Успешное проведение шоу</SelectItem>
+                      <SelectItem value="kr2">KR2: VIP-аудитория 20+</SelectItem>
+                      <SelectItem value="kr3">KR3: Ключевой контракт 2+ млн лв</SelectItem>
+                      <SelectItem value="kr4">KR4: Медиа-охват 100,000+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Связать задачу с ключевым результатом для отслеживания прогресса
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

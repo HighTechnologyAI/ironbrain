@@ -41,7 +41,7 @@ export default function DetailedStrategicBanner() {
   const { loading, error, objective, updateObjective, syncStatus, saveStatus } = useStrategy(true);
   const { t, language } = useLanguage();
   const { isAdmin } = useAdmin();
-  const { progress: krProgress, loading: krLoading } = useKRProgress();
+  const { progress: krProgress, stats: krStats, loading: krLoading } = useKRProgress();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editData, setEditData] = useState({
     title: '',
@@ -61,8 +61,8 @@ export default function DetailedStrategicBanner() {
       progress: krProgress.kr1,
       status: krProgress.kr1 >= 80 ? 'on_track' : krProgress.kr1 >= 50 ? 'at_risk' : 'behind',
       targets: {
-        current: '1 show',
-        target: '0 show'
+        current: krStats.kr1?.completed?.toString() || '0',
+        target: krStats.kr1?.total?.toString() || '0'
       }
     },
     {
@@ -72,8 +72,8 @@ export default function DetailedStrategicBanner() {
       progress: krProgress.kr2,
       status: krProgress.kr2 >= 80 ? 'on_track' : krProgress.kr2 >= 50 ? 'at_risk' : 'behind',
       targets: {
-        current: '20 guests',
-        target: '0 guests'
+        current: krStats.kr2?.completed?.toString() || '0',
+        target: krStats.kr2?.total?.toString() || '0'
       }
     },
     {
@@ -83,8 +83,8 @@ export default function DetailedStrategicBanner() {
       progress: krProgress.kr3,
       status: krProgress.kr3 >= 80 ? 'on_track' : krProgress.kr3 >= 50 ? 'at_risk' : 'behind',
       targets: {
-        current: '2 M BGN',
-        target: '0 M BGN'
+        current: krStats.kr3?.completed?.toString() || '0',
+        target: krStats.kr3?.total?.toString() || '0'
       }
     },
     {
@@ -94,8 +94,8 @@ export default function DetailedStrategicBanner() {
       progress: krProgress.kr4,
       status: krProgress.kr4 >= 80 ? 'on_track' : krProgress.kr4 >= 50 ? 'at_risk' : 'behind',
       targets: {
-        current: '100000 reach',
-        target: '0 reach'
+        current: krStats.kr4?.completed?.toString() || '0',
+        target: krStats.kr4?.total?.toString() || '0'
       }
     }
   ];
@@ -374,11 +374,11 @@ export default function DetailedStrategicBanner() {
                       
                       <div className="flex justify-between text-xs">
                         <div className="flex items-center gap-1">
-                          <span className="text-muted-foreground">{loc.target}:</span>
+                          <span className="text-muted-foreground">Задачи:</span>
                           <span className="font-mono">{kr.targets.target}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <span className="text-muted-foreground">{loc.current}:</span>
+                          <span className="text-muted-foreground">Выполнено:</span>
                           <span className="font-mono">{kr.targets.current}</span>
                         </div>
                       </div>
