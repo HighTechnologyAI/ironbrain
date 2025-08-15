@@ -501,7 +501,7 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
         .update({
           title: updates.title,
           description: updates.description,
-          budget_planned: updates.budget_planned,
+          budget_planned: parseFloat(updates.budget_planned?.toString() || '0') || 0,
           target_date: updates.target_date,
           tags: updates.tags,
           currency: updates.currency,
