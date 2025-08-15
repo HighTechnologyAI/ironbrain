@@ -87,6 +87,11 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
     }
   }, [user?.id, task.created_by?.id]); // Более специфичные зависимости
 
+  // Обновляем selectedKR при изменении task.key_result
+  useEffect(() => {
+    setSelectedKR(task.key_result || '');
+  }, [task.key_result]);
+
   const statusLabels = {
     pending: t.pending,
     in_progress: t.inProgress,
@@ -139,8 +144,8 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
       });
 
       setEditingKR(false);
-      // Обновляем локальное состояние
-      task.key_result = selectedKR || null;
+      // Перезагружаем страницу для обновления прогресса KR
+      window.location.reload();
     } catch (error: any) {
       toast({
         title: language === 'ru' ? 'Ошибка' : 'Грешка',
