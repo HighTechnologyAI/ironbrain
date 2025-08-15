@@ -167,12 +167,12 @@ export default function StrategicBanner() {
     );
   }
 
-  const displayTitle = objective.title;
-  const displayDescription = objective.description || loc.description;
-  const displayDate = objective.target_date ? format(new Date(objective.target_date), 'dd.MM.yyyy') : null;
-  const displayBudget = objective.budget_planned;
-  const displayCurrency = objective.currency || 'BGN';
-  const displayTags = objective.tags || [];
+  const displayTitle = objective?.title || loc.title;
+  const displayDescription = objective?.description || loc.description;
+  const displayDate = objective?.target_date ? format(new Date(objective.target_date), 'dd.MM.yyyy') : null;
+  const displayBudget = objective?.budget_planned;
+  const displayCurrency = objective?.currency || 'BGN';
+  const displayTags = objective?.tags || [];
 
   return (
     <>
@@ -207,7 +207,7 @@ export default function StrategicBanner() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold font-mono text-foreground mb-2" key={objective?.id || 'loading'}>
-            {objective?.title || loc.title}
+            {displayTitle}
           </div>
           <div className="flex items-center justify-between mt-2 mb-3">
             <div className="flex items-center gap-1 text-xs">
