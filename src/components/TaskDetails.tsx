@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import TaskChat from '@/components/TaskChat';
 import TaskText from '@/components/TaskText';
 import {
@@ -27,6 +28,8 @@ import {
   AlertCircle,
   Timer,
   Settings,
+  Target,
+  Edit,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru, bg } from 'date-fns/locale';
@@ -43,6 +46,7 @@ interface Task {
   actual_hours: number;
   tags: string[];
   language?: string | null;
+  key_result?: string | null;
   assigned_to: {
     id: string;
     full_name: string;
@@ -62,6 +66,8 @@ interface TaskDetailsProps {
 const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
   const [open, setOpen] = useState(false);
   const [isTaskCreator, setIsTaskCreator] = useState(false);
+  const [editingKR, setEditingKR] = useState(false);
+  const [selectedKR, setSelectedKR] = useState(task.key_result || '');
   const { user } = useAuth();
   const { t, language } = useLanguage();
   const { toast } = useToast();
@@ -111,6 +117,39 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
     critical: 'border-transparent bg-destructive text-destructive-foreground animate-pulse-glow',
   };
 
+  const krOptions = {
+    kr1: 'KR1: Успешное проведение шоу',
+    kr2: 'KR2: VIP-аудитория 20+',
+    kr3: 'KR3: Ключевой контракт 2+ млн лв',
+    kr4: 'KR4: Медиа-охват 100,000+',
+  };
+
+  const handleUpdateKR = async () => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({ key_result: selectedKR || null })
+        .eq('id', task.id);
+
+      if (error) throw error;
+
+      toast({
+        title: language === 'ru' ? 'KR обновлен' : 'KR е обновен',
+        description: language === 'ru' ? 'Ключевой результат успешно обновлен' : 'Ключевият резултат е обновен успешно',
+      });
+
+      setEditingKR(false);
+      // Обновляем локальное состояние
+      task.key_result = selectedKR || null;
+    } catch (error: any) {
+      toast({
+        title: language === 'ru' ? 'Ошибка' : 'Грешка',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   const getStatusIcon = (status: Task['status']) => {
     switch (status) {
       case 'completed':
@@ -151,7 +190,7 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
 
       toast({
         title: language === 'ru' ? 'Проблема добавлена' : 'Проблемата е добавена',
-        description: language === 'ru' ? 'Запись доступна во вкладке «Проблемы».' : 'Записът е в раздел „Проблеми“.',
+        description: language === 'ru' ? 'Запись доступна во вкладке «Проблемы».' : 'Записът е в раздел „Проблеми".',
       });
       setReportOpen(false);
       setProblemDescription('');
@@ -286,6 +325,64 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
                     {format(new Date(task.created_at), 'dd.MM.yyyy HH:mm', { locale: dateLocale })}
                   </span>
                 </div>
+
+                {/* Ключевой результат */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Target className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
+                      {language === 'ru' ? 'Ключевой результат' : 'Ключов резултат'}:
+                    </span>
+                    {!editingKR && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="p-1 h-6 w-6"
+                        onClick={() => setEditingKR(true)}
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {editingKR ? (
+                    <div className="space-y-2">
+                      <Select value={selectedKR} onValueChange={setSelectedKR}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={language === 'ru' ? 'Выберите KR' : 'Изберете KR'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">{language === 'ru' ? 'Без KR' : 'Без KR'}</SelectItem>
+                          {Object.entries(krOptions).map(([value, label]) => (
+                            <SelectItem key={value} value={value}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={handleUpdateKR}>
+                          {language === 'ru' ? 'Сохранить' : 'Запази'}
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => {
+                            setEditingKR(false);
+                            setSelectedKR(task.key_result || '');
+                          }}
+                        >
+                          {language === 'ru' ? 'Отмена' : 'Отказ'}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Badge variant="outline" className="text-xs">
+                      {task.key_result ? krOptions[task.key_result as keyof typeof krOptions] : 
+                       (language === 'ru' ? 'Не указан' : 'Не е указан')}
+                    </Badge>
+                  )}
+                </div>
               </div>
 
               {task.tags && task.tags.length > 0 && (
@@ -341,7 +438,7 @@ const TaskDetails = ({ task, trigger }: TaskDetailsProps) => {
         <DialogDescription>
           {language === 'ru'
             ? 'Опишите проблему. Запись появится во вкладке «Проблемы».'
-            : 'Опишете проблема. Записът ще се появи в „Проблеми“.'
+            : 'Опишете проблема. Записът ще се появи в „Проблеми".'
           }
         </DialogDescription>
       </DialogHeader>

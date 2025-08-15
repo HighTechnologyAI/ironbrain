@@ -59,6 +59,7 @@ interface Task {
   actual_hours: number;
   tags: string[];
   language?: string | null;
+  key_result?: string | null;
   assigned_to: {
     id: string;
     full_name: string;
@@ -123,6 +124,7 @@ const Tasks = () => {
           actual_hours,
           tags,
           language,
+          key_result,
           assigned_to:profiles!tasks_assigned_to_fkey(id, full_name, position),
           created_by:profiles!tasks_created_by_fkey(id, full_name)
         `)
@@ -169,6 +171,7 @@ const Tasks = () => {
           actual_hours,
           tags,
           language,
+          key_result,
           assigned_to:profiles!tasks_assigned_to_fkey(id, full_name, position),
           created_by:profiles!tasks_created_by_fkey(id, full_name)
         `)
