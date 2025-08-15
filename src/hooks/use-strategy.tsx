@@ -31,6 +31,12 @@ interface UseStrategyReturn {
   error: string | null;
   objective: Objective | null;
   krs: KeyResult[];
+  updateObjective?: (updates: {
+    title?: string;
+    description?: string;
+    budget_planned?: number;
+    target_date?: string;
+  }) => Promise<boolean>;
 }
 
 export const STRATEGIC_TITLE = "ДРОН-ШОУ 2025: Переломный момент для Tiger Technology - заключение многомиллионного контракта через демонстрацию передовых технологий";
@@ -205,5 +211,31 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
     return () => { isMounted = false; };
   }, [user, autoSeed]);
 
-  return { loading, error, objective, krs };
+  const updateObjective = async (updates: {
+    title?: string;
+    description?: string;
+    budget_planned?: number;
+    target_date?: string;
+  }) => {
+    if (!objective) return false;
+    
+    try {
+      const { error } = await supabase
+        .from('objectives')
+        .update(updates)
+        .eq('id', objective.id);
+      
+      if (error) throw error;
+      
+      // Update local state
+      setObjective(prev => prev ? { ...prev, ...updates } : null);
+      return true;
+    } catch (e: any) {
+      console.error('Error updating objective:', e);
+      setError(e.message || 'Update error');
+      return false;
+    }
+  };
+
+  return { loading, error, objective, krs, updateObjective };
 }

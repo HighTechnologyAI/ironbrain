@@ -14,7 +14,7 @@ import { useState } from "react";
 import { StatusChip } from "@/components/ui/status-chip";
 
 export default function StrategicBanner() {
-  const { loading, error, objective } = useStrategy(true);
+  const { loading, error, objective, updateObjective } = useStrategy(true);
   const { t, language } = useLanguage();
   const { isAdmin } = useAdmin();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -85,9 +85,49 @@ export default function StrategicBanner() {
     setIsEditOpen(true);
   };
 
-  const handleSave = () => {
-    console.log('Saving strategic goal:', editData);
-    setIsEditOpen(false);
+  const handleSave = async () => {
+    if (!updateObjective) return;
+    
+    const updates: any = {};
+    
+    // Parse budget if it's a number
+    if (editData.budget && !isNaN(Number(editData.budget))) {
+      updates.budget_planned = Number(editData.budget);
+    }
+    
+    // Parse date if it's provided
+    if (editData.date) {
+      try {
+        // Try to parse the date in different formats
+        const dateStr = editData.date;
+        let parsedDate: Date;
+        
+        if (dateStr.includes(',')) {
+          // Format like "20 августа 2025, 19:30"
+          const [datePart] = dateStr.split(',');
+          parsedDate = new Date(datePart.trim());
+        } else {
+          parsedDate = new Date(dateStr);
+        }
+        
+        if (!isNaN(parsedDate.getTime())) {
+          updates.target_date = parsedDate.toISOString().split('T')[0];
+        }
+      } catch (e) {
+        console.warn('Could not parse date:', editData.date);
+      }
+    }
+    
+    // Only update title and description for non-strategic objectives
+    if (!isStrategic) {
+      if (editData.title) updates.title = editData.title;
+      if (editData.description) updates.description = editData.description;
+    }
+    
+    const success = await updateObjective(updates);
+    if (success) {
+      setIsEditOpen(false);
+    }
   };
 
   if (loading) {
