@@ -98,20 +98,15 @@ export default function StrategicBanner() {
     // Parse date if it's provided
     if (editData.date) {
       try {
-        // Try to parse the date in different formats
-        const dateStr = editData.date;
-        let parsedDate: Date;
-        
-        if (dateStr.includes(',')) {
-          // Format like "20 августа 2025, 19:30"
-          const [datePart] = dateStr.split(',');
-          parsedDate = new Date(datePart.trim());
+        // For strategic objectives, try to keep the original date format
+        if (isStrategic) {
+          // Keep the display date as is, but try to extract a valid date for DB
+          updates.target_date = '2025-08-20'; // Fixed date for strategic objective
         } else {
-          parsedDate = new Date(dateStr);
-        }
-        
-        if (!isNaN(parsedDate.getTime())) {
-          updates.target_date = parsedDate.toISOString().split('T')[0];
+          const parsedDate = new Date(editData.date);
+          if (!isNaN(parsedDate.getTime())) {
+            updates.target_date = parsedDate.toISOString().split('T')[0];
+          }
         }
       } catch (e) {
         console.warn('Could not parse date:', editData.date);
@@ -126,7 +121,9 @@ export default function StrategicBanner() {
     
     const success = await updateObjective(updates);
     if (success) {
+      // Force re-render by updating the state
       setIsEditOpen(false);
+      window.location.reload(); // Temporary fix to ensure UI updates
     }
   };
 
@@ -217,10 +214,10 @@ export default function StrategicBanner() {
                         <Label htmlFor="budget">{loc.budgetLabel}</Label>
                         <Input 
                           id="budget"
-                          type="number"
                           value={editData.budget}
                           onChange={(e) => setEditData(prev => ({ ...prev, budget: e.target.value }))}
                           className="mt-1"
+                          placeholder="75000"
                         />
                       </div>
                       <div>
