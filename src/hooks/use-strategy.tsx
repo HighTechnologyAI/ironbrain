@@ -81,12 +81,15 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
           ownerId = adminProfile?.id || profile?.id || null;
         }
 
-        // load existing objective by title
-        const { data: existingObj, error: loadErr } = await supabase
+        // load existing objective by title (take the latest one if multiple exist)
+        const { data: existingObjs, error: loadErr } = await supabase
           .from('objectives')
           .select('*')
           .eq('title', STRATEGIC_TITLE)
-          .maybeSingle();
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        const existingObj = existingObjs?.[0] || null;
 
         if (loadErr) throw loadErr;
 

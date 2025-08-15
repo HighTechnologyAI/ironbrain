@@ -22,7 +22,8 @@ export default function StrategicBanner() {
     title: '',
     description: '',
     budget: '',
-    date: ''
+    date: '',
+    currency: 'BGN'
   });
   
   const localized = {
@@ -80,7 +81,8 @@ export default function StrategicBanner() {
       title: displayTitle,
       description: displayDescription,
       budget: displayBudget?.toString() || '75000',
-      date: displayDate
+      date: displayDate,
+      currency: 'BGN'
     });
     setIsEditOpen(true);
   };
@@ -206,7 +208,7 @@ export default function StrategicBanner() {
                         className="mt-1"
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-3">
                       <div>
                         <Label htmlFor="budget">{loc.budgetLabel}</Label>
                         <Input 
@@ -216,6 +218,20 @@ export default function StrategicBanner() {
                           className="mt-1"
                           placeholder="75000"
                         />
+                      </div>
+                      <div>
+                        <Label htmlFor="currency">Валюта</Label>
+                        <select 
+                          id="currency"
+                          value={editData.currency}
+                          onChange={(e) => setEditData(prev => ({ ...prev, currency: e.target.value }))}
+                          className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        >
+                          <option value="BGN">BGN</option>
+                          <option value="USD">USD</option>
+                          <option value="EUR">EUR</option>
+                          <option value="UAH">UAH</option>
+                        </select>
                       </div>
                       <div>
                         <Label htmlFor="date">{loc.dateLabel}</Label>
@@ -275,7 +291,7 @@ export default function StrategicBanner() {
             {displayBudget != null && (
               <div className="flex items-center gap-1">
                 <Wallet className="h-3 w-3 text-primary" />
-                <span className="font-mono">{displayBudget.toLocaleString()} лв</span>
+                <span className="font-mono">{displayBudget.toLocaleString()} {editData.currency || 'BGN'}</span>
               </div>
             )}
           </div>
