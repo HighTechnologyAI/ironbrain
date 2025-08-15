@@ -57,7 +57,7 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
       window.addEventListener('resize', resize);
 
       let startTime = Date.now();
-      const PHASE_DURATION = 3000; // Увеличено время для полного просмотра анимации
+      const PHASE_DURATION = 4500; // Увеличена длительность каждой фазы до 4.5 секунд
 
       console.log('Animation started, phase:', phase);
 
@@ -96,14 +96,14 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
         if (phaseProgress >= 1) {
           console.log('Animation complete, waiting for full consumption...');
           setPhase('complete');
-          // Даем полное время для завершения эффекта поглощения
+          // Увеличена задержка для полного просмотра финального эффекта
           setTimeout(() => {
             console.log('Navigating to dashboard...');
             navigate('/');
             setTimeout(() => {
               onComplete();
-            }, 1000);
-          }, 3500); // Увеличена задержка для полного поглощения
+            }, 1500);
+          }, 5000); // Увеличена финальная задержка до 5 секунд
           return;
         }
       }
@@ -131,8 +131,9 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
 
   const drawKrakenAttraction = (ctx: CanvasRenderingContext2D, w: number, h: number, progress: number) => {
     console.log('Drawing kraken attraction, progress:', progress);
-    // Темный оверлей
-    ctx.fillStyle = `rgba(13, 13, 13, ${progress * 0.8})`;
+    // Более плавное появление темного оверлея
+    const overlayAlpha = Math.pow(progress, 0.7) * 0.85;
+    ctx.fillStyle = `rgba(13, 13, 13, ${overlayAlpha})`;
     ctx.fillRect(0, 0, w, h);
 
     // Позиция Кракена (слева)
@@ -143,36 +144,58 @@ const TransitionPortal = ({ isActive, onComplete }: TransitionPortalProps) => {
     const userX = w * 0.5;
     const userY = h * 0.4;
 
-    for (let i = 0; i < 8; i++) {
-      const offset = (i / 8) * Math.PI * 2;
-      const waveOffset = Math.sin(Date.now() * 0.01 + offset) * 20;
+    // Увеличено количество щупалец для более впечатляющего эффекта
+    for (let i = 0; i < 12; i++) {
+      const offset = (i / 12) * Math.PI * 2;
+      const waveOffset = Math.sin(Date.now() * 0.008 + offset) * 25;
       
-      ctx.strokeStyle = `rgba(255, 211, 0, ${0.6 * progress})`;
-      ctx.lineWidth = 3 + Math.sin(Date.now() * 0.005 + offset) * 2;
+      // Более яркие и динамичные цвета
+      const beamAlpha = (0.7 + Math.sin(Date.now() * 0.01 + offset) * 0.3) * progress;
+      ctx.strokeStyle = `rgba(255, 211, 0, ${beamAlpha})`;
+      ctx.lineWidth = 4 + Math.sin(Date.now() * 0.006 + offset) * 3;
       
       ctx.beginPath();
       ctx.moveTo(krakenX + waveOffset, krakenY);
       
-      // Curved beam
-      const midX = (krakenX + userX) / 2 + Math.sin(Date.now() * 0.008 + offset) * 50;
-      const midY = (krakenY + userY) / 2 + Math.cos(Date.now() * 0.008 + offset) * 30;
+      // Более изогнутые лучи притяжения
+      const midX = (krakenX + userX) / 2 + Math.sin(Date.now() * 0.006 + offset) * 80;
+      const midY = (krakenY + userY) / 2 + Math.cos(Date.now() * 0.006 + offset) * 50;
       
-      ctx.quadraticCurveTo(midX, midY, userX, userY);
+      ctx.quadraticCurveTo(midX, midY, userX + Math.sin(offset) * 10, userY + Math.cos(offset) * 10);
+      ctx.stroke();
+      
+      // Добавляем внутреннее свечение
+      ctx.strokeStyle = `rgba(255, 255, 255, ${beamAlpha * 0.3})`;
+      ctx.lineWidth = 1;
       ctx.stroke();
     }
 
-    // Pulsing energy at user position
-    const pulse = Math.sin(Date.now() * 0.02) * 0.5 + 0.5;
-    const radius = 50 + pulse * 30;
+    // Более мощная пульсирующая энергия в позиции пользователя
+    const pulse = Math.sin(Date.now() * 0.025) * 0.5 + 0.5;
+    const radius = 60 + pulse * 50;
     
     const gradient = ctx.createRadialGradient(userX, userY, 0, userX, userY, radius);
-    gradient.addColorStop(0, `rgba(255, 211, 0, ${0.8 * progress})`);
+    gradient.addColorStop(0, `rgba(255, 211, 0, ${0.9 * progress})`);
+    gradient.addColorStop(0.5, `rgba(255, 255, 255, ${0.4 * progress})`);
     gradient.addColorStop(1, 'rgba(255, 211, 0, 0)');
     
     ctx.fillStyle = gradient;
     ctx.beginPath();
     ctx.arc(userX, userY, radius, 0, Math.PI * 2);
     ctx.fill();
+    
+    // Дополнительные энергетические частицы
+    for (let i = 0; i < 15; i++) {
+      const particleAngle = (i / 15) * Math.PI * 2 + Date.now() * 0.01;
+      const particleDistance = 80 + Math.sin(Date.now() * 0.015 + i) * 40;
+      const particleX = userX + Math.cos(particleAngle) * particleDistance;
+      const particleY = userY + Math.sin(particleAngle) * particleDistance;
+      
+      ctx.fillStyle = `rgba(255, 211, 0, ${progress * 0.8})`;
+      ctx.beginPath();
+      ctx.arc(particleX, particleY, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
   };
 
   const drawDoorSlide = (ctx: CanvasRenderingContext2D, w: number, h: number, progress: number) => {
