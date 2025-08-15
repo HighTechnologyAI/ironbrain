@@ -27,13 +27,28 @@ export const useDrones = () => {
         setLoading(true);
         
         const { data, error } = await supabase
-          .from('uav_drones')
+          .from('drone_status_view')
           .select('*')
           .order('created_at', { ascending: false });
         
         if (error) throw error;
         
-        setDrones(data || []);
+        const normalized = (data || []).map((row: any) => ({
+          id: row.id,
+          name: row.name,
+          model: row.model,
+          serial: row.serial_number,
+          status: row.status,
+          battery_level: row.battery_level != null ? Number(row.battery_level) : undefined,
+          firmware: undefined,
+          location_lat: row.location_latitude != null ? Number(row.location_latitude) : undefined,
+          location_lon: row.location_longitude != null ? Number(row.location_longitude) : undefined,
+          last_contact: row.last_telemetry || null,
+          created_by: undefined,
+          created_at: row.created_at,
+        }));
+        
+        setDrones(normalized);
       } catch (err) {
         console.error('Error fetching drones:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
@@ -47,10 +62,8 @@ export const useDrones = () => {
     // Real-time subscription
     const channel = supabase
       .channel('drones-changes')
-      .on('postgres_changes', 
-          { event: '*', schema: 'public', table: 'uav_drones' }, 
-          () => fetchDrones()
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'drones' }, fetchDrones)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'drone_telemetry' }, fetchDrones)
       .subscribe();
     
     return () => {
@@ -60,9 +73,20 @@ export const useDrones = () => {
 
   const createDrone = async (droneData: Omit<Drone, 'id' | 'created_at'>) => {
     try {
+      const payload: any = {
+        name: droneData.name,
+        model: droneData.model,
+        serial_number: droneData.serial,
+        status: droneData.status ?? 'offline',
+        battery_level: droneData.battery_level ?? 0,
+        location_latitude: droneData.location_lat,
+        location_longitude: droneData.location_lon,
+        created_by: droneData.created_by,
+      };
+
       const { data, error } = await supabase
-        .from('uav_drones')
-        .insert([droneData])
+        .from('drones')
+        .insert(payload)
         .select()
         .single();
 
@@ -76,9 +100,19 @@ export const useDrones = () => {
 
   const updateDrone = async (id: string, updates: Partial<Drone>) => {
     try {
+      const updatesPayload: any = {
+        name: updates.name,
+        model: updates.model,
+        serial_number: updates.serial,
+        status: updates.status,
+        battery_level: updates.battery_level,
+        location_latitude: updates.location_lat,
+        location_longitude: updates.location_lon,
+      };
+
       const { data, error } = await supabase
-        .from('uav_drones')
-        .update(updates)
+        .from('drones')
+        .update(updatesPayload)
         .eq('id', id)
         .select()
         .single();

@@ -62,8 +62,12 @@ const MissionControl = () => {
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'ready': return 'ready';
+      case 'online': return 'ready';
       case 'armed': return 'armed';
       case 'in_flight': return 'flying';
+      case 'mission': return 'flying';
+      case 'maintenance': return 'warning';
+      case 'charging': return 'warning';
       case 'warning': return 'warning';
       case 'critical': return 'critical';
       case 'offline': return 'offline';
@@ -113,7 +117,7 @@ const MissionControl = () => {
 
   // Filter active missions
   const activeMissions = missions.filter(m => m.status === 'in_flight' || m.status === 'armed');
-  const readyDrones = drones.filter(d => d.status === 'ready').length;
+  const readyDrones = drones.filter(d => d.status === 'ready' || d.status === 'online').length;
 
   return (
     <div className="min-h-screen bg-background">

@@ -336,6 +336,158 @@ export type Database = {
           },
         ]
       }
+      drone_telemetry: {
+        Row: {
+          altitude_meters: number
+          armed: boolean | null
+          battery_current: number | null
+          battery_level: number
+          battery_voltage: number | null
+          drone_id: string
+          errors: Json | null
+          flight_mode: string | null
+          gps_satellites: number | null
+          heading_degrees: number | null
+          humidity_percent: number | null
+          id: string
+          location_latitude: number | null
+          location_longitude: number | null
+          raw_data: Json | null
+          signal_strength: number | null
+          speed_ms: number
+          temperature_celsius: number | null
+          timestamp: string
+          vibration_level: number | null
+        }
+        Insert: {
+          altitude_meters?: number
+          armed?: boolean | null
+          battery_current?: number | null
+          battery_level: number
+          battery_voltage?: number | null
+          drone_id: string
+          errors?: Json | null
+          flight_mode?: string | null
+          gps_satellites?: number | null
+          heading_degrees?: number | null
+          humidity_percent?: number | null
+          id?: string
+          location_latitude?: number | null
+          location_longitude?: number | null
+          raw_data?: Json | null
+          signal_strength?: number | null
+          speed_ms?: number
+          temperature_celsius?: number | null
+          timestamp?: string
+          vibration_level?: number | null
+        }
+        Update: {
+          altitude_meters?: number
+          armed?: boolean | null
+          battery_current?: number | null
+          battery_level?: number
+          battery_voltage?: number | null
+          drone_id?: string
+          errors?: Json | null
+          flight_mode?: string | null
+          gps_satellites?: number | null
+          heading_degrees?: number | null
+          humidity_percent?: number | null
+          id?: string
+          location_latitude?: number | null
+          location_longitude?: number | null
+          raw_data?: Json | null
+          signal_strength?: number | null
+          speed_ms?: number
+          temperature_celsius?: number | null
+          timestamp?: string
+          vibration_level?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drone_telemetry_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "drone_status_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drone_telemetry_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "drones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drones: {
+        Row: {
+          altitude_meters: number | null
+          battery_level: number | null
+          created_at: string
+          created_by: string | null
+          flight_time_hours: number | null
+          id: string
+          is_active: boolean | null
+          last_maintenance: string | null
+          location_latitude: number | null
+          location_longitude: number | null
+          manufacturer: string
+          model: string
+          name: string
+          serial_number: string
+          speed_ms: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          altitude_meters?: number | null
+          battery_level?: number | null
+          created_at?: string
+          created_by?: string | null
+          flight_time_hours?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_maintenance?: string | null
+          location_latitude?: number | null
+          location_longitude?: number | null
+          manufacturer?: string
+          model: string
+          name: string
+          serial_number: string
+          speed_ms?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          altitude_meters?: number | null
+          battery_level?: number | null
+          created_at?: string
+          created_by?: string | null
+          flight_time_hours?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_maintenance?: string | null
+          location_latitude?: number | null
+          location_longitude?: number | null
+          manufacturer?: string
+          model?: string
+          name?: string
+          serial_number?: string
+          speed_ms?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drones_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_performance: {
         Row: {
           achievement_points: number | null
@@ -1705,6 +1857,39 @@ export type Database = {
       }
     }
     Views: {
+      drone_status_view: {
+        Row: {
+          altitude_meters: number | null
+          armed: boolean | null
+          battery_current: number | null
+          battery_level: number | null
+          battery_voltage: number | null
+          created_at: string | null
+          errors: Json | null
+          flight_mode: string | null
+          flight_time_hours: number | null
+          gps_satellites: number | null
+          heading_degrees: number | null
+          humidity_percent: number | null
+          id: string | null
+          is_active: boolean | null
+          last_maintenance: string | null
+          last_telemetry: string | null
+          location_latitude: number | null
+          location_longitude: number | null
+          manufacturer: string | null
+          model: string | null
+          name: string | null
+          serial_number: string | null
+          signal_strength: number | null
+          speed_ms: number | null
+          status: string | null
+          temperature_celsius: number | null
+          updated_at: string | null
+          vibration_level: number | null
+        }
+        Relationships: []
+      }
       recent_telemetry_summary: {
         Row: {
           battery_level: number | null
