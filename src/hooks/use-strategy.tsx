@@ -63,19 +63,19 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
     storeName: 'objectives'
   });
 
-  // Save to cache
+  // Save to cache using ID instead of title
   const saveToCache = useCallback(async (data: Objective) => {
     try {
-      await cacheStore.setItem(STRATEGIC_TITLE, data);
+      await cacheStore.setItem('strategic_objective', data);
     } catch (err) {
       console.warn('Cache save failed:', err);
     }
   }, []);
 
-  // Load from cache
+  // Load from cache using fixed key
   const loadFromCache = useCallback(async (): Promise<Objective | null> => {
     try {
-      return await cacheStore.getItem<Objective>(STRATEGIC_TITLE);
+      return await cacheStore.getItem<Objective>('strategic_objective');
     } catch (err) {
       console.warn('Cache load failed:', err);
       return null;
@@ -139,17 +139,21 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
               const updatedObjective = payload.new as Objective;
               console.log('📡 Broadcasting update to UI:', updatedObjective);
               
-              // Immediately update all users' interfaces
-              setObjective(updatedObjective);
-              setSyncStatus('connected');
-              setSaveStatus('saved');
-              
-              // Cache the update for persistence
-              await saveToCache(updatedObjective);
+              // Проверяем что это наша цель по ID или статусу
+              if (objective && updatedObjective.id === objective.id) {
+                // Моментально обновляем UI для всех пользователей
+                setObjective(updatedObjective);
+                setSyncStatus('connected');
+                setSaveStatus('saved');
+                
+                // Кешируем для устойчивости
+                await saveToCache(updatedObjective);
+                console.log('✅ ВСЕМ ПОЛЬЗОВАТЕЛЯМ: Данные синхронизированы!');
+              }
               
             } else if (payload.eventType === 'INSERT' && payload.new) {
               const newObjective = payload.new as Objective;
-              if (newObjective.title === STRATEGIC_TITLE) {
+              if (newObjective.status === 'active') {
                 console.log('🆕 New strategic objective created:', newObjective);
                 setObjective(newObjective);
                 await saveToCache(newObjective);
@@ -220,10 +224,12 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
 
         // 3. ALWAYS load fresh data from Supabase for accuracy
         console.log('🌐 Loading fresh data from Supabase...');
+        // Ищем по ID или по статусу 'active' + created_by админа, а не по названию
         const { data: existingObjs, error: loadErr } = await supabase
           .from('objectives')
           .select('*')
-          .eq('title', STRATEGIC_TITLE)
+          .eq('status', 'active')
+          .eq('created_by', ownerId || profile?.id)
           .order('created_at', { ascending: false })
           .limit(1);
 
