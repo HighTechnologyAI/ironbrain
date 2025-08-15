@@ -23,9 +23,10 @@ interface TagIconSelectorProps {
   onTagAdd: (tag: { name: string; icon: string }) => void;
   placeholder?: string;
   className?: string;
+  buttonText?: string;
 }
 
-export function TagIconSelector({ onTagAdd, placeholder = "Добавить тег...", className }: TagIconSelectorProps) {
+export function TagIconSelector({ onTagAdd, placeholder = "Добавить тег...", className, buttonText = "Добавить тег" }: TagIconSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [newTagName, setNewTagName] = useState("");
@@ -63,10 +64,10 @@ export function TagIconSelector({ onTagAdd, placeholder = "Добавить те
       <PopoverTrigger asChild>
         <Button 
           type="button" 
-          size="sm" 
           className={cn("shrink-0 transition-all duration-200 hover:scale-105", className)}
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-4 w-4 mr-2" />
+          {buttonText}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0 bg-background/95 backdrop-blur-sm border-border/60" align="start">

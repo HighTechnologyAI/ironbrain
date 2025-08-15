@@ -63,18 +63,24 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
         {
           event: '*',
           schema: 'public',
-          table: 'objectives',
-          filter: `title=eq.${STRATEGIC_TITLE}`
+          table: 'objectives'
         },
         (payload) => {
           if (isMounted) {
             if (payload.eventType === 'UPDATE' && payload.new) {
-              setObjective(payload.new as Objective);
+              const newObjective = payload.new as Objective;
+              // Update only if it's our current objective
+              setObjective(prev => prev && prev.id === newObjective.id ? newObjective : prev);
             } else if (payload.eventType === 'INSERT' && payload.new) {
-              setObjective(payload.new as Objective);
+              const newObjective = payload.new as Objective;
+              if (newObjective.title === STRATEGIC_TITLE) {
+                setObjective(newObjective);
+              }
             } else if (payload.eventType === 'DELETE' && payload.old) {
-              // If our objective was deleted, reload
-              window.location.reload();
+              const deletedObjective = payload.old as Objective;
+              if (deletedObjective.title === STRATEGIC_TITLE) {
+                window.location.reload();
+              }
             }
           }
         }

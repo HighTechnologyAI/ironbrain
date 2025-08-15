@@ -260,47 +260,26 @@ export default function StrategicObjectiveEditor({
               </div>
               
               <div className="space-y-3">
-                <div className="flex gap-2">
-                  <Input 
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    placeholder={localized.addTag || 'Добавить тег...'}
-                    className="flex-1 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        addTag();
-                      }
-                    }}
-                  />
-                  <Button 
-                    type="button" 
-                    size="sm" 
-                    onClick={addTag}
-                    className="shrink-0 transition-all duration-200 hover:scale-105"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                  <TagIconSelector 
-                    onTagAdd={addTagWithIcon}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  />
-                </div>
+                <TagIconSelector 
+                  onTagAdd={addTagWithIcon}
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-[1.02] flex items-center justify-center gap-2 py-3 rounded-lg"
+                  buttonText="Создать интеллектуальный тег"
+                />
                 
                 {editData.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-3 gap-2 mt-4">
                     {editData.tags.map((tag, index) => (
                       <Badge 
                         key={index} 
                         variant="secondary" 
-                        className="flex items-center gap-1 transition-all duration-200 hover:bg-secondary/80 animate-fade-in"
+                        className="flex items-center gap-1 transition-all duration-200 hover:bg-secondary/80 animate-fade-in justify-between p-2"
                       >
-                        {tag}
+                        <span className="text-sm">{tag}</span>
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="h-auto p-0 ml-1 hover:bg-transparent opacity-70 hover:opacity-100 transition-opacity"
+                          className="h-auto p-0 hover:bg-transparent opacity-70 hover:opacity-100 transition-opacity"
                           onClick={() => removeTag(tag)}
                         >
                           <X className="h-3 w-3" />
