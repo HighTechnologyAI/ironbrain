@@ -292,7 +292,7 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
               current_value: 40,
               unit: '% готовности',
               owner_id: ownerId,
-              status: 'ahead',
+              status: 'on_track',
               created_by: profile.id,
             },
           ];
@@ -349,7 +349,7 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
     target_date?: string;
     tags?: string[];
     currency?: string;
-  }) => {
+  }, retryCount = 0) => {
     if (!objective) return false;
     
     setSaveStatus('saving');
@@ -376,13 +376,21 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
       await saveToCache(updatedObjective);
       setSaveStatus('local_only');
       
-      // Attempt Supabase save
+      // Attempt Supabase save with error handling
       const { error } = await supabase
         .from('objectives')
         .update(processedUpdates)
         .eq('id', objective.id);
       
-      if (error) throw error;
+      if (error) {
+        // Handle specific CORS and network errors
+        if (error.message?.includes('CORS') || 
+            error.message?.includes('network') ||
+            error.message?.includes('fetch')) {
+          throw new Error(`NETWORK_ERROR: ${error.message}`);
+        }
+        throw error;
+      }
       
       setSaveStatus('saved');
       
@@ -395,8 +403,32 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
       return true;
     } catch (e: any) {
       console.error('Error updating objective:', e);
+      
+      // Retry logic for network errors
+      if (retryCount < 3 && (
+        e.message?.includes('NETWORK_ERROR') ||
+        e.message?.includes('CORS') ||
+        e.message?.includes('fetch')
+      )) {
+        console.log(`🔄 Retrying save (attempt ${retryCount + 1}/3)`);
+        setTimeout(() => {
+          updateObjective(updates, retryCount + 1);
+        }, 1000 * (retryCount + 1));
+        return false;
+      }
+      
       setError(e.message || 'Update error');
       setSaveStatus('error');
+      
+      // Ensure data is saved to cache even on error
+      try {
+        const updatedObjective = { ...objective, ...updates };
+        await saveToCache(updatedObjective);
+        console.log('💾 Data preserved in cache despite network error');
+      } catch (cacheError) {
+        console.error('Cache save failed:', cacheError);
+      }
+      
       return false;
     }
   };
