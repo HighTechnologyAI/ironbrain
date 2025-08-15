@@ -206,11 +206,9 @@ export default function StrategicBanner() {
           </div>
         </CardHeader>
         <CardContent>
-          {displayTitle && (
-            <div className="text-2xl font-bold font-mono text-foreground mb-2" key={objective?.id || 'loading'}>
-              <span className="font-mono">{displayTitle}</span>
-            </div>
-          )}
+          <div className="text-2xl font-bold font-mono text-foreground mb-2" key={objective?.id || 'loading'}>
+            {displayTitle}
+          </div>
           <div className="flex items-center justify-between mt-2 mb-3">
             <div className="flex items-center gap-1 text-xs">
               <TrendingUp className="h-3 w-3 text-success" />
