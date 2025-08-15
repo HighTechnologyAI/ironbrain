@@ -738,7 +738,7 @@ const Tasks = () => {
                     )}
                     <TabsTrigger 
                       value="my"
-                      className="relative z-10 data-[state=active]:bg-transparent data-[state=active]:border-transparent data-[state=active]:text-primary hover:bg-primary/10 transition-all duration-300"
+                      className="relative z-10 data-[state=active]:bg-primary/20 data-[state=active]:border-primary/30 data-[state=active]:text-primary data-[state=active]:shadow-glow-primary hover:bg-primary/10 transition-all duration-300 border"
                     >
                       {t.myTasks} ({getMyTasks().length})
                     </TabsTrigger>
