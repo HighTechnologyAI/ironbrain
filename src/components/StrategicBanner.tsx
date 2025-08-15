@@ -11,7 +11,7 @@ import { useState } from "react";
 import { StatusChip } from "@/components/ui/status-chip";
 
 export default function StrategicBanner() {
-  const { loading, error, objective, updateObjective, syncStatus } = useStrategy(true);
+  const { loading, error, objective, updateObjective, syncStatus, saveStatus } = useStrategy(true);
   const { t, language } = useLanguage();
   const { isAdmin } = useAdmin();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -263,6 +263,7 @@ export default function StrategicBanner() {
         onSave={handleSave}
         onCancel={() => setIsEditOpen(false)}
         syncStatus={syncStatus}
+        saveStatus={saveStatus}
         localized={loc}
       />
     </>

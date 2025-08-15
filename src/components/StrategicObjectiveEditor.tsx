@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { EnhancedDatePicker } from "@/components/ui/enhanced-date-picker";
 import { TagIconSelector } from "@/components/ui/tag-icon-selector";
 import { useState, useEffect } from "react";
-import { Calendar as CalendarIcon, DollarSign, Hash, X, Plus, Wifi, WifiOff, Clock } from "lucide-react";
+import { Calendar as CalendarIcon, DollarSign, Hash, X, Plus, Wifi, WifiOff, Clock, Check, AlertCircle, Save } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,7 @@ interface StrategicObjectiveEditorProps {
   date: string;
   tags: string[];
   syncStatus?: 'connected' | 'connecting' | 'disconnected';
+  saveStatus?: 'saved' | 'saving' | 'error' | 'local_only';
   onSave: (data: {
     title: string;
     description: string;
@@ -54,6 +55,7 @@ export default function StrategicObjectiveEditor({
   date,
   tags,
   syncStatus = 'disconnected',
+  saveStatus = 'saved',
   onSave,
   onCancel,
   localized
@@ -150,8 +152,10 @@ export default function StrategicObjectiveEditor({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold flex items-center gap-2">
+          <DialogTitle className="text-xl font-semibold flex items-center gap-3">
             {localized.editTitle}
+            
+            {/* Sync Status Indicator */}
             <div className={`transition-all duration-300 ${
               syncStatus === 'connected' ? 'text-success' :
               syncStatus === 'connecting' ? 'text-warning animate-pulse' :
@@ -160,6 +164,39 @@ export default function StrategicObjectiveEditor({
               {syncStatus === 'connected' ? <Wifi className="h-4 w-4" /> :
                syncStatus === 'connecting' ? <Clock className="h-4 w-4" /> :
                <WifiOff className="h-4 w-4" />}
+            </div>
+
+            {/* Save Status Indicator */}
+            <div className={`flex items-center gap-1 text-xs transition-all duration-300 ${
+              saveStatus === 'saved' ? 'text-success' :
+              saveStatus === 'saving' ? 'text-warning' :
+              saveStatus === 'local_only' ? 'text-info' :
+              'text-destructive'
+            }`}>
+              {saveStatus === 'saved' && (
+                <>
+                  <Check className="h-3 w-3" />
+                  <span>Сохранено</span>
+                </>
+              )}
+              {saveStatus === 'saving' && (
+                <>
+                  <Save className="h-3 w-3 animate-pulse" />
+                  <span>Сохранение...</span>
+                </>
+              )}
+              {saveStatus === 'local_only' && (
+                <>
+                  <Clock className="h-3 w-3" />
+                  <span>Локально</span>
+                </>
+              )}
+              {saveStatus === 'error' && (
+                <>
+                  <AlertCircle className="h-3 w-3" />
+                  <span>Ошибка</span>
+                </>
+              )}
             </div>
           </DialogTitle>
         </DialogHeader>
@@ -314,10 +351,15 @@ export default function StrategicObjectiveEditor({
             </Button>
             <Button 
               onClick={handleSave}
-              disabled={syncStatus === 'disconnected'}
+              disabled={saveStatus === 'saving' || syncStatus === 'disconnected'}
               className="transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {syncStatus === 'connecting' ? 'Синхронизация...' : localized.saveChanges}
+              {saveStatus === 'saving' ? (
+                <div className="flex items-center gap-2">
+                  <Save className="h-4 w-4 animate-pulse" />
+                  Сохранение...
+                </div>
+              ) : syncStatus === 'connecting' ? 'Синхронизация...' : localized.saveChanges}
             </Button>
           </div>
         </div>

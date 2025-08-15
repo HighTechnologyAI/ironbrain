@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import localforage from "localforage";
 
 export interface Objective {
   id: string;
@@ -34,6 +35,7 @@ interface UseStrategyReturn {
   objective: Objective | null;
   krs: KeyResult[];
   syncStatus: 'connected' | 'connecting' | 'disconnected';
+  saveStatus: 'saved' | 'saving' | 'error' | 'local_only';
   updateObjective?: (updates: {
     title?: string;
     description?: string;
@@ -53,6 +55,67 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
   const [objective, setObjective] = useState<Objective | null>(null);
   const [krs, setKrs] = useState<KeyResult[]>([]);
   const [syncStatus, setSyncStatus] = useState<'connected' | 'connecting' | 'disconnected'>('connecting');
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error' | 'local_only'>('saved');
+
+  // Configure localforage for persistence
+  const cacheStore = localforage.createInstance({
+    name: 'tiger_strategy',
+    storeName: 'objectives'
+  });
+
+  // Save to cache
+  const saveToCache = useCallback(async (data: Objective) => {
+    try {
+      await cacheStore.setItem(STRATEGIC_TITLE, data);
+    } catch (err) {
+      console.warn('Cache save failed:', err);
+    }
+  }, []);
+
+  // Load from cache
+  const loadFromCache = useCallback(async (): Promise<Objective | null> => {
+    try {
+      return await cacheStore.getItem<Objective>(STRATEGIC_TITLE);
+    } catch (err) {
+      console.warn('Cache load failed:', err);
+      return null;
+    }
+  }, []);
+
+  // Auto-save mechanism
+  const autoSave = useCallback(async (data: Objective) => {
+    if (!data) return;
+    
+    setSaveStatus('saving');
+    
+    try {
+      // Save to cache first (instant)
+      await saveToCache(data);
+      setSaveStatus('local_only');
+      
+      // Then try to sync to Supabase
+      const { error } = await supabase
+        .from('objectives')
+        .update({
+          title: data.title,
+          description: data.description,
+          budget_planned: data.budget_planned,
+          target_date: data.target_date,
+          tags: data.tags,
+          currency: data.currency
+        })
+        .eq('id', data.id);
+        
+      if (error) throw error;
+      setSaveStatus('saved');
+      
+      // Clear save status after 3 seconds
+      setTimeout(() => setSaveStatus('saved'), 3000);
+    } catch (err) {
+      console.error('Auto-save failed:', err);
+      setSaveStatus('error');
+    }
+  }, [saveToCache]);
 
   useEffect(() => {
     let isMounted = true;
@@ -107,6 +170,13 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
         if (!user) {
           setLoading(false);
           return;
+        }
+
+        // Try to load from cache first for instant display
+        const cachedData = await loadFromCache();
+        if (cachedData) {
+          setObjective(cachedData);
+          setSaveStatus('local_only');
         }
 
         // current profile
@@ -250,6 +320,12 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
           if (isMounted) {
             setObjective(obj);
             setKrs((krsData || []) as KeyResult[]);
+            setSaveStatus('saved');
+            
+            // Save to cache for persistence
+            if (obj) {
+              await saveToCache(obj);
+            }
           }
         }
       } catch (e: any) {
@@ -276,6 +352,8 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
   }) => {
     if (!objective) return false;
     
+    setSaveStatus('saving');
+    
     try {
       // Convert date from DD.MM.YYYY to UTC properly
       let processedUpdates = { ...updates };
@@ -290,6 +368,15 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
         }
       }
       
+      // Update local state immediately with optimistic update
+      const updatedObjective = { ...objective, ...processedUpdates };
+      setObjective(updatedObjective);
+      
+      // Save to cache immediately
+      await saveToCache(updatedObjective);
+      setSaveStatus('local_only');
+      
+      // Attempt Supabase save
       const { error } = await supabase
         .from('objectives')
         .update(processedUpdates)
@@ -297,8 +384,10 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
       
       if (error) throw error;
       
-      // Update local state immediately for better UX
-      setObjective(prev => prev ? { ...prev, ...processedUpdates } : null);
+      setSaveStatus('saved');
+      
+      // Clear save status after 3 seconds
+      setTimeout(() => setSaveStatus('saved'), 3000);
       
       // Clear any previous errors
       setError(null);
@@ -307,9 +396,38 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
     } catch (e: any) {
       console.error('Error updating objective:', e);
       setError(e.message || 'Update error');
+      setSaveStatus('error');
       return false;
     }
   };
 
-  return { loading, error, objective, krs, syncStatus, updateObjective };
+  // Auto-save effect with debounce
+  useEffect(() => {
+    if (!objective) return;
+    
+    const autoSaveTimer = setTimeout(() => {
+      autoSave(objective);
+    }, 30000); // Auto-save every 30 seconds
+    
+    return () => clearTimeout(autoSaveTimer);
+  }, [objective, autoSave]);
+
+  // Save on page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (objective && saveStatus !== 'saved') {
+        // Synchronous save to sessionStorage as fallback
+        try {
+          sessionStorage.setItem('tiger_draft_objective', JSON.stringify(objective));
+        } catch (err) {
+          console.warn('Session storage save failed:', err);
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [objective, saveStatus]);
+
+  return { loading, error, objective, krs, syncStatus, saveStatus, updateObjective };
 }
