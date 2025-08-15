@@ -206,8 +206,12 @@ export default function StrategicBanner() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold font-mono text-foreground mb-2" key={objective?.id || 'loading'}>
-            {displayTitle}
+          <div className="text-2xl font-bold font-mono text-foreground mb-2" key={`${objective?.id}-${objective?.title}`}>
+            {objective?.title ? (
+              <span className="font-mono">{objective.title}</span>
+            ) : (
+              displayTitle
+            )}
           </div>
           <div className="flex items-center justify-between mt-2 mb-3">
             <div className="flex items-center gap-1 text-xs">
