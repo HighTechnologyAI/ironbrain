@@ -67,8 +67,15 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
           filter: `title=eq.${STRATEGIC_TITLE}`
         },
         (payload) => {
-          if (isMounted && payload.new) {
-            setObjective(payload.new as Objective);
+          if (isMounted) {
+            if (payload.eventType === 'UPDATE' && payload.new) {
+              setObjective(payload.new as Objective);
+            } else if (payload.eventType === 'INSERT' && payload.new) {
+              setObjective(payload.new as Objective);
+            } else if (payload.eventType === 'DELETE' && payload.old) {
+              // If our objective was deleted, reload
+              window.location.reload();
+            }
           }
         }
       )
@@ -258,8 +265,12 @@ export function useStrategy(autoSeed = true): UseStrategyReturn {
       
       if (error) throw error;
       
-      // Update local state
+      // Update local state immediately for better UX
       setObjective(prev => prev ? { ...prev, ...updates } : null);
+      
+      // Clear any previous errors
+      setError(null);
+      
       return true;
     } catch (e: any) {
       console.error('Error updating objective:', e);

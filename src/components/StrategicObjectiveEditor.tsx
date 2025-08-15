@@ -5,9 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useState } from "react";
+import { EnhancedDatePicker } from "@/components/ui/enhanced-date-picker";
+import { TagIconSelector } from "@/components/ui/tag-icon-selector";
+import { useState, useEffect } from "react";
 import { Calendar as CalendarIcon, DollarSign, Hash, X, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -57,18 +57,53 @@ export default function StrategicObjectiveEditor({
   localized
 }: StrategicObjectiveEditorProps) {
   const [editData, setEditData] = useState({
-    title,
-    description,
-    budget,
-    currency,
-    date,
-    tags: [...tags]
+    title: title || '',
+    description: description || '',
+    budget: budget || '',
+    currency: currency || 'BGN',
+    date: date || '',
+    tags: tags ? [...tags] : []
   });
   
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    date ? new Date(date) : undefined
+    date && date.trim() ? (() => {
+      try {
+        const [day, month, year] = date.split('.');
+        if (day && month && year) {
+          return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        }
+        return undefined;
+      } catch {
+        return undefined;
+      }
+    })() : undefined
   );
   const [newTag, setNewTag] = useState("");
+
+  // Update local state when props change
+  useEffect(() => {
+    setEditData({
+      title: title || '',
+      description: description || '',
+      budget: budget || '',
+      currency: currency || 'BGN',
+      date: date || '',
+      tags: tags ? [...tags] : []
+    });
+    
+    if (date && date.trim()) {
+      try {
+        const [day, month, year] = date.split('.');
+        if (day && month && year) {
+          setSelectedDate(new Date(parseInt(year), parseInt(month) - 1, parseInt(day)));
+        }
+      } catch {
+        setSelectedDate(undefined);
+      }
+    } else {
+      setSelectedDate(undefined);
+    }
+  }, [title, description, budget, currency, date, tags]);
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
@@ -85,6 +120,16 @@ export default function StrategicObjectiveEditor({
         tags: [...prev.tags, newTag.trim()]
       }));
       setNewTag("");
+    }
+  };
+
+  const addTagWithIcon = (tagData: { name: string; icon: string }) => {
+    const tagWithIcon = `${tagData.icon} ${tagData.name}`;
+    if (!editData.tags.includes(tagWithIcon)) {
+      setEditData(prev => ({
+        ...prev,
+        tags: [...prev.tags, tagWithIcon]
+      }));
     }
   };
 
@@ -139,7 +184,7 @@ export default function StrategicObjectiveEditor({
             </CardContent>
           </Card>
 
-          {/* Financial Section */}
+          {/* Financial Section - Always Visible */}
           <Card className="bg-surface-1/50 backdrop-blur-sm border-border/60">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-4">
@@ -154,9 +199,17 @@ export default function StrategicObjectiveEditor({
                   </Label>
                   <Input 
                     id="budget"
+                    type="number"
+                    min="0"
+                    step="1000"
                     value={editData.budget}
-                    onChange={(e) => setEditData(prev => ({ ...prev, budget: e.target.value }))}
-                    className="mt-1"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '' || (!isNaN(Number(value)) && Number(value) >= 0)) {
+                        setEditData(prev => ({ ...prev, budget: value }));
+                      }
+                    }}
+                    className="mt-1 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                     placeholder="75000"
                   />
                 </div>
@@ -171,17 +224,17 @@ export default function StrategicObjectiveEditor({
                     onChange={(e) => setEditData(prev => ({ ...prev, currency: e.target.value }))}
                     className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-all duration-200"
                   >
-                    <option value="BGN">BGN</option>
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="UAH">UAH</option>
+                    <option value="BGN">BGN (лв)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="UAH">UAH (₴)</option>
                   </select>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Date Section */}
+          {/* Enhanced Date Section */}
           <Card className="bg-surface-1/50 backdrop-blur-sm border-border/60">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-4">
@@ -189,29 +242,12 @@ export default function StrategicObjectiveEditor({
                 <h3 className="text-sm font-medium">{localized.dateLabel}</h3>
               </div>
               
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal transition-all duration-200",
-                      !selectedDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Выберите дату"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={handleDateSelect}
-                    initialFocus
-                    className="p-3 pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
+              <EnhancedDatePicker
+                date={selectedDate}
+                onDateSelect={handleDateSelect}
+                placeholder="Выберите дату"
+                className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+              />
             </CardContent>
           </Card>
 
@@ -229,7 +265,7 @@ export default function StrategicObjectiveEditor({
                     value={newTag}
                     onChange={(e) => setNewTag(e.target.value)}
                     placeholder={localized.addTag || 'Добавить тег...'}
-                    className="flex-1"
+                    className="flex-1 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -241,10 +277,14 @@ export default function StrategicObjectiveEditor({
                     type="button" 
                     size="sm" 
                     onClick={addTag}
-                    className="shrink-0"
+                    className="shrink-0 transition-all duration-200 hover:scale-105"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
+                  <TagIconSelector 
+                    onTagAdd={addTagWithIcon}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  />
                 </div>
                 
                 {editData.tags.length > 0 && (
@@ -253,14 +293,14 @@ export default function StrategicObjectiveEditor({
                       <Badge 
                         key={index} 
                         variant="secondary" 
-                        className="flex items-center gap-1 transition-all duration-200 hover:bg-secondary/80"
+                        className="flex items-center gap-1 transition-all duration-200 hover:bg-secondary/80 animate-fade-in"
                       >
                         {tag}
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="h-auto p-0 ml-1 hover:bg-transparent"
+                          className="h-auto p-0 ml-1 hover:bg-transparent opacity-70 hover:opacity-100 transition-opacity"
                           onClick={() => removeTag(tag)}
                         >
                           <X className="h-3 w-3" />
