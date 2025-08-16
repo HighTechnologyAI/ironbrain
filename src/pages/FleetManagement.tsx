@@ -7,12 +7,13 @@ import { StatusChip } from '@/components/neon/StatusChip';
 import { EmptyState } from '@/components/neon/EmptyState';
 import { Plane, Battery, MapPin, Clock, Settings } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { ConfigService } from '@/services/configService';
 
 const Fleet: React.FC = () => {
   const { t } = useTranslation();
 
   // Feature flag check
-  if (import.meta.env.VITE_FEATURE_FLEET !== 'true') {
+  if (!ConfigService.isFeatureEnabled('fleet')) {
     return null;
   }
 

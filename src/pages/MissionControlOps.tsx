@@ -4,12 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusChip } from '@/components/neon/StatusChip';
 import { EmptyState } from '@/components/neon/EmptyState';
 import { Map, Navigation, Radio, Gauge, Battery, Thermometer } from 'lucide-react';
+import { ConfigService } from '@/services/configService';
 
 const MissionControl: React.FC = () => {
   const { t } = useTranslation();
 
   // Feature flag check
-  if (import.meta.env.VITE_FEATURE_MISSION_CONTROL !== 'true') {
+  if (!ConfigService.isFeatureEnabled('missionControl')) {
     return null;
   }
 

@@ -63,14 +63,16 @@ export const applyNeonTheme = (config: NeonThemeConfig = {}) => {
   // Add other theme properties as needed
 };
 
+import { ConfigService } from '@/services/configService';
+
 // Check if Neon UI v2 is enabled
 export const isNeonUIEnabled = (): boolean => {
-  return import.meta.env.VITE_UI_V2_ENABLED === 'true';
+  return ConfigService.isFeatureEnabled('neonUI');
 };
 
 // Get accent color from environment
 export const getAccentColor = (): string => {
-  return import.meta.env.VITE_UI_V2_ACCENT || '#16C172';
+  return ConfigService.getUIConfig().accentColor;
 };
 
 // Initialize theme system

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileText, Search, Filter, Calendar } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { ConfigService } from '@/services/configService';
 
 const SystemLogs: React.FC = () => {
   const { t } = useTranslation();
@@ -16,7 +17,7 @@ const SystemLogs: React.FC = () => {
   const [severityFilter, setSeverityFilter] = useState('all');
 
   // Feature flag check
-  if (import.meta.env.VITE_FEATURE_LOGS !== 'true') {
+  if (!ConfigService.isFeatureEnabled('logs')) {
     return null;
   }
 

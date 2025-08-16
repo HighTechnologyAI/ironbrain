@@ -43,6 +43,7 @@ import GroundControlStation from "./pages/GroundControlStation";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { ConfigService } from "@/services/configService";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -98,19 +99,19 @@ const AppShell = () => {
             <Route path="/mission-console" element={<ProtectedRoute><MissionConsole /></ProtectedRoute>} />
             <Route path="/ground-control" element={<ProtectedRoute><GroundControlStation /></ProtectedRoute>} />
             {/* Operations Center Routes - Feature Flag Protected */}
-            {import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' && (
+            {ConfigService.isFeatureEnabled('opsCenter') && (
               <Route path="/ops-center" element={<ProtectedRoute><OpsCenter /></ProtectedRoute>} />
             )}
-            {import.meta.env.VITE_FEATURE_MISSION_CONTROL === 'true' && (
+            {ConfigService.isFeatureEnabled('missionControl') && (
               <Route path="/mission-control" element={<ProtectedRoute><MissionControlPage /></ProtectedRoute>} />
             )}
-            {import.meta.env.VITE_FEATURE_FLEET === 'true' && (
+            {ConfigService.isFeatureEnabled('fleet') && (
               <Route path="/fleet" element={<ProtectedRoute><FleetPage /></ProtectedRoute>} />
             )}
-            {import.meta.env.VITE_FEATURE_COMMAND_CENTER === 'true' && (
+            {ConfigService.isFeatureEnabled('commandCenter') && (
               <Route path="/command-center" element={<ProtectedRoute><CommandCenterPage /></ProtectedRoute>} />
             )}
-            {import.meta.env.VITE_FEATURE_LOGS === 'true' && (
+            {ConfigService.isFeatureEnabled('logs') && (
               <Route path="/logs" element={<ProtectedRoute><SystemLogsPage /></ProtectedRoute>} />
             )}
             <Route path="/auth" element={<Auth />} />

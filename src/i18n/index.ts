@@ -19,8 +19,10 @@ const resources = {
   },
 };
 
-const supportedLngs = ['en', 'ru', 'bg'];
-const defaultLng = import.meta.env.VITE_LOCALE_DEFAULT || 'ru';
+import { ConfigService } from '@/services/configService';
+
+const supportedLngs = ConfigService.getUIConfig().supportedLanguages;
+const defaultLng = ConfigService.getUIConfig().defaultLanguage;
 
 i18n
   .use(LanguageDetector)

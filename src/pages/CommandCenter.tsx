@@ -15,13 +15,14 @@ import {
   Activity
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { ConfigService } from '@/services/configService';
 
 const CommandCenter: React.FC = () => {
   const { t } = useTranslation();
   const [dryRunMode, setDryRunMode] = useState(true);
 
   // Feature flag check
-  if (import.meta.env.VITE_FEATURE_COMMAND_CENTER !== 'true') {
+  if (!ConfigService.isFeatureEnabled('commandCenter')) {
     return null;
   }
 

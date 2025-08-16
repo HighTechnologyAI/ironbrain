@@ -5,12 +5,13 @@ import { StatusChip } from '@/components/neon/StatusChip';
 import { EmptyState } from '@/components/neon/EmptyState';
 import { Activity, AlertTriangle, Zap, Users, Database, Cpu, Wifi, Battery } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ConfigService } from '@/services/configService';
 
 const OpsCenter: React.FC = () => {
   const { t } = useTranslation();
 
   // Feature flag check
-  if (import.meta.env.VITE_FEATURE_OPS_CENTER !== 'true') {
+  if (!ConfigService.isFeatureEnabled('opsCenter')) {
     return null;
   }
 
