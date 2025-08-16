@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LucideIcon, Home, Bot, CheckSquare, Users, Target, BarChart3, Shield, Award, ExternalLink, Settings, Plane, Factory, Wrench, FileText, Satellite } from 'lucide-react';
+import { LucideIcon, Home, Bot, CheckSquare, Users, Target, BarChart3, Shield, Award, ExternalLink, Settings, Plane, Factory, Wrench, FileText, Satellite, Eye, TrendingUp } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -42,12 +42,14 @@ export function AppSidebar() {
   const productionItems: Item[] = [
     { title: t.production || 'Производство', url: '/production', icon: Factory },
     { title: t.projects || 'Проекты', url: '/projects', icon: Target },
-    { title: t.dashboard.maintenance, url: '/maintenance', icon: Wrench, badge: '3', variant: 'warning' }
+    { title: t.dashboard.maintenance, url: '/maintenance', icon: Wrench, badge: '3', variant: 'warning' },
+    { title: 'Predictive Maintenance', url: '/predictive-maintenance', icon: TrendingUp, badge: 'AI', variant: 'mission' }
   ];
 
   const systemItems: Item[] = [
     { title: t.analytics || 'Аналитика', url: '/analytics', icon: BarChart3 },
     { title: t.issues || 'Проблемы', url: '/issues', icon: Shield },
+    { title: 'SOC Panel', url: '/soc-panel', icon: Eye, badge: 'SOC', variant: 'warning' },
     { title: t.awards || 'Награды', url: '/awards', icon: Award },
     { title: t.aiAssistant || 'AI Помощник', url: '/ai-assistant', icon: Bot, badge: 'AI' }
   ];

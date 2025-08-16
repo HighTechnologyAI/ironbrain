@@ -35,6 +35,8 @@ import FleetPage from "./pages/FleetManagement";
 import CommandCenterPage from "./pages/CommandCenter";
 import SystemLogsPage from "./pages/SystemLogs";
 import DroneEcosystem from "./pages/DroneEcosystem";
+import SOCPanel from "./pages/SOCPanel";
+import PredictiveMaintenance from "./pages/PredictiveMaintenance";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -87,6 +89,8 @@ const AppShell = () => {
             <Route path="/documents" element={<ProtectedRoute><DocumentCenter /></ProtectedRoute>} />
             {/* TIGER TECH Drone Ecosystem */}
             <Route path="/drone-ecosystem" element={<ProtectedRoute><DroneEcosystem /></ProtectedRoute>} />
+            <Route path="/soc-panel" element={<ProtectedRoute><SOCPanel /></ProtectedRoute>} />
+            <Route path="/predictive-maintenance" element={<ProtectedRoute><PredictiveMaintenance /></ProtectedRoute>} />
             {/* Operations Center Routes - Feature Flag Protected */}
             {import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' && (
               <Route path="/ops-center" element={<ProtectedRoute><OpsCenter /></ProtectedRoute>} />

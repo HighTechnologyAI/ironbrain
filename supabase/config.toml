@@ -15,6 +15,15 @@ verify_jwt = false
 [functions.ingest-events]
 verify_jwt = false
 
+[functions.mission-control]
+verify_jwt = false
+
+[functions.swarm-coordinator]
+verify_jwt = false
+
+[functions.detections-pipeline]
+verify_jwt = false
+
 [functions.lang-detect]
 verify_jwt = false
 
