@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Map, Layers, Navigation, Satellite, MapPin } from 'lucide-react';
+import { Map as MapIcon, Layers, Navigation, Satellite, MapPin } from 'lucide-react';
 import { DroneService } from '@/services/droneService';
 import { MissionService } from '@/services/missionService';
 import { useQuery } from '@tanstack/react-query';
@@ -28,7 +28,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapStyle, setMapStyle] = useState('mapbox://styles/mapbox/satellite-v9');
   const [initialized, setInitialized] = useState(false);
-  const markersRef = useRef<Map<string, mapboxgl.Marker>>(new Map<string, mapboxgl.Marker>());
+  const markersRef = useRef(new Map<string, mapboxgl.Marker>());
 
   // Fetch drones and missions data
   const { data: drones } = useQuery({
@@ -192,7 +192,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
 
   const mapStyles = [
     { name: t('map.satellite'), value: 'mapbox://styles/mapbox/satellite-v9', icon: Satellite },
-    { name: t('map.streets'), value: 'mapbox://styles/mapbox/streets-v11', icon: Map },
+    { name: t('map.streets'), value: 'mapbox://styles/mapbox/streets-v11', icon: MapIcon },
     { name: t('map.terrain'), value: 'mapbox://styles/mapbox/outdoors-v11', icon: Layers }
   ];
 
@@ -201,7 +201,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Map className="h-5 w-5" />
+            <MapIcon className="h-5 w-5" />
             {t('map.title')}
           </CardTitle>
           
