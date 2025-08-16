@@ -1,0 +1,51 @@
+# Pro Mega Spot Technology AI GCS Backend
+# Optimized for Jetson Nano (ARM64)
+
+# Core Flask framework
+Flask==2.3.3
+Flask-CORS==4.0.0
+Flask-SocketIO==5.3.6
+
+# WebSocket and async support
+eventlet==0.33.3
+python-socketio==5.8.0
+
+# System monitoring
+psutil==5.9.5
+
+# Video processing (OpenCV)
+opencv-python==4.8.0.76
+
+# Scientific computing (lightweight versions)
+numpy==1.24.3
+
+# HTTP requests
+requests==2.31.0
+
+# JSON handling
+ujson==5.8.0
+
+# Configuration management
+python-dotenv==1.0.0
+
+# Logging
+colorlog==6.7.0
+
+# Development tools
+pytest==7.4.2
+pytest-flask==1.2.0
+
+# Optional: MAVLink support (if pymavlink is available for ARM64)
+# pymavlink==2.4.37
+
+# Optional: GStreamer Python bindings (install via apt)
+# PyGObject==3.44.1
+
+# Note: Some packages may need to be installed via apt on Jetson Nano:
+# sudo apt update
+# sudo apt install -y python3-opencv python3-numpy python3-psutil
+# sudo apt install -y python3-gi python3-gi-cairo gir1.2-gtk-3.0
+# sudo apt install -y gstreamer1.0-tools gstreamer1.0-plugins-base
+# sudo apt install -y gstreamer1.0-plugins-good gstreamer1.0-plugins-bad
+# sudo apt install -y gstreamer1.0-libav python3-gst-1.0
+

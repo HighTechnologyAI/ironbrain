@@ -1,0 +1,37 @@
+# Pro Mega Spot Technology AI - GCS Configuration Template
+# Copy this file to /home/gcs/config/gcs.conf and customize
+
+[server]
+host = 0.0.0.0
+port = 5000
+debug = false
+
+[video]
+default_source = test
+hardware_accel = true
+max_resolution = 1280x720
+target_fps = 30
+bitrate = 2000000
+
+[mavlink]
+default_connection = udp:0.0.0.0:14550
+heartbeat_rate = 1.0
+update_rate = 30.0
+timeout = 10.0
+
+[performance]
+auto_optimization = true
+memory_limit_mb = 512
+cpu_limit_percent = 80
+monitor_interval = 1.0
+
+[logging]
+level = INFO
+file = /home/gcs/logs/gcs.log
+max_size_mb = 100
+backup_count = 5
+
+[security]
+enable_cors = true
+allowed_origins = *
+api_key_required = false

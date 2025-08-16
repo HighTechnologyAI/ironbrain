@@ -1,0 +1,17 @@
+Pro Mega Spot Technology AI - Ground Control Station
+Jetson Nano Optimized Version
+
+Version: 2025.08.06
+Build Date: Wed Aug  6 12:08:57 EDT 2025
+Build Host: b07741850eea
+Git Commit: N/A
+
+Components:
+- Backend: Flask + optimized services
+- Frontend: React + Vite
+- Video: Hardware-accelerated streaming
+- MAVLink: Optimized telemetry processing
+- Monitoring: Real-time performance tracking
+
+Target Platform: NVIDIA Jetson Nano
+Minimum Requirements: 4GB RAM, 5GB storage

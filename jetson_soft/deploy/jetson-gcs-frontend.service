@@ -1,0 +1,29 @@
+[Unit]
+Description=Pro Mega Spot Technology AI - Frontend Server
+After=network.target jetson-gcs.service
+Wants=network.target
+
+[Service]
+Type=simple
+User=gcs
+Group=gcs
+WorkingDirectory=/home/gcs/jetson-nano-gcs/gcs-frontend
+ExecStart=/usr/bin/serve -s dist -l 3000
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jetson-gcs-frontend
+
+# Resource limits
+MemoryLimit=256M
+CPUQuota=100%
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

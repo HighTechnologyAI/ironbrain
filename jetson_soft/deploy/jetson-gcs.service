@@ -1,0 +1,32 @@
+[Unit]
+Description=Pro Mega Spot Technology AI - Jetson Nano GCS Backend
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=gcs
+Group=gcs
+WorkingDirectory=/home/gcs/jetson-nano-gcs/gcs-backend
+Environment=PATH=/home/gcs/jetson-nano-gcs/gcs-backend/venv/bin
+EnvironmentFile=/home/gcs/config/.env
+ExecStart=/home/gcs/jetson-nano-gcs/gcs-backend/venv/bin/python run.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jetson-gcs
+
+# Resource limits for Jetson Nano
+MemoryLimit=512M
+CPUQuota=200%
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/gcs
+
+[Install]
+WantedBy=multi-user.target
