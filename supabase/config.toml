@@ -9,6 +9,12 @@ verify_jwt = false
 [functions.create-demo-users]
 verify_jwt = true
 
+[functions.ingest-telemetry]
+verify_jwt = false
+
+[functions.ingest-events]
+verify_jwt = false
+
 [functions.lang-detect]
 verify_jwt = false
 

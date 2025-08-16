@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LucideIcon, Home, Bot, CheckSquare, Users, Target, BarChart3, Shield, Award, ExternalLink, Settings, Plane, Factory, Wrench, FileText } from 'lucide-react';
+import { LucideIcon, Home, Bot, CheckSquare, Users, Target, BarChart3, Shield, Award, ExternalLink, Settings, Plane, Factory, Wrench, FileText, Satellite } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -33,6 +33,7 @@ export function AppSidebar() {
   // UAV-focused navigation groups
   const operationsItems: Item[] = [
     { title: t.dashboardOld || 'Операционный центр', url: '/', icon: Home },
+    { title: 'Drone Ecosystem', url: '/drone-ecosystem', icon: Satellite, badge: 'BETA', variant: 'mission' },
     { title: t.dashboard.missionControl, url: '/missions', icon: Plane, badge: 'LIVE', variant: 'mission' },
     { title: t.tasks || 'Задачи', url: '/tasks', icon: CheckSquare },
     { title: t.team || 'Команда', url: '/team', icon: Users }
