@@ -39,6 +39,7 @@ import SOCPanel from "./pages/SOCPanel";
 import PredictiveMaintenance from "./pages/PredictiveMaintenance";
 import GlobalMap from "@/components/GlobalMap";
 import MissionConsole from "@/components/MissionConsole";
+import GroundControlStation from "./pages/GroundControlStation";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -95,6 +96,7 @@ const AppShell = () => {
             <Route path="/predictive-maintenance" element={<ProtectedRoute><PredictiveMaintenance /></ProtectedRoute>} />
             <Route path="/global-map" element={<ProtectedRoute><GlobalMap /></ProtectedRoute>} />
             <Route path="/mission-console" element={<ProtectedRoute><MissionConsole /></ProtectedRoute>} />
+            <Route path="/ground-control" element={<ProtectedRoute><GroundControlStation /></ProtectedRoute>} />
             {/* Operations Center Routes - Feature Flag Protected */}
             {import.meta.env.VITE_FEATURE_OPS_CENTER === 'true' && (
               <Route path="/ops-center" element={<ProtectedRoute><OpsCenter /></ProtectedRoute>} />
