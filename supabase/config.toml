@@ -24,6 +24,12 @@ verify_jwt = false
 [functions.detections-pipeline]
 verify_jwt = false
 
+[functions.get-mapbox-token]
+verify_jwt = false
+
+[functions.get-weather]
+verify_jwt = false
+
 [functions.lang-detect]
 verify_jwt = false
 

@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LucideIcon, Home, Bot, CheckSquare, Users, Target, BarChart3, Shield, Award, ExternalLink, Settings, Plane, Factory, Wrench, FileText, Satellite, Eye, TrendingUp } from 'lucide-react';
+import { LucideIcon, Home, Bot, CheckSquare, Users, Target, BarChart3, Shield, Award, ExternalLink, Settings, Plane, Factory, Wrench, FileText, Satellite, Eye, TrendingUp, MapPin, Monitor } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -34,6 +34,8 @@ export function AppSidebar() {
   const operationsItems: Item[] = [
     { title: t.dashboardOld || 'Операционный центр', url: '/', icon: Home },
     { title: 'Drone Ecosystem', url: '/drone-ecosystem', icon: Satellite, badge: 'BETA', variant: 'mission' },
+    { title: 'Global Map', url: '/global-map', icon: MapPin, badge: 'LIVE', variant: 'mission' },
+    { title: 'Mission Console', url: '/mission-console', icon: Monitor, badge: 'OPS', variant: 'mission' },
     { title: t.dashboard.missionControl, url: '/missions', icon: Plane, badge: 'LIVE', variant: 'mission' },
     { title: t.tasks || 'Задачи', url: '/tasks', icon: CheckSquare },
     { title: t.team || 'Команда', url: '/team', icon: Users }
