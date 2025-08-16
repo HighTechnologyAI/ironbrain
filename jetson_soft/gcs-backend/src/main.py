@@ -21,8 +21,8 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 import eventlet
 
-# Import optimized services
-from src.services.mavlink_service import mavlink_service
+# Import modular services
+from src.services.modular_mavlink_service import mavlink_service
 from src.services.video_service import VideoService
 from src.services.mission_service import MissionService
 from src.services.system_monitor import SystemMonitor
