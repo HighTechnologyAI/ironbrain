@@ -5,89 +5,73 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface WeatherData {
-  temperature: number;
-  wind_speed: number;
-  wind_direction: number;
-  visibility: number;
-  pressure: number;
-  humidity: number;
-  weather_condition: string;
-  location: string;
-}
-
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { lat, lon } = await req.json();
-    
-    // Default to Timarevo Airfield coordinates if not provided
-    const latitude = lat || 43.388944;  // 43°23'20.2"N
-    const longitude = lon || 26.885444; // 26°53'07.6"E
-    
     const apiKey = Deno.env.get('OPENWEATHER_API_KEY');
     
     if (!apiKey) {
-      throw new Error('OpenWeather API key not configured');
+      console.error('OPENWEATHER_API_KEY not found in environment');
+      return new Response(
+        JSON.stringify({ error: 'Weather API key not configured' }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
-    console.log(`Fetching weather for coordinates: ${latitude}, ${longitude}`);
+    if (!lat || !lon) {
+      return new Response(
+        JSON.stringify({ error: 'Latitude and longitude are required' }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
 
-    // Fetch current weather data
-    const weatherResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=ru`
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
     );
 
-    if (!weatherResponse.ok) {
-      throw new Error(`Weather API error: ${weatherResponse.status}`);
+    if (!response.ok) {
+      throw new Error(`Weather API error: ${response.status}`);
     }
 
-    const weatherData = await weatherResponse.json();
+    const weatherData = await response.json();
     
-    console.log('Weather data received:', weatherData);
-
-    const result: WeatherData = {
-      temperature: Math.round(weatherData.main.temp),
-      wind_speed: Math.round(weatherData.wind.speed),
-      wind_direction: weatherData.wind.deg || 0,
-      visibility: Math.round((weatherData.visibility || 10000) / 1000), // Convert to km
-      pressure: weatherData.main.pressure,
+    const result = {
+      temperature: weatherData.main.temp,
       humidity: weatherData.main.humidity,
-      weather_condition: weatherData.weather[0].description,
-      location: weatherData.name || 'Timarevo Airfield'
+      pressure: weatherData.main.pressure,
+      windSpeed: weatherData.wind.speed,
+      windDirection: weatherData.wind.deg,
+      visibility: weatherData.visibility,
+      weather: weatherData.weather[0].main,
+      description: weatherData.weather[0].description
     };
+
+    console.log('Weather data fetched successfully for coordinates:', { lat, lon });
 
     return new Response(
       JSON.stringify(result),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      },
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
     );
-
   } catch (error) {
-    console.error('Error fetching weather:', error);
-    
+    console.error('Error in get-weather:', error);
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        // Fallback data
-        temperature: 12,
-        wind_speed: 7,
-        wind_direction: 45,
-        visibility: 8.5,
-        pressure: 1013,
-        humidity: 65,
-        weather_condition: 'ясно',
-        location: 'Timarevo Airfield'
-      }),
-      {
-        status: 200, // Return 200 with fallback data instead of error
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      },
+      JSON.stringify({ error: 'Failed to fetch weather data' }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
     );
   }
 });
