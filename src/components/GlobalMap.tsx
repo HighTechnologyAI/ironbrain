@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useDroneEcosystem } from '@/hooks/use-drone-ecosystem';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, MapPin, Zap, Wind } from 'lucide-react';
+import WeatherWidget from '@/components/WeatherWidget';
+import { Loader2, MapPin, Zap } from 'lucide-react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default function GlobalMap() {
@@ -117,10 +118,6 @@ export default function GlobalMap() {
       `;
 
       el.addEventListener('click', () => setSelectedDrone(drone.id));
-
-      new mapboxgl.Marker(el)
-        .setLngLat([drone.location_longitude, drone.location_latitude])
-        .addTo(map.current!);
 
       // Add popup with drone info
       const popup = new mapboxgl.Popup({ offset: 25 })
@@ -243,16 +240,7 @@ export default function GlobalMap() {
             </div>
           </Card>
 
-          <Card className="p-4">
-            <h3 className="font-semibold mb-3">Weather</h3>
-            <div className="flex items-center gap-2">
-              <Wind className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm">Clear conditions</span>
-            </div>
-            <div className="text-xs text-muted-foreground mt-1">
-              Wind: 5 km/h NE
-            </div>
-          </Card>
+          <WeatherWidget lat={42.7339} lon={25.4858} />
         </div>
       </div>
     </div>

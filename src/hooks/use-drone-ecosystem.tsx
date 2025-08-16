@@ -31,16 +31,17 @@ export interface MissionInfo {
 export interface TelemetryData {
   id: string;
   drone_id: string;
-  ts: string;
-  lat?: number;
-  lon?: number;
-  alt?: number;
-  vel?: number;
-  hdg?: number;
-  batt_v?: number;
-  temp?: number;
-  health?: any;
-  payload_state?: any;
+  timestamp: string;
+  battery_level: number;
+  location_latitude?: number;
+  location_longitude?: number;
+  altitude_meters: number;
+  speed_ms: number;
+  heading_degrees?: number;
+  battery_voltage?: number;
+  temperature_celsius?: number;
+  flight_mode?: string;
+  armed?: boolean;
 }
 
 export function useDroneEcosystem() {
@@ -93,9 +94,9 @@ export function useDroneEcosystem() {
   const fetchTelemetry = useCallback(async (droneId?: string, limit = 100) => {
     try {
       let query = supabase
-        .from('telemetry')
+        .from('drone_telemetry')
         .select('*')
-        .order('ts', { ascending: false })
+        .order('timestamp', { ascending: false })
         .limit(limit);
 
       if (droneId) {
@@ -120,6 +121,8 @@ export function useDroneEcosystem() {
         .insert([{
           name: missionData.name,
           status: 'planning',
+          org_id: (await supabase.rpc('get_current_user_org_id')).data,
+          created_by: (await supabase.rpc('get_current_user_profile')).data?.id,
           ...missionData
         }])
         .select()
@@ -237,7 +240,7 @@ export function useDroneEcosystem() {
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'telemetry'
+          table: 'drone_telemetry'
         },
         (payload) => {
           setTelemetry(prev => [payload.new as TelemetryData, ...prev.slice(0, 99)]);
