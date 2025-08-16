@@ -193,6 +193,45 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_type: string | null
+          after_state: Json | null
+          before_state: Json | null
+          created_at: string | null
+          id: string
+          ip: unknown | null
+          resource: string
+          ts: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_type?: string | null
+          after_state?: Json | null
+          before_state?: Json | null
+          created_at?: string | null
+          id?: string
+          ip?: unknown | null
+          resource: string
+          ts?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_type?: string | null
+          after_state?: Json | null
+          before_state?: Json | null
+          created_at?: string | null
+          id?: string
+          ip?: unknown | null
+          resource?: string
+          ts?: string | null
+        }
+        Relationships: []
+      }
       budget_entries: {
         Row: {
           actual_amount: number
@@ -332,6 +371,53 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      detections: {
+        Row: {
+          bbox: Json | null
+          class: string
+          created_at: string | null
+          geo: Json | null
+          id: string
+          model_version: string | null
+          score: number | null
+          tracking_id: string | null
+          ts: string
+          video_segment_id: string | null
+        }
+        Insert: {
+          bbox?: Json | null
+          class: string
+          created_at?: string | null
+          geo?: Json | null
+          id?: string
+          model_version?: string | null
+          score?: number | null
+          tracking_id?: string | null
+          ts: string
+          video_segment_id?: string | null
+        }
+        Update: {
+          bbox?: Json | null
+          class?: string
+          created_at?: string | null
+          geo?: Json | null
+          id?: string
+          model_version?: string | null
+          score?: number | null
+          tracking_id?: string | null
+          ts?: string
+          video_segment_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "detections_video_segment_id_fkey"
+            columns: ["video_segment_id"]
+            isOneToOne: false
+            referencedRelation: "video_segments"
             referencedColumns: ["id"]
           },
         ]
@@ -488,6 +574,53 @@ export type Database = {
           },
         ]
       }
+      drones_extended: {
+        Row: {
+          created_at: string | null
+          fw_rev: string | null
+          hw_rev: string | null
+          id: string
+          jetson_serial: string | null
+          last_heartbeat_at: string | null
+          org_id: string | null
+          public_key_fingerprint: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          fw_rev?: string | null
+          hw_rev?: string | null
+          id?: string
+          jetson_serial?: string | null
+          last_heartbeat_at?: string | null
+          org_id?: string | null
+          public_key_fingerprint?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          fw_rev?: string | null
+          hw_rev?: string | null
+          id?: string
+          jetson_serial?: string | null
+          last_heartbeat_at?: string | null
+          org_id?: string | null
+          public_key_fingerprint?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drones_extended_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_performance: {
         Row: {
           achievement_points: number | null
@@ -544,6 +677,44 @@ export type Database = {
             columns: ["employee_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string | null
+          drone_id: string | null
+          id: string
+          payload: Json | null
+          severity: string | null
+          ts: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string | null
+          drone_id?: string | null
+          id?: string
+          payload?: Json | null
+          severity?: string | null
+          ts?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string | null
+          drone_id?: string | null
+          id?: string
+          payload?: Json | null
+          severity?: string | null
+          ts?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "drones_extended"
             referencedColumns: ["id"]
           },
         ]
@@ -695,6 +866,30 @@ export type Database = {
           },
         ]
       }
+      kv_config: {
+        Row: {
+          id: string
+          key: string
+          scope: string
+          updated_at: string | null
+          value_json: Json | null
+        }
+        Insert: {
+          id?: string
+          key: string
+          scope: string
+          updated_at?: string | null
+          value_json?: Json | null
+        }
+        Update: {
+          id?: string
+          key?: string
+          scope?: string
+          updated_at?: string | null
+          value_json?: Json | null
+        }
+        Relationships: []
+      }
       media_hits: {
         Row: {
           created_at: string
@@ -803,6 +998,45 @@ export type Database = {
           },
         ]
       }
+      mission_assignments: {
+        Row: {
+          assigned_at: string | null
+          drone_id: string | null
+          id: string
+          mission_id: string | null
+          role: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          drone_id?: string | null
+          id?: string
+          mission_id?: string | null
+          role?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          drone_id?: string | null
+          id?: string
+          mission_id?: string | null
+          role?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_assignments_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "drones_extended"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_assignments_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions_extended"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       missions: {
         Row: {
           altitude_meters: number | null
@@ -862,6 +1096,110 @@ export type Database = {
             columns: ["drone_id"]
             isOneToOne: false
             referencedRelation: "uav_drones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      missions_extended: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          ends_at: string | null
+          geo_fence: Json | null
+          id: string
+          name: string
+          org_id: string | null
+          ruleset: Json | null
+          starts_at: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          ends_at?: string | null
+          geo_fence?: Json | null
+          id?: string
+          name: string
+          org_id?: string | null
+          ruleset?: Json | null
+          starts_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          ends_at?: string | null
+          geo_fence?: Json | null
+          id?: string
+          name?: string
+          org_id?: string | null
+          ruleset?: Json | null
+          starts_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missions_extended_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users_extended"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missions_extended_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      models: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string | null
+          id: string
+          metrics: Json | null
+          name: string
+          sha256: string
+          source: string | null
+          task: string
+          version: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          id?: string
+          metrics?: Json | null
+          name: string
+          sha256: string
+          source?: string | null
+          task: string
+          version: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          id?: string
+          metrics?: Json | null
+          name?: string
+          sha256?: string
+          source?: string | null
+          task?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "models_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "users_extended"
             referencedColumns: ["id"]
           },
         ]
@@ -963,6 +1301,65 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orgs: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          tier: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          tier?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          tier?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      partner_clearances: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          org_id: string | null
+          partner: string
+          scope: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          org_id?: string | null
+          partner: string
+          scope?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          org_id?: string | null
+          partner?: string
+          scope?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_clearances_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
             referencedColumns: ["id"]
           },
         ]
@@ -1487,6 +1884,62 @@ export type Database = {
           },
         ]
       }
+      telemetry: {
+        Row: {
+          alt: number | null
+          batt_v: number | null
+          created_at: string | null
+          drone_id: string | null
+          hdg: number | null
+          health: Json | null
+          id: string
+          lat: number | null
+          lon: number | null
+          payload_state: Json | null
+          temp: number | null
+          ts: string
+          vel: number | null
+        }
+        Insert: {
+          alt?: number | null
+          batt_v?: number | null
+          created_at?: string | null
+          drone_id?: string | null
+          hdg?: number | null
+          health?: Json | null
+          id?: string
+          lat?: number | null
+          lon?: number | null
+          payload_state?: Json | null
+          temp?: number | null
+          ts?: string
+          vel?: number | null
+        }
+        Update: {
+          alt?: number | null
+          batt_v?: number | null
+          created_at?: string | null
+          drone_id?: string | null
+          hdg?: number | null
+          health?: Json | null
+          id?: string
+          lat?: number | null
+          lon?: number | null
+          payload_state?: Json | null
+          temp?: number | null
+          ts?: string
+          vel?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "telemetry_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "drones_extended"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       translations_cache: {
         Row: {
           created_at: string
@@ -1765,6 +2218,104 @@ export type Database = {
           },
         ]
       }
+      users_extended: {
+        Row: {
+          created_at: string | null
+          id: string
+          locale: string | null
+          mfa_enabled: boolean | null
+          org_id: string | null
+          role: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          locale?: string | null
+          mfa_enabled?: boolean | null
+          org_id?: string | null
+          role?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          locale?: string | null
+          mfa_enabled?: boolean | null
+          org_id?: string | null
+          role?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_extended_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_segments: {
+        Row: {
+          codec: string | null
+          created_at: string | null
+          drone_id: string | null
+          id: string
+          media_type: string | null
+          mission_id: string | null
+          sha256: string
+          size_bytes: number | null
+          storage_path: string
+          ts_end: string
+          ts_start: string
+        }
+        Insert: {
+          codec?: string | null
+          created_at?: string | null
+          drone_id?: string | null
+          id?: string
+          media_type?: string | null
+          mission_id?: string | null
+          sha256: string
+          size_bytes?: number | null
+          storage_path: string
+          ts_end: string
+          ts_start: string
+        }
+        Update: {
+          codec?: string | null
+          created_at?: string | null
+          drone_id?: string | null
+          id?: string
+          media_type?: string | null
+          mission_id?: string | null
+          sha256?: string
+          size_bytes?: number | null
+          storage_path?: string
+          ts_end?: string
+          ts_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_segments_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "drones_extended"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_segments_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions_extended"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vip_guests: {
         Row: {
           contact: string | null
@@ -1926,6 +2477,10 @@ export type Database = {
       }
     }
     Functions: {
+      get_current_user_org_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_current_user_profile: {
         Args: Record<PropertyKey, never>
         Returns: {
