@@ -1,13 +1,8 @@
 // Централизованная конфигурация Tiger CRM
-const V = (import.meta as any).env || {};
-
-const FALLBACK_SUPABASE_URL = 'https://zqnjgwrvvrqaenzmlvfx.supabase.co';
-const FALLBACK_SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpxbmpnd3J2dnJxYWVuem1sdmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyNDYwNDcsImV4cCI6MjA2OTgyMjA0N30.uv41CLbWP5ZMnQLymCIE9uB9m4wC9xyKNSOU3btqcR8';
-const FALLBACK_SUPABASE_PROJECT_ID = 'zqnjgwrvvrqaenzmlvfx';
-
-const SUPABASE_URL = V.VITE_SUPABASE_URL ?? FALLBACK_SUPABASE_URL;
-const SUPABASE_ANON_KEY = V.VITE_SUPABASE_ANON_KEY ?? FALLBACK_SUPABASE_ANON;
-const SUPABASE_PROJECT_ID = V.VITE_SUPABASE_PROJECT_ID ?? FALLBACK_SUPABASE_PROJECT_ID;
+// Direct Supabase configuration (Lovable doesn't support VITE_* variables)
+const SUPABASE_URL = 'https://zqnjgwrvvrqaenzmlvfx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpxbmpnd3J2dnJxYWVuem1sdmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyNDYwNDcsImV4cCI6MjA2OTgyMjA0N30.uv41CLbWP5ZMnQLymCIE9uB9m4wC9xyKNSOU3btqcR8';
+const SUPABASE_PROJECT_ID = 'zqnjgwrvvrqaenzmlvfx';
 
 export const APP_CONFIG = {
   app: {
