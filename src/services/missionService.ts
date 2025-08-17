@@ -278,11 +278,20 @@ export class MissionService {
     });
   }
 
-  // Jetson integration (simulated for now)
+  // Jetson integration
   static async deployToJetson(missionId: string) {
     try {
       console.log(`Deploying mission ${missionId} to Jetson Nano...`);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // TODO: Replace with real Jetson API call
+      const response = await fetch('/api/jetson/deploy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ missionId })
+      });
+      
+      if (!response.ok) throw new Error('Deployment failed');
+      
       return { success: true, error: null };
     } catch (error) {
       console.error('Error deploying to Jetson:', error);
@@ -294,22 +303,48 @@ export class MissionService {
     try {
       console.log(`Getting status for mission ${missionId}...`);
       
-      const mockStatus = {
-        missionId,
-        status: 'active',
-        progress: Math.floor(Math.random() * 100),
-        currentWaypoint: Math.floor(Math.random() * 5) + 1,
-        totalWaypoints: 8,
-        dronePosition: {
-          lat: 42.3601 + (Math.random() - 0.5) * 0.01,
-          lng: 23.7911 + (Math.random() - 0.5) * 0.01,
-          alt: 100 + Math.random() * 50
-        },
-        battery: 85 - Math.random() * 20,
-        signal: 90 + Math.random() * 10
-      };
+      // Try to get real telemetry data first
+      const { data: telemetryData } = await supabase
+        .from('drone_telemetry')
+        .select('*')
+        .order('timestamp', { ascending: false })
+        .limit(1)
+        .single();
       
-      return { data: mockStatus, error: null };
+      if (telemetryData) {
+        return {
+          data: {
+            missionId,
+            status: telemetryData.armed ? 'active' : 'paused',
+            progress: Math.floor(Math.random() * 100), // TODO: Calculate real progress
+            currentWaypoint: 1, // TODO: Get from mission state
+            totalWaypoints: 8, // TODO: Get from mission waypoints
+            dronePosition: {
+              lat: telemetryData.location_latitude || 42.3601,
+              lng: telemetryData.location_longitude || 23.7911,
+              alt: telemetryData.altitude_meters || 100
+            },
+            battery: telemetryData.battery_level || 85,
+            signal: telemetryData.signal_strength || 90
+          },
+          error: null
+        };
+      }
+      
+      // Fallback to simulated data if no telemetry available
+      return {
+        data: {
+          missionId,
+          status: 'planning',
+          progress: 0,
+          currentWaypoint: 0,
+          totalWaypoints: 0,
+          dronePosition: { lat: 42.3601, lng: 23.7911, alt: 0 },
+          battery: 0,
+          signal: 0
+        },
+        error: null
+      };
     } catch (error) {
       console.error('Error getting mission status:', error);
       return { data: null, error };
