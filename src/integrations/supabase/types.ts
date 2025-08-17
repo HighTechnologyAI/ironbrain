@@ -1037,6 +1037,56 @@ export type Database = {
           },
         ]
       }
+      mission_waypoints: {
+        Row: {
+          action: string
+          alt_meters: number
+          created_at: string
+          created_by: string | null
+          hold_time_seconds: number
+          id: string
+          lat: number
+          lon: number
+          mission_id: string
+          sequence_number: number
+          updated_at: string
+        }
+        Insert: {
+          action?: string
+          alt_meters?: number
+          created_at?: string
+          created_by?: string | null
+          hold_time_seconds?: number
+          id?: string
+          lat: number
+          lon: number
+          mission_id: string
+          sequence_number: number
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          alt_meters?: number
+          created_at?: string
+          created_by?: string | null
+          hold_time_seconds?: number
+          id?: string
+          lat?: number
+          lon?: number
+          mission_id?: string
+          sequence_number?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_waypoints_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions_extended"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       missions: {
         Row: {
           altitude_meters: number | null
