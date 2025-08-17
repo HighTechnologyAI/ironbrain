@@ -19,6 +19,7 @@ import {
   MapPin
 } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
+import JetsonConnectionManager from '@/components/JetsonConnectionManager';
 
 const DroneEcosystem: React.FC = () => {
   const { t } = useLanguage();
@@ -118,7 +119,7 @@ const DroneEcosystem: React.FC = () => {
       </div>
 
       <Tabs defaultValue="map" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="map" className="flex items-center space-x-2">
             <Map className="h-4 w-4" />
             <span>Global Map</span>
@@ -134,6 +135,10 @@ const DroneEcosystem: React.FC = () => {
           <TabsTrigger value="media" className="flex items-center space-x-2">
             <Video className="h-4 w-4" />
             <span>Media</span>
+          </TabsTrigger>
+          <TabsTrigger value="jetson" className="flex items-center space-x-2">
+            <Settings className="h-4 w-4" />
+            <span>Jetson</span>
           </TabsTrigger>
           <TabsTrigger value="swarm" className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
@@ -344,6 +349,10 @@ const DroneEcosystem: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="jetson" className="space-y-4">
+          <JetsonConnectionManager />
         </TabsContent>
 
         <TabsContent value="swarm" className="space-y-4">
