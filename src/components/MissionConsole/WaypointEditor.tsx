@@ -62,7 +62,16 @@ export const WaypointEditor: React.FC<WaypointEditorProps> = ({
   };
 
   const addWaypoint = async () => {
-    if (!missionId || !newWaypoint.lat || !newWaypoint.lon || !newWaypoint.alt_meters) {
+    if (!missionId) {
+      toast({
+        title: "No mission selected",
+        description: "Please select a mission first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!newWaypoint.lat || !newWaypoint.lon || !newWaypoint.alt_meters) {
       toast({
         title: "Invalid waypoint",
         description: "Please fill in all required fields",

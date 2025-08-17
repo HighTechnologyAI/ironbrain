@@ -25,7 +25,7 @@ export const EnhancedMissionDetails: React.FC<{ missionId?: string }> = ({ missi
   const { toast } = useToast();
 
   // Fetch missions
-  const { data: missions, isLoading } = useQuery({
+  const { data: missions, isLoading, refetch } = useQuery({
     queryKey: ['extended-missions'],
     queryFn: async () => {
       const { data, error } = await MissionService.getExtendedMissions();
@@ -34,13 +34,31 @@ export const EnhancedMissionDetails: React.FC<{ missionId?: string }> = ({ missi
     }
   });
 
-  // Load mission details when missionId changes
+  // Load mission details and waypoints when missionId changes
   useEffect(() => {
     if (missionId && missions) {
       const mission = missions.find(m => m.id === missionId);
       setSelectedMission(mission || null);
+      
+      // Load waypoints for this mission
+      if (mission) {
+        loadMissionWaypoints(mission.id);
+      }
     }
   }, [missionId, missions]);
+
+  const loadMissionWaypoints = async (missionId: string) => {
+    try {
+      const { data, error } = await MissionService.getMissionWaypoints(missionId);
+      if (error) {
+        console.error('Error loading waypoints:', error);
+      } else if (data) {
+        setWaypoints(data);
+      }
+    } catch (error) {
+      console.error('Error loading waypoints:', error);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -67,7 +85,7 @@ export const EnhancedMissionDetails: React.FC<{ missionId?: string }> = ({ missi
       const newMission = {
         name: `Mission ${Date.now()}`,
         status: 'planning' as const,
-        // org_id will be set automatically by RLS
+        org_id: 'temp-org-id' // This should be handled by RLS, but we need a fallback
       };
 
       const { data, error } = await MissionService.createExtendedMission(newMission);
@@ -80,6 +98,7 @@ export const EnhancedMissionDetails: React.FC<{ missionId?: string }> = ({ missi
         });
       } else if (data) {
         setSelectedMission(data);
+        await refetch(); // Refresh missions list
         toast({
           title: "Mission created",
           description: "New mission created successfully"
@@ -87,6 +106,11 @@ export const EnhancedMissionDetails: React.FC<{ missionId?: string }> = ({ missi
       }
     } catch (error) {
       console.error('Error creating mission:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create mission",
+        variant: "destructive"
+      });
     }
   };
 
