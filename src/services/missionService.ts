@@ -237,11 +237,11 @@ export class MissionService {
     }
   }
 
-  static async createWaypointsBatch(waypoints: Partial<MissionWaypoint>[]) {
+  static async createWaypointsBatch(waypoints: Omit<MissionWaypoint, 'id' | 'created_at' | 'updated_at'>[]) {
     try {
       const { data, error } = await supabase
         .from('mission_waypoints')
-        .insert(waypoints)
+        .insert(waypoints as any)
         .select();
 
       if (error) throw error;
