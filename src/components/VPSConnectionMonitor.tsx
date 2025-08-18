@@ -88,16 +88,9 @@ export function VPSConnectionMonitor() {
   };
 
   useEffect(() => {
+    // Initial check only
     checkServices();
     fetchVPSData();
-    
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(() => {
-      checkServices();
-      fetchVPSData();
-    }, 30000);
-
-    return () => clearInterval(interval);
   }, []);
 
   const getStatusIcon = (status: ServiceStatus['status']) => {

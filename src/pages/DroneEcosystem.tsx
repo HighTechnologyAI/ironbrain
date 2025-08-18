@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import JetsonConnectionManager from '@/components/JetsonConnectionManager';
+import { DroneEcosystemIntegrated } from '@/components/DroneEcosystemManager/DroneEcosystemIntegrated';
+import { PerformanceMonitor } from '@/components/PerformanceMonitor';
 
 const DroneEcosystem: React.FC = () => {
   const { t } = useLanguage();
@@ -147,83 +149,10 @@ const DroneEcosystem: React.FC = () => {
         </TabsList>
 
         <TabsContent value="map" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Map className="h-5 w-5" />
-                <span>Global Drone Map</span>
-                <Badge variant="secondary">{mockDrones.length} Active</Badge>
-              </CardTitle>
-              <CardDescription>
-                Real-time positioning and status of all drones in the fleet
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Mock Map Area */}
-                <div className="lg:col-span-2">
-                  <div className="aspect-video bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg border border-dashed border-muted-foreground/20 flex items-center justify-center">
-                    <div className="text-center space-y-2">
-                      <Map className="h-12 w-12 mx-auto text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">
-                        Interactive Map (Mapbox Integration)
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Shows drone positions, geo-fences, and mission waypoints
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Drone List */}
-                <div className="space-y-3">
-                  <h3 className="font-semibold text-lg">Fleet Status</h3>
-                  {mockDrones.map((drone) => (
-                    <Card 
-                      key={drone.id} 
-                      className={`cursor-pointer transition-all hover:shadow-md ${
-                        selectedDrone === drone.id ? 'ring-2 ring-primary' : ''
-                      }`}
-                      onClick={() => setSelectedDrone(selectedDrone === drone.id ? null : drone.id)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium">{drone.name}</h4>
-                          <Badge className={getStatusColor(drone.status)}>
-                            {drone.status}
-                          </Badge>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div className="flex items-center space-x-1">
-                            <Battery className="h-3 w-3" />
-                            <span>{drone.battery}%</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Signal className="h-3 w-3" />
-                            <span>{drone.signal}%</span>
-                          </div>
-                          <div className="col-span-2 flex items-center space-x-1">
-                            <MapPin className="h-3 w-3" />
-                            <span className="text-xs text-muted-foreground">
-                              {drone.position.lat.toFixed(4)}, {drone.position.lon.toFixed(4)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {drone.mission && (
-                          <div className="mt-2 pt-2 border-t border-muted">
-                            <p className="text-xs text-muted-foreground">Mission:</p>
-                            <p className="text-sm font-medium">{drone.mission}</p>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <DroneEcosystemIntegrated 
+            onDroneSelect={setSelectedDrone}
+            selectedDroneId={selectedDrone}
+          />
         </TabsContent>
 
         <TabsContent value="missions" className="space-y-4">
@@ -309,17 +238,11 @@ const DroneEcosystem: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg border border-dashed border-muted-foreground/20 flex items-center justify-center">
-                <div className="text-center space-y-2">
-                  <Activity className="h-12 w-12 mx-auto text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">
-                    Telemetry Dashboard (Charts & Metrics)
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Real-time graphs for battery, altitude, speed, temperature
-                  </p>
-                </div>
-              </div>
+          <PerformanceMonitor
+            isConnected={true}
+            lastUpdate={new Date()}
+            telemetryActive={true}
+          />
             </CardContent>
           </Card>
         </TabsContent>
