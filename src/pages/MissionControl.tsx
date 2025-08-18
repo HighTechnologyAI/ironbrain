@@ -4,6 +4,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { useMissions } from '@/hooks/use-missions';
 import { useDrones } from '@/hooks/use-drones';
 import { useWeather } from '@/hooks/use-weather';
+import { VPSConnectionMonitor } from '@/components/VPSConnectionMonitor';
 import TacticalMapModal from '@/components/TacticalMapModal';
 import MapboxDebugger from '@/components/MapboxDebugger';
 import { EnhancedMissionDetails } from '@/components/MissionConsole/EnhancedMissionDetails';
@@ -142,8 +143,12 @@ const MissionControl = () => {
         </div>
 
         {/* Main Mission Control Tabs */}
-        <Tabs defaultValue="extended" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="vps" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="vps" className="flex items-center gap-2">
+              <Satellite className="h-4 w-4" />
+              VPS Status
+            </TabsTrigger>
             <TabsTrigger value="extended" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Enhanced Control
@@ -161,6 +166,11 @@ const MissionControl = () => {
               Tactical Map
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="vps" className="space-y-6">
+            {/* VPS Connection Monitor */}
+            <VPSConnectionMonitor />
+          </TabsContent>
 
           <TabsContent value="extended" className="space-y-6">
             {/* Enhanced Mission Details */}

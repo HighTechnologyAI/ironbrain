@@ -55,6 +55,43 @@ export const APP_CONFIG = {
     permissions: { admin: ['all'], manager: ['read', 'write', 'manage_team'], employee: ['read', 'write_own'] },
   },
   api: { timeout: 30000, retryAttempts: 3, retryDelay: 1000 },
+  vps: {
+    baseUrl: 'http://87.120.254.156',
+    mavlink: {
+      port: 5760,
+      endpoints: {
+        health: '/health',
+        connect: '/api/connect',
+        command: '/api/command',
+        status: '/api/status'
+      }
+    },
+    rtsp: {
+      port: 5762,
+      streamPort: 8554,
+      endpoints: {
+        health: '/health',
+        streams: '/api/streams',
+        testStream: '/api/test-stream',
+        stream: '/api/stream'
+      }
+    },
+    supabaseIntegration: {
+      port: 5761,
+      endpoints: {
+        health: '/health',
+        telemetry: '/api/telemetry',
+        drones: '/api/drones',
+        drone: '/api/drone'
+      }
+    },
+    telegram: {
+      port: 5000,
+      endpoints: {
+        health: '/health'
+      }
+    }
+  },
   reports: { dailyReportTime: '22:00', enableDailyReports: true, reportFormats: ['json', 'pdf'] },
   integrations: { openai: { enabled: true, model: 'gpt-3.5-turbo', maxTokens: 1000 }, telegram: { enabled: false, botToken: '' } },
   security: {
