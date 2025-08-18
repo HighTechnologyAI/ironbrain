@@ -222,10 +222,23 @@ export class VPSService {
   static async sendTelemetryToSupabase(droneId: string, telemetry: Record<string, any>): Promise<VPSResponse> {
     try {
       const url = `${this.baseUrl}:${APP_CONFIG.vps.supabaseIntegration.port}${APP_CONFIG.vps.supabaseIntegration.endpoints.telemetry}`;
+      
+      // Исправляем формат данных согласно ошибке 400 из тестирования
+      const payload = {
+        drone_id: droneId,
+        // Убеждаемся что статус соответствует enum в Supabase
+        status: telemetry.status === 'flying' ? 'mission' : telemetry.status,
+        battery_level: telemetry.battery_level,
+        location_latitude: telemetry.location_latitude,
+        location_longitude: telemetry.location_longitude,
+        altitude_meters: telemetry.altitude_meters,
+        speed_ms: telemetry.speed_ms
+      };
+      
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ drone_id: droneId, telemetry })
+        body: JSON.stringify(payload)
       });
       
       if (!response.ok) {
@@ -255,8 +268,32 @@ export class VPSService {
     return { mavlink, rtsp, supabaseIntegration };
   }
 
-  // Generate RTSP stream URL
-  static getRTSPStreamUrl(droneId: string, streamName: string = 'main'): string {
-    return `rtsp://${APP_CONFIG.vps.baseUrl.replace('http://', '')}:${APP_CONFIG.vps.rtsp.streamPort}/${droneId}/${streamName}`;
+  // Generate RTSP stream URL - используем правильный hostname
+  static getRTSPStreamUrl(droneId: string, streamName: string = 'test'): string {
+    return `rtsp://president.ironbrain.site:${APP_CONFIG.vps.rtsp.streamPort}/${droneId}/${streamName}`;
+  }
+  
+  // Добавляем метод для обработки ошибок соединения
+  static async checkConnectionHealth(): Promise<{
+    overall: boolean;
+    services: Record<string, boolean>;
+    errors: string[];
+  }> {
+    const health = await this.checkAllServicesHealth();
+    const errors: string[] = [];
+    
+    if (!health.mavlink.success) errors.push(`MAVLink: ${health.mavlink.error}`);
+    if (!health.rtsp.success) errors.push(`RTSP: ${health.rtsp.error}`);
+    if (!health.supabaseIntegration.success) errors.push(`Supabase: ${health.supabaseIntegration.error}`);
+    
+    return {
+      overall: errors.length === 0,
+      services: {
+        mavlink: health.mavlink.success,
+        rtsp: health.rtsp.success,
+        supabase: health.supabaseIntegration.success
+      },
+      errors
+    };
   }
 }

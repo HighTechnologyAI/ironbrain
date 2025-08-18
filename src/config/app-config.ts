@@ -56,7 +56,7 @@ export const APP_CONFIG = {
   },
   api: { timeout: 30000, retryAttempts: 3, retryDelay: 1000 },
   vps: {
-    baseUrl: 'http://87.120.254.156',
+    baseUrl: 'http://president.ironbrain.site',
     mavlink: {
       port: 5760,
       endpoints: {

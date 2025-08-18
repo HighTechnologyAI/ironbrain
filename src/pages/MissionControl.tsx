@@ -5,6 +5,7 @@ import { useMissions } from '@/hooks/use-missions';
 import { useDrones } from '@/hooks/use-drones';
 import { useWeather } from '@/hooks/use-weather';
 import { VPSConnectionMonitor } from '@/components/VPSConnectionMonitor';
+import { VPSStatusDebugger } from '@/components/VPSStatusDebugger';
 import TacticalMapModal from '@/components/TacticalMapModal';
 import MapboxDebugger from '@/components/MapboxDebugger';
 import { EnhancedMissionDetails } from '@/components/MissionConsole/EnhancedMissionDetails';
@@ -168,8 +169,10 @@ const MissionControl = () => {
           </TabsList>
 
           <TabsContent value="vps" className="space-y-6">
-            {/* VPS Connection Monitor */}
-            <VPSConnectionMonitor />
+            <div className="grid gap-6 lg:grid-cols-2">
+              <VPSConnectionMonitor />
+              <VPSStatusDebugger />
+            </div>
           </TabsContent>
 
           <TabsContent value="extended" className="space-y-6">
