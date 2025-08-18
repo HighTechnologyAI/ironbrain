@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useErrorRecovery } from './use-error-recovery';
 
 export interface RealTimeTelemetry {
   droneId: string;
@@ -21,6 +22,7 @@ export const useRealTimeTelemetry = (droneId?: string) => {
   const [telemetry, setTelemetry] = useState<RealTimeTelemetry | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const { handleError, resetErrorState, isRecovering } = useErrorRecovery();
 
   useEffect(() => {
     if (!droneId) return;
@@ -91,31 +93,40 @@ export const useRealTimeTelemetry = (droneId?: string) => {
 
     // Fetch initial telemetry data
     const fetchInitialData = async () => {
-      const { data, error } = await supabase
-        .from('drone_telemetry')
-        .select('*')
-        .eq('drone_id', droneId)
-        .order('timestamp', { ascending: false })
-        .limit(1)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('drone_telemetry')
+          .select('*')
+          .eq('drone_id', droneId)
+          .order('timestamp', { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
-      if (data && !error) {
-        setTelemetry({
-          droneId: data.drone_id,
-          timestamp: data.timestamp,
-          batteryLevel: data.battery_level,
-          altitude: data.altitude_meters,
-          speed: data.speed_ms,
-          latitude: data.location_latitude,
-          longitude: data.location_longitude,
-          heading: data.heading_degrees,
-          signalStrength: data.signal_strength,
-          gpsSatellites: data.gps_satellites,
-          armed: data.armed,
-          flightMode: data.flight_mode,
-          errors: Array.isArray(data.errors) ? data.errors : []
-        });
-        setLastUpdate(new Date());
+        if (error) {
+          throw new Error(`Failed to fetch telemetry: ${error.message}`);
+        }
+
+        if (data) {
+          setTelemetry({
+            droneId: data.drone_id,
+            timestamp: data.timestamp,
+            batteryLevel: data.battery_level,
+            altitude: data.altitude_meters,
+            speed: data.speed_ms,
+            latitude: data.location_latitude,
+            longitude: data.location_longitude,
+            heading: data.heading_degrees,
+            signalStrength: data.signal_strength,
+            gpsSatellites: data.gps_satellites,
+            armed: data.armed,
+            flightMode: data.flight_mode,
+            errors: Array.isArray(data.errors) ? data.errors : []
+          });
+          setLastUpdate(new Date());
+          resetErrorState();
+        }
+      } catch (error) {
+        await handleError(error as Error, fetchInitialData);
       }
     };
 
@@ -137,6 +148,7 @@ export const useRealTimeTelemetry = (droneId?: string) => {
   return {
     telemetry,
     isConnected,
-    lastUpdate
+    lastUpdate,
+    isRecovering
   };
 };
