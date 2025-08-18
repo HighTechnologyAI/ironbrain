@@ -1,7 +1,7 @@
 // VPS Integration Service for Tiger CRM
-// Handles communication with Iron Brain VPS services
+// Handles communication with Iron Brain VPS services via Supabase Edge Functions (CORS proxy)
 
-import { APP_CONFIG } from '@/config/app-config';
+import { supabase } from '@/integrations/supabase/client';
 
 interface VPSResponse<T = any> {
   success: boolean;
@@ -32,22 +32,14 @@ interface StreamInfo {
 }
 
 export class VPSService {
-  private static readonly baseUrl = APP_CONFIG.vps.baseUrl;
-
-  // MAVLink Service API calls
+  // MAVLink Service API calls via Edge Function proxy
   static async checkMAVLinkHealth(): Promise<VPSResponse> {
     try {
-      const url = `${this.baseUrl}:${APP_CONFIG.vps.mavlink.port}${APP_CONFIG.vps.mavlink.endpoints.health}`;
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+      const { data, error } = await supabase.functions.invoke('vps-mavlink-proxy', {
+        body: { endpoint: '/health' }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      if (error) throw error;
       return { success: true, data };
     } catch (error) {
       console.error('MAVLink health check failed:', error);
@@ -57,18 +49,15 @@ export class VPSService {
 
   static async connectDrone(connectionString: string): Promise<VPSResponse> {
     try {
-      const url = `${this.baseUrl}:${APP_CONFIG.vps.mavlink.port}${APP_CONFIG.vps.mavlink.endpoints.connect}`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ connection_string: connectionString })
+      const { data, error } = await supabase.functions.invoke('vps-mavlink-proxy', {
+        body: { 
+          endpoint: '/connect',
+          method: 'POST',
+          payload: { connection_string: connectionString }
+        }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      if (error) throw error;
       return { success: true, data };
     } catch (error) {
       console.error('Drone connection failed:', error);
@@ -78,18 +67,15 @@ export class VPSService {
 
   static async sendDroneCommand(command: string, params?: Record<string, any>): Promise<VPSResponse> {
     try {
-      const url = `${this.baseUrl}:${APP_CONFIG.vps.mavlink.port}${APP_CONFIG.vps.mavlink.endpoints.command}`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ command, ...params })
+      const { data, error } = await supabase.functions.invoke('vps-mavlink-proxy', {
+        body: { 
+          endpoint: '/command',
+          method: 'POST',
+          payload: { command, ...params }
+        }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      if (error) throw error;
       return { success: true, data };
     } catch (error) {
       console.error('Drone command failed:', error);
@@ -99,17 +85,11 @@ export class VPSService {
 
   static async getDroneStatus(): Promise<VPSResponse<DroneStatus[]>> {
     try {
-      const url = `${this.baseUrl}:${APP_CONFIG.vps.mavlink.port}${APP_CONFIG.vps.mavlink.endpoints.status}`;
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+      const { data, error } = await supabase.functions.invoke('vps-mavlink-proxy', {
+        body: { endpoint: '/status' }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      if (error) throw error;
       return { success: true, data };
     } catch (error) {
       console.error('Drone status fetch failed:', error);
@@ -117,20 +97,14 @@ export class VPSService {
     }
   }
 
-  // RTSP Service API calls
+  // RTSP Service API calls via Edge Function proxy
   static async checkRTSPHealth(): Promise<VPSResponse> {
     try {
-      const url = `${this.baseUrl}:${APP_CONFIG.vps.rtsp.port}${APP_CONFIG.vps.rtsp.endpoints.health}`;
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+      const { data, error } = await supabase.functions.invoke('vps-rtsp-proxy', {
+        body: { endpoint: '/health' }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      if (error) throw error;
       return { success: true, data };
     } catch (error) {
       console.error('RTSP health check failed:', error);
@@ -140,17 +114,11 @@ export class VPSService {
 
   static async getActiveStreams(): Promise<VPSResponse<StreamInfo[]>> {
     try {
-      const url = `${this.baseUrl}:${APP_CONFIG.vps.rtsp.port}${APP_CONFIG.vps.rtsp.endpoints.streams}`;
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+      const { data, error } = await supabase.functions.invoke('vps-rtsp-proxy', {
+        body: { endpoint: '/streams' }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      if (error) throw error;
       return { success: true, data };
     } catch (error) {
       console.error('Streams fetch failed:', error);
@@ -160,17 +128,14 @@ export class VPSService {
 
   static async createTestStream(droneId: string): Promise<VPSResponse> {
     try {
-      const url = `${this.baseUrl}:${APP_CONFIG.vps.rtsp.port}${APP_CONFIG.vps.rtsp.endpoints.testStream}/${droneId}`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+      const { data, error } = await supabase.functions.invoke('vps-rtsp-proxy', {
+        body: { 
+          endpoint: `/test_stream/${droneId}`,
+          method: 'POST'
+        }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      if (error) throw error;
       return { success: true, data };
     } catch (error) {
       console.error('Test stream creation failed:', error);
@@ -178,20 +143,14 @@ export class VPSService {
     }
   }
 
-  // Supabase Integration Service API calls
+  // Supabase Integration Service API calls via Edge Function proxy
   static async checkSupabaseIntegrationHealth(): Promise<VPSResponse> {
     try {
-      const url = `${this.baseUrl}:${APP_CONFIG.vps.supabaseIntegration.port}${APP_CONFIG.vps.supabaseIntegration.endpoints.health}`;
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+      const { data, error } = await supabase.functions.invoke('vps-supabase-proxy', {
+        body: { endpoint: '/health' }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      if (error) throw error;
       return { success: true, data };
     } catch (error) {
       console.error('Supabase integration health check failed:', error);
@@ -201,17 +160,11 @@ export class VPSService {
 
   static async getVPSDrones(): Promise<VPSResponse> {
     try {
-      const url = `${this.baseUrl}:${APP_CONFIG.vps.supabaseIntegration.port}${APP_CONFIG.vps.supabaseIntegration.endpoints.drones}`;
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+      const { data, error } = await supabase.functions.invoke('vps-supabase-proxy', {
+        body: { endpoint: '/drones' }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      if (error) throw error;
       return { success: true, data };
     } catch (error) {
       console.error('VPS drones fetch failed:', error);
@@ -221,8 +174,6 @@ export class VPSService {
 
   static async sendTelemetryToSupabase(droneId: string, telemetry: Record<string, any>): Promise<VPSResponse> {
     try {
-      const url = `${this.baseUrl}:${APP_CONFIG.vps.supabaseIntegration.port}${APP_CONFIG.vps.supabaseIntegration.endpoints.telemetry}`;
-      
       // Исправляем формат данных согласно ошибке 400 из тестирования
       const payload = {
         drone_id: droneId,
@@ -235,17 +186,15 @@ export class VPSService {
         speed_ms: telemetry.speed_ms
       };
       
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      const { data, error } = await supabase.functions.invoke('vps-supabase-proxy', {
+        body: { 
+          endpoint: '/telemetry',
+          method: 'POST',
+          payload
+        }
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      if (error) throw error;
       return { success: true, data };
     } catch (error) {
       console.error('Telemetry send failed:', error);
@@ -268,9 +217,9 @@ export class VPSService {
     return { mavlink, rtsp, supabaseIntegration };
   }
 
-  // Generate RTSP stream URL - используем правильный hostname
+  // Generate RTSP stream URL
   static getRTSPStreamUrl(droneId: string, streamName: string = 'test'): string {
-    return `rtsp://president.ironbrain.site:${APP_CONFIG.vps.rtsp.streamPort}/${droneId}/${streamName}`;
+    return `rtsp://president.ironbrain.site:8554/${droneId}/${streamName}`;
   }
   
   // Добавляем метод для обработки ошибок соединения
