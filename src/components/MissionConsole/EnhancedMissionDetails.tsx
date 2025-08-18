@@ -38,7 +38,10 @@ export const EnhancedMissionDetails: React.FC<{ missionId?: string }> = ({ missi
       const { data, error } = await MissionService.getExtendedMissions();
       if (error) throw error;
       return data || [];
-    }
+    },
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Load mission details and waypoints when missionId changes

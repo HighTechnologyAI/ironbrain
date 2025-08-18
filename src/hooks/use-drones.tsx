@@ -59,11 +59,13 @@ export const useDrones = () => {
 
     fetchDrones();
     
-    // Real-time subscription
+    // Real-time subscription with throttling
     const channel = supabase
       .channel('drones-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'drones' }, fetchDrones)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'drone_telemetry' }, fetchDrones)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'drones' }, () => {
+        // Throttle updates to prevent excessive refreshes
+        setTimeout(fetchDrones, 1000);
+      })
       .subscribe();
     
     return () => {

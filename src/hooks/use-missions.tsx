@@ -56,12 +56,15 @@ export const useMissions = () => {
 
     fetchMissions();
     
-    // Real-time subscription
+    // Real-time subscription with throttling
     const channel = supabase
       .channel('missions-changes')
       .on('postgres_changes', 
           { event: '*', schema: 'public', table: 'missions' }, 
-          () => fetchMissions()
+          () => {
+            // Throttle updates to prevent excessive refreshes
+            setTimeout(fetchMissions, 1000);
+          }
       )
       .subscribe();
     
