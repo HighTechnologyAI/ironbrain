@@ -16,6 +16,7 @@ import {
 import { MissionService, type ExtendedMission, type MissionWaypoint } from '@/services/missionService';
 import { WaypointEditor } from './WaypointEditor';
 import { MissionStatus } from './MissionStatus';
+import { RTSPPlayer } from '../RTSPPlayer';
 import { useToast } from '@/hooks/use-toast';
 
 export const EnhancedMissionDetails: React.FC<{ missionId?: string }> = ({ missionId }) => {
@@ -181,66 +182,115 @@ export const EnhancedMissionDetails: React.FC<{ missionId?: string }> = ({ missi
 
       {/* Mission Details & Controls */}
       {selectedMission && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Mission Status */}
-          <MissionStatus 
-            mission={{
-              id: selectedMission.id,
-              name: selectedMission.name,
-              status: selectedMission.status as any,
-              progress: 0, // TODO: Calculate from waypoints
-              waypoints: waypoints.length,
-              currentWaypoint: 1,
-              estimatedTime: '00:00',
-              startTime: selectedMission.starts_at
-            }}
-            onStart={() => MissionService.startMission(selectedMission.id)}
-            onPause={() => MissionService.pauseMission(selectedMission.id)}
-            onStop={() => MissionService.failMission(selectedMission.id)}
-          />
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Mission Status */}
+            <MissionStatus 
+              mission={{
+                id: selectedMission.id,
+                name: selectedMission.name,
+                status: selectedMission.status as any,
+                progress: 0, // TODO: Calculate from waypoints
+                waypoints: waypoints.length,
+                currentWaypoint: 1,
+                estimatedTime: '00:00',
+                startTime: selectedMission.starts_at
+              }}
+              onStart={() => MissionService.startMission(selectedMission.id)}
+              onPause={() => MissionService.pauseMission(selectedMission.id)}
+              onStop={() => MissionService.failMission(selectedMission.id)}
+            />
 
-          {/* Mission Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Mission Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span>Created: {formatDate(selectedMission.created_at)}</span>
+            {/* Mission Info */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Mission Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span>Created: {formatDate(selectedMission.created_at)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span>Updated: {formatDate(selectedMission.updated_at)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <span>Waypoints: {waypoints.length}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span>Org: {selectedMission.org_id?.slice(0, 8)}...</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>Updated: {formatDate(selectedMission.updated_at)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span>Waypoints: {waypoints.length}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                  <span>Org: {selectedMission.org_id?.slice(0, 8)}...</span>
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Mission Progress</span>
-                  <span>0%</span>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Mission Progress</span>
+                    <span>0%</span>
+                  </div>
+                  <Progress value={0} className="h-2" />
                 </div>
-                <Progress value={0} className="h-2" />
-              </div>
 
-              <Button 
-                onClick={() => setShowWaypointEditor(!showWaypointEditor)}
-                variant="outline"
-                className="w-full"
-              >
-                {showWaypointEditor ? 'Hide' : 'Show'} Waypoint Editor
-              </Button>
-            </CardContent>
-          </Card>
+                <Button 
+                  onClick={() => setShowWaypointEditor(!showWaypointEditor)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  {showWaypointEditor ? 'Hide' : 'Show'} Waypoint Editor
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Live Stream */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <RTSPPlayer 
+              droneId="8397f2ac-847a-4184-aba8-e30c62ee6654"
+              streamUrl="rtsp://87.120.254.156:8554/8397f2ac-847a-4184-aba8-e30c62ee6654/main_camera"
+              showControls={true}
+            />
+            
+            {/* Mission Telemetry */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Plane className="h-5 w-5" />
+                  Drone Telemetry
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-1">
+                    <span className="text-muted-foreground">Altitude:</span>
+                    <p className="font-mono text-lg">100m</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-muted-foreground">Speed:</span>
+                    <p className="font-mono text-lg">10 m/s</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-muted-foreground">Battery:</span>
+                    <p className="font-mono text-lg text-green-600">85%</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-muted-foreground">Signal:</span>
+                    <p className="font-mono text-lg text-green-600">Strong</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-muted-foreground">Position:</span>
+                    <p className="font-mono text-xs">55.7558, 37.6173</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-muted-foreground">Status:</span>
+                    <Badge variant="default">Online</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
 
