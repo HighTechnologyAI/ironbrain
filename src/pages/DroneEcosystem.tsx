@@ -22,6 +22,8 @@ import { useLanguage } from '@/hooks/use-language';
 import JetsonConnectionManager from '@/components/JetsonConnectionManager';
 import { DroneEcosystemIntegrated } from '@/components/DroneEcosystemManager/DroneEcosystemIntegrated';
 import { PerformanceMonitor } from '@/components/PerformanceMonitor';
+import { VPSBridge } from '@/components/VPSBridge';
+import { ManualDroneControl } from '@/components/ManualDroneControl';
 
 const DroneEcosystem: React.FC = () => {
   const { t } = useLanguage();
@@ -121,7 +123,7 @@ const DroneEcosystem: React.FC = () => {
       </div>
 
       <Tabs defaultValue="map" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="map" className="flex items-center space-x-2">
             <Map className="h-4 w-4" />
             <span>Global Map</span>
@@ -129,6 +131,10 @@ const DroneEcosystem: React.FC = () => {
           <TabsTrigger value="missions" className="flex items-center space-x-2">
             <Plane className="h-4 w-4" />
             <span>Missions</span>
+          </TabsTrigger>
+          <TabsTrigger value="control" className="flex items-center space-x-2">
+            <Settings className="h-4 w-4" />
+            <span>Manual Control</span>
           </TabsTrigger>
           <TabsTrigger value="telemetry" className="flex items-center space-x-2">
             <Activity className="h-4 w-4" />
@@ -142,6 +148,10 @@ const DroneEcosystem: React.FC = () => {
             <Settings className="h-4 w-4" />
             <span>Jetson</span>
           </TabsTrigger>
+          <TabsTrigger value="vps" className="flex items-center space-x-2">
+            <Settings className="h-4 w-4" />
+            <span>VPS Bridge</span>
+          </TabsTrigger>
           <TabsTrigger value="swarm" className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
             <span>Swarm</span>
@@ -153,6 +163,10 @@ const DroneEcosystem: React.FC = () => {
             onDroneSelect={setSelectedDrone}
             selectedDroneId={selectedDrone}
           />
+        </TabsContent>
+
+        <TabsContent value="control" className="space-y-4">
+          <ManualDroneControl />
         </TabsContent>
 
         <TabsContent value="missions" className="space-y-4">
@@ -276,6 +290,10 @@ const DroneEcosystem: React.FC = () => {
 
         <TabsContent value="jetson" className="space-y-4">
           <JetsonConnectionManager />
+        </TabsContent>
+
+        <TabsContent value="vps" className="space-y-4">
+          <VPSBridge />
         </TabsContent>
 
         <TabsContent value="swarm" className="space-y-4">
