@@ -15,7 +15,7 @@ serve(async (req) => {
     const endpoint = url.searchParams.get('endpoint') || '/health'
     const method = req.method
     
-    const vpsUrl = `http://president.ironbrain.site:5761${endpoint}`
+    const vpsUrl = `http://87.120.254.156:5761${endpoint}`
     
     console.log(`Proxying ${method} request to: ${vpsUrl}`)
     
