@@ -21,55 +21,49 @@ export const useDrones = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchDrones = async () => {
-      try {
-        setLoading(true);
-        
-        const { data, error } = await supabase
-          .from('drone_status_view')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        
-        const normalized = (data || []).map((row: any) => ({
-          id: row.id,
-          name: row.name,
-          model: row.model,
-          serial: row.serial_number,
-          status: row.status,
-          battery_level: row.battery_level != null ? Number(row.battery_level) : undefined,
-          firmware: undefined,
-          location_lat: row.location_latitude != null ? Number(row.location_latitude) : undefined,
-          location_lon: row.location_longitude != null ? Number(row.location_longitude) : undefined,
-          last_contact: row.last_telemetry || null,
-          created_by: undefined,
-          created_at: row.created_at,
-        }));
-        
-        setDrones(normalized);
-      } catch (err) {
-        console.error('Error fetching drones:', err);
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchDrones = async () => {
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase
+        .from('drone_status_view')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      const normalized = (data || []).map((row: any) => ({
+        id: row.id,
+        name: row.name,
+        model: row.model,
+        serial: row.serial_number,
+        status: row.status,
+        battery_level: row.battery_level != null ? Number(row.battery_level) : undefined,
+        firmware: undefined,
+        location_lat: row.location_latitude != null ? Number(row.location_latitude) : undefined,
+        location_lon: row.location_longitude != null ? Number(row.location_longitude) : undefined,
+        last_contact: row.last_telemetry || null,
+        created_by: undefined,
+        created_at: row.created_at,
+      }));
+      
+      setDrones(normalized);
+    } catch (err) {
+      console.error('Error fetching drones:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchDrones();
     
-    // Real-time subscription with throttling
-    const channel = supabase
-      .channel('drones-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'drones' }, () => {
-        // Throttle updates to prevent excessive refreshes
-        setTimeout(fetchDrones, 1000);
-      })
-      .subscribe();
+    // Disable real-time subscription to prevent auto-refresh
+    // Real-time updates will be handled manually via refresh button
     
     return () => {
-      supabase.removeChannel(channel);
+      // No cleanup needed since no subscriptions
     };
   }, []);
 
@@ -127,5 +121,9 @@ export const useDrones = () => {
     }
   };
 
-  return { drones, loading, error, createDrone, updateDrone };
+  const refresh = () => {
+    fetchDrones();
+  };
+
+  return { drones, loading, error, createDrone, updateDrone, refresh };
 };

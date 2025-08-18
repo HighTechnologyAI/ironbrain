@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DroneService } from '@/services/droneService';
 import { VPSService } from '@/services/vpsService';
-import { CheckCircle, XCircle, Clock, RefreshCw } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, RefreshCw, Server } from 'lucide-react';
 
 interface ServiceStatus {
   name: string;
@@ -23,6 +23,7 @@ export function VPSConnectionMonitor() {
   ]);
   const [isChecking, setIsChecking] = useState(false);
   const [vpsData, setVpsData] = useState<any>(null);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   const checkServices = async () => {
     setIsChecking(true);
@@ -87,10 +88,15 @@ export function VPSConnectionMonitor() {
     }
   };
 
+  const handleManualRefresh = async () => {
+    await checkServices();
+    await fetchVPSData();
+    setLastRefresh(new Date());
+  };
+
   useEffect(() => {
-    // Initial check only
-    checkServices();
-    fetchVPSData();
+    // Initial check only - no auto-refresh
+    handleManualRefresh();
   }, []);
 
   const getStatusIcon = (status: ServiceStatus['status']) => {
@@ -123,15 +129,22 @@ export function VPSConnectionMonitor() {
     <div className="space-y-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>VPS Services Status</CardTitle>
+          <div>
+            <CardTitle>VPS Services Status</CardTitle>
+            {lastRefresh && (
+              <p className="text-sm text-muted-foreground">
+                Обновлено: {lastRefresh.toLocaleTimeString()}
+              </p>
+            )}
+          </div>
           <Button
-            onClick={checkServices}
+            onClick={handleManualRefresh}
             disabled={isChecking}
             size="sm"
             variant="outline"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isChecking ? 'animate-spin' : ''}`} />
-            Refresh
+            {isChecking ? 'Проверка...' : 'Обновить'}
           </Button>
         </CardHeader>
         <CardContent>

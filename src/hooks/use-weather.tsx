@@ -17,48 +17,49 @@ export const useWeather = (lat?: number, lon?: number) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchWeather = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { data, error } = await supabase.functions.invoke('get-weather', {
+        body: { 
+          lat: lat || 43.388944,  // Timarevo Airfield coordinates
+          lon: lon || 26.885444 
+        }
+      });
+
+      if (error) throw error;
+
+      setWeather(data);
+    } catch (err) {
+      console.error('Error fetching weather:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      
+      // Set fallback data
+      setWeather({
+        temperature: 12,
+        wind_speed: 7,
+        wind_direction: 45,
+        visibility: 8.5,
+        pressure: 1013,
+        humidity: 65,
+        weather_condition: 'ясно',
+        location: 'Timarevo Airfield'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const { data, error } = await supabase.functions.invoke('get-weather', {
-          body: { 
-            lat: lat || 43.388944,  // Timarevo Airfield coordinates
-            lon: lon || 26.885444 
-          }
-        });
-
-        if (error) throw error;
-
-        setWeather(data);
-      } catch (err) {
-        console.error('Error fetching weather:', err);
-        setError(err instanceof Error ? err.message : 'Unknown error');
-        
-        // Set fallback data
-        setWeather({
-          temperature: 12,
-          wind_speed: 7,
-          wind_direction: 45,
-          visibility: 8.5,
-          pressure: 1013,
-          humidity: 65,
-          weather_condition: 'ясно',
-          location: 'Timarevo Airfield'
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchWeather();
     
-    // Auto-refresh every 10 minutes
-    const interval = setInterval(fetchWeather, 10 * 60 * 1000);
+    // Disable auto-refresh interval - refresh only on manual request
     
-    return () => clearInterval(interval);
+    return () => {
+      // No cleanup needed since no intervals
+    };
   }, [lat, lon]);
 
   const getWindDirection = (degrees: number): string => {
@@ -67,5 +68,9 @@ export const useWeather = (lat?: number, lon?: number) => {
     return directions[index];
   };
 
-  return { weather, loading, error, getWindDirection };
+  const refresh = () => {
+    fetchWeather();
+  };
+
+  return { weather, loading, error, getWindDirection, refresh };
 };

@@ -30,16 +30,17 @@ import {
   Satellite,
   Target,
   Loader2,
-  Settings
+  Settings,
+  RefreshCw
 } from 'lucide-react';
 
 const MissionControl = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   
-  const { missions, loading: missionsLoading, error: missionsError } = useMissions();
-  const { drones, loading: dronesLoading, error: dronesError } = useDrones();
-  const { weather, loading: weatherLoading, getWindDirection } = useWeather();
+  const { missions, loading: missionsLoading, error: missionsError, refresh: refreshMissions } = useMissions();
+  const { drones, loading: dronesLoading, error: dronesError, refresh: refreshDrones } = useDrones();
+  const { weather, loading: weatherLoading, getWindDirection, refresh: refreshWeather } = useWeather();
 
   if (missionsLoading || dronesLoading || weatherLoading) {
     return (
@@ -140,6 +141,20 @@ const MissionControl = () => {
               Готов к полету: {readyDrones} | 
               Всего единиц: {drones.length}
             </p>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => {
+                refreshMissions();
+                refreshDrones();
+                refreshWeather();
+              }}
+              variant="outline"
+              size="sm"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Обновить все данные
+            </Button>
           </div>
         </div>
 
