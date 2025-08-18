@@ -58,10 +58,11 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
       }));
     };
 
-    const interval = setInterval(updateMetrics, 2000);
+    // Disable auto-refresh to prevent constant updates
+    // const interval = setInterval(updateMetrics, 10000);
     updateMetrics();
 
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, [isConnected, lastUpdate]);
 
   const getStatusIcon = (status: string) => {
