@@ -35,14 +35,27 @@ export class VPSService {
   // MAVLink Service API calls via Edge Function proxy
   static async checkMAVLinkHealth(): Promise<VPSResponse> {
     try {
+      console.log('🔍 Checking MAVLink health...');
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const { data, error } = await supabase.functions.invoke('vps-mavlink-proxy', {
-        body: { endpoint: '/health' }
+        body: { endpoint: '/health' },
+        // @ts-ignore - AbortSignal не в типах но работает
+        signal: controller.signal
       });
       
+      clearTimeout(timeoutId);
+      
       if (error) throw error;
+      console.log('✅ MAVLink health check success:', data);
       return { success: true, data };
     } catch (error) {
-      console.error('MAVLink health check failed:', error);
+      console.error('❌ MAVLink health check failed:', error);
+      if (error instanceof Error && error.name === 'AbortError') {
+        return { success: false, error: 'Timeout: MAVLink service не отвечает более 10 секунд' };
+      }
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }
@@ -100,14 +113,27 @@ export class VPSService {
   // RTSP Service API calls via Edge Function proxy
   static async checkRTSPHealth(): Promise<VPSResponse> {
     try {
+      console.log('🔍 Checking RTSP health...');
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      
       const { data, error } = await supabase.functions.invoke('vps-rtsp-proxy', {
-        body: { endpoint: '/health' }
+        body: { endpoint: '/health' },
+        // @ts-ignore
+        signal: controller.signal
       });
       
+      clearTimeout(timeoutId);
+      
       if (error) throw error;
+      console.log('✅ RTSP health check success:', data);
       return { success: true, data };
     } catch (error) {
-      console.error('RTSP health check failed:', error);
+      console.error('❌ RTSP health check failed:', error);
+      if (error instanceof Error && error.name === 'AbortError') {
+        return { success: false, error: 'Timeout: RTSP service не отвечает более 10 секунд' };
+      }
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }
@@ -146,14 +172,27 @@ export class VPSService {
   // Supabase Integration Service API calls via Edge Function proxy
   static async checkSupabaseIntegrationHealth(): Promise<VPSResponse> {
     try {
+      console.log('🔍 Checking Supabase Integration health...');
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      
       const { data, error } = await supabase.functions.invoke('vps-supabase-proxy', {
-        body: { endpoint: '/health' }
+        body: { endpoint: '/health' },
+        // @ts-ignore
+        signal: controller.signal
       });
       
+      clearTimeout(timeoutId);
+      
       if (error) throw error;
+      console.log('✅ Supabase Integration health check success:', data);
       return { success: true, data };
     } catch (error) {
-      console.error('Supabase integration health check failed:', error);
+      console.error('❌ Supabase Integration health check failed:', error);
+      if (error instanceof Error && error.name === 'AbortError') {
+        return { success: false, error: 'Timeout: Supabase Integration не отвечает более 10 секунд' };
+      }
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }
