@@ -18,12 +18,17 @@ import { WaypointEditor } from './WaypointEditor';
 import { MissionStatus } from './MissionStatus';
 import { RTSPPlayer } from '../RTSPPlayer';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useRealTimeTelemetry } from '@/hooks/use-real-time-telemetry';
 
 export const EnhancedMissionDetails: React.FC<{ missionId?: string }> = ({ missionId }) => {
   const [selectedMission, setSelectedMission] = useState<ExtendedMission | null>(null);
   const [waypoints, setWaypoints] = useState<MissionWaypoint[]>([]);
   const [showWaypointEditor, setShowWaypointEditor] = useState(false);
   const { toast } = useToast();
+
+  // Real-time telemetry for the active drone
+  const { telemetry, isConnected, lastUpdate } = useRealTimeTelemetry("8397f2ac-847a-4184-aba8-e30c62ee6654");
 
   // Fetch missions
   const { data: missions, isLoading, refetch } = useQuery({
@@ -262,31 +267,67 @@ export const EnhancedMissionDetails: React.FC<{ missionId?: string }> = ({ missi
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Connection Status */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Real-time Connection:</span>
+                  <Badge variant={isConnected ? "default" : "destructive"}>
+                    {isConnected ? "Connected" : "Disconnected"}
+                  </Badge>
+                </div>
+                
+                {lastUpdate && (
+                  <div className="text-xs text-muted-foreground">
+                    Last update: {lastUpdate.toLocaleTimeString()}
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="space-y-1">
                     <span className="text-muted-foreground">Altitude:</span>
-                    <p className="font-mono text-lg">100m</p>
+                    <p className="font-mono text-lg">{telemetry?.altitude || 0}m</p>
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted-foreground">Speed:</span>
-                    <p className="font-mono text-lg">10 m/s</p>
+                    <p className="font-mono text-lg">{telemetry?.speed || 0} m/s</p>
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted-foreground">Battery:</span>
-                    <p className="font-mono text-lg text-green-600">85%</p>
+                    <p className={`font-mono text-lg ${
+                      (telemetry?.batteryLevel || 0) > 50 ? 'text-green-600' : 
+                      (telemetry?.batteryLevel || 0) > 20 ? 'text-yellow-600' : 'text-red-600'
+                    }`}>
+                      {telemetry?.batteryLevel || 0}%
+                    </p>
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted-foreground">Signal:</span>
-                    <p className="font-mono text-lg text-green-600">Strong</p>
+                    <p className={`font-mono text-lg ${
+                      (telemetry?.signalStrength || 0) > 70 ? 'text-green-600' : 
+                      (telemetry?.signalStrength || 0) > 30 ? 'text-yellow-600' : 'text-red-600'
+                    }`}>
+                      {telemetry?.signalStrength || 0}%
+                    </p>
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted-foreground">Position:</span>
-                    <p className="font-mono text-xs">55.7558, 37.6173</p>
+                    <p className="font-mono text-xs">
+                      {telemetry?.latitude?.toFixed(4) || '0.0000'}, {telemetry?.longitude?.toFixed(4) || '0.0000'}
+                    </p>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-muted-foreground">Status:</span>
-                    <Badge variant="default">Online</Badge>
+                    <span className="text-muted-foreground">Mode:</span>
+                    <Badge variant={telemetry?.armed ? "destructive" : "default"}>
+                      {telemetry?.flightMode || 'Unknown'}
+                    </Badge>
                   </div>
+                  {telemetry?.errors && telemetry.errors.length > 0 && (
+                    <div className="col-span-2 space-y-1">
+                      <span className="text-muted-foreground">Errors:</span>
+                      <div className="text-xs text-red-600">
+                        {telemetry.errors.join(', ')}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
