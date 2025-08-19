@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, Loader2, AlertTriangle, RefreshCw, Cpu } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ValidationResult {
   id: string;
@@ -25,14 +26,14 @@ export function IronBrainValidator() {
   const [isValidating, setIsValidating] = useState(false);
   const [connectedDrones, setConnectedDrones] = useState<DroneInfo[]>([]);
 
-  const VPS_API_BASE = "http://87.120.254.156:3001/api/v1";
+  const VPS_API_BASE = "http://87.120.254.156:5761";
 
   const initializeValidation = () => {
     setValidationResults([
       { 
         id: 'vps-health', 
         name: 'VPS Health Check', 
-        description: 'Проверка IronBrain VPS (87.120.254.156:3001)', 
+        description: 'Проверка IronBrain VPS (87.120.254.156:5761)', 
         status: 'checking' 
       },
       { 
@@ -63,27 +64,28 @@ export function IronBrainValidator() {
   };
 
   const testVPSEndpoint = async (endpoint: string, timeout = 5000) => {
-    const controller = new AbortController();
-    setTimeout(() => controller.abort(), timeout);
-
+    // Используем Edge Function для обхода CORS
     try {
-      const response = await fetch(`${VPS_API_BASE}${endpoint}`, {
-        method: 'GET',
-        signal: controller.signal,
-        headers: {
-          'Accept': 'application/json',
+      const { data, error } = await supabase.functions.invoke('vps-supabase-proxy', {
+        body: { 
+          action: 'GET',
+          endpoint: endpoint,
+          vps_ip: '87.120.254.156',
+          vps_port: 5761
         }
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      if (error) {
+        throw new Error(error.message);
       }
 
-      return await response.json();
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        throw new Error('Timeout: VPS не отвечает');
+      if (!data.success) {
+        throw new Error(data.error || 'VPS request failed');
       }
+
+      return data.response;
+    } catch (error) {
+      console.error('VPS Endpoint Error:', error);
       throw error;
     }
   };
@@ -93,7 +95,7 @@ export function IronBrainValidator() {
     initializeValidation();
     setConnectedDrones([]);
 
-    // 1. VPS Health Check
+    // 1. VPS Health Check (порт 5761)
     try {
       const healthData = await testVPSEndpoint('/health');
       
@@ -108,7 +110,7 @@ export function IronBrainValidator() {
 
     // 2. VPS API Gateway
     try {
-      const apiData = await testVPSEndpoint('/status');
+      const apiData = await testVPSEndpoint('/api/v1/status');
       
       if (apiData.api_status === 'active') {
         updateResult('vps-api', 'ready', `API Gateway активен: ${apiData.active_endpoints} endpoints`);
@@ -121,7 +123,7 @@ export function IronBrainValidator() {
 
     // 3. Drone Registry
     try {
-      const dronesData = await testVPSEndpoint('/drones');
+      const dronesData = await testVPSEndpoint('/api/v1/drones');
       
       if (Array.isArray(dronesData.drones)) {
         const activeDrones = dronesData.drones.filter((d: DroneInfo) => d.status === 'online');
@@ -143,7 +145,7 @@ export function IronBrainValidator() {
 
     // 4. WebSocket Bridge Test
     try {
-      const wsData = await testVPSEndpoint('/websocket/status');
+      const wsData = await testVPSEndpoint('/api/v1/websocket/status');
       
       if (wsData.websocket_active) {
         updateResult('websocket-bridge', 'ready', `WebSocket активен: ${wsData.connected_clients} клиентов подключено`);
@@ -212,7 +214,7 @@ export function IronBrainValidator() {
             </Button>
           </CardTitle>
           <CardDescription>
-            Проверка подключения к IronBrain VPS (87.120.254.156:3001) - единственной точки доступа к дронам
+            Проверка подключения к IronBrain VPS (87.120.254.156:5761) - единственной точки доступа к дронам
           </CardDescription>
         </CardHeader>
         
@@ -268,7 +270,7 @@ export function IronBrainValidator() {
             <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <div className="flex items-center gap-2 text-yellow-800">
                 <AlertTriangle className="h-5 w-5" />
-                <span className="font-semibold">⚠️ Проблемы с VPS подключением. Проверьте доступность 87.120.254.156:3001</span>
+                <span className="font-semibold">⚠️ Проблемы с VPS подключением. Проверьте доступность 87.120.254.156:5761</span>
               </div>
             </div>
           )}
@@ -276,7 +278,7 @@ export function IronBrainValidator() {
           <div className="mt-4 p-3 bg-gray-50 rounded-lg">
             <h5 className="font-semibold text-gray-900 mb-2">📡 Архитектура подключения</h5>
             <div className="text-sm text-gray-700 space-y-1">
-              <div>• Tiger CRM → VPS API (87.120.254.156:3001)</div>
+              <div>• Tiger CRM → VPS API (87.120.254.156:5761)</div>
               <div>• VPS → Jetson (автоматическое подключение)</div>
               <div>• Управление только через Device ID дронов</div>
             </div>

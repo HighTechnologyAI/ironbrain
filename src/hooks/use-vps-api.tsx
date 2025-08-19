@@ -28,8 +28,9 @@ class VPSApiClient {
   private ws: WebSocket | null = null;
 
   constructor() {
-    this.baseURL = "http://87.120.254.156:3001/api/v1";
-    this.wsURL = "ws://87.120.254.156:3001";
+    // VPS на самом деле работает на порту 5761, не 3001
+    this.baseURL = "http://87.120.254.156:5761/api/v1";
+    this.wsURL = "ws://87.120.254.156:5761";
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<VPSApiResponse<T>> {
