@@ -27,6 +27,7 @@ import { ManualDroneControl } from '@/components/ManualDroneControl';
 import { IronBrainValidator } from '@/components/IronBrainValidator';
 import { LiveDroneStatus } from '@/components/LiveDroneStatus';
 import { Phase2Defects } from '@/components/Phase2Defects';
+import { Phase3Preparation } from '@/components/Phase3Preparation';
 
 const DroneEcosystem: React.FC = () => {
   const { t } = useLanguage();
@@ -126,10 +127,14 @@ const DroneEcosystem: React.FC = () => {
       </div>
 
       <Tabs defaultValue="live" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-10">
+        <TabsList className="grid w-full grid-cols-11">
           <TabsTrigger value="live" className="flex items-center space-x-2">
             <Activity className="h-4 w-4" />
             <span>🔴 Live Status</span>
+          </TabsTrigger>
+          <TabsTrigger value="prep" className="flex items-center space-x-2">
+            <Settings className="h-4 w-4" />
+            <span>🔧 Phase 3 Prep</span>
           </TabsTrigger>
           <TabsTrigger value="defects" className="flex items-center space-x-2">
             <AlertTriangle className="h-4 w-4" />
@@ -205,6 +210,10 @@ const DroneEcosystem: React.FC = () => {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="prep" className="space-y-4">
+          <Phase3Preparation />
         </TabsContent>
 
         <TabsContent value="defects" className="space-y-4">
