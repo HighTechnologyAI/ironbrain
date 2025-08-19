@@ -42,8 +42,14 @@ serve(async (req) => {
 
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
     
-    // Route to appropriate service based on endpoint
-    const isBridgeEndpoint = cleanEndpoint === '/health' || cleanEndpoint.startsWith('/websocket')
+    // Route to appropriate service based on endpoint patterns
+    const isBridgeEndpoint = (
+      cleanEndpoint === '/health' ||
+      cleanEndpoint.startsWith('/websocket') ||
+      cleanEndpoint.includes('websocket') ||
+      cleanEndpoint.startsWith('/drones') ||
+      cleanEndpoint.startsWith('/telemetry')
+    )
     const baseUrl = isBridgeEndpoint ? BRIDGE_BASE_URL : API_BASE_URL
     const vpsUrl = `${baseUrl}${cleanEndpoint}`
 

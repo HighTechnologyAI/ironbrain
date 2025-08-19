@@ -141,7 +141,7 @@ export function IronBrainValidator() {
 
     // 4. WebSocket Bridge Test
     try {
-      const wsData = await testVPSEndpoint('/api/v1/websocket/status');
+      const wsData = await testVPSEndpoint('/websocket/status');
       
       if (wsData.websocket_active) {
         updateResult('websocket-bridge', 'ready', `WebSocket активен: ${wsData.connected_clients} клиентов подключено`);
