@@ -21,10 +21,24 @@ interface DroneInfo {
   location?: { lat: number; lng: number; };
 }
 
+interface ExtendedDroneInfo {
+  id?: string;
+  name?: string;
+  device_id: string;
+  status: string;
+  last_seen: string;
+  battery_level?: number;
+  battery?: number;
+  location?: { lat: number; lng: number; };
+  gps?: { lat: number; lon: number; };
+  armed?: boolean;
+  mode?: string;
+}
+
 export function IronBrainValidator() {
   const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
   const [isValidating, setIsValidating] = useState(false);
-  const [connectedDrones, setConnectedDrones] = useState<DroneInfo[]>([]);
+  const [connectedDrones, setConnectedDrones] = useState<ExtendedDroneInfo[]>([]);
 
   const VPS_API_BASE = "http://87.120.254.156:5761";
 
@@ -127,7 +141,30 @@ export function IronBrainValidator() {
     try {
       const dronesData = await testVPSEndpoint('/drones');
       
-      if (Array.isArray(dronesData.drones)) {
+      // Check if it's a single drone telemetry response (actual format from IronBrain)
+      if (dronesData && typeof dronesData === 'object' && 'gps' in dronesData && 'battery' in dronesData) {
+        const isConnected = dronesData.connected || false;
+        const droneId = 'jetson_nano_real_001'; // Known drone ID from IronBrain
+        
+        setConnectedDrones([{
+          device_id: droneId,
+          status: isConnected ? 'online' : 'offline',
+          last_seen: dronesData.last_update || new Date().toISOString(),
+          battery_level: dronesData.battery,
+          battery: dronesData.battery,
+          location: dronesData.gps ? { lat: dronesData.gps.lat, lng: dronesData.gps.lon } : undefined,
+          gps: dronesData.gps,
+          armed: dronesData.armed,
+          mode: dronesData.mode
+        }]);
+        
+        if (isConnected) {
+          updateResult('drone-registry', 'ready', `Дрон ${droneId} подключен (${dronesData.battery}% батареи)`);
+        } else {
+          updateResult('drone-registry', 'attention', `Дрон ${droneId} зарегистрирован но offline (${dronesData.battery}% батареи)`);
+        }
+      } else if (Array.isArray(dronesData?.drones)) {
+        // Handle array format if that's returned instead
         const activeDrones = dronesData.drones.filter((d: DroneInfo) => d.status === 'online');
         setConnectedDrones(dronesData.drones);
         
@@ -141,7 +178,7 @@ export function IronBrainValidator() {
       } else {
         updateResult('drone-registry', 'error', 'Некорректный ответ от реестра дронов');
       }
-    } catch (error) {
+    } catch (error: any) {
       updateResult('drone-registry', 'error', `Реестр дронов недоступен: ${error.message}`);
     }
 
