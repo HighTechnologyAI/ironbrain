@@ -1,8 +1,9 @@
 // Drone service for telemetry and control
-// Consolidates drone-related functionality
+// Consolidates drone-related functionality with VPS integration
 
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
+import { VPSService } from './vpsService';
 
 type Drone = Database['public']['Tables']['drones']['Row'];
 type DroneTelemetry = Database['public']['Tables']['drone_telemetry']['Row'];
@@ -111,5 +112,61 @@ export class DroneService {
     };
 
     return { data: stats, error: null };
+  }
+
+  // VPS Integration methods
+  static async connectToVPSDrone(connectionString: string) {
+    const result = await VPSService.connectDrone(connectionString);
+    return result;
+  }
+
+  static async getVPSDroneStatus() {
+    const result = await VPSService.getDroneStatus();
+    return result;
+  }
+
+  static async sendVPSCommand(command: string, params?: Record<string, any>) {
+    const result = await VPSService.sendDroneCommand(command, params);
+    return result;
+  }
+
+  static async getVPSStreams() {
+    const result = await VPSService.getActiveStreams();
+    return result;
+  }
+
+  static async createVPSTestStream(droneId: string) {
+    const result = await VPSService.createTestStream(droneId);
+    return result;
+  }
+
+  // Health check all VPS services
+  static async checkVPSHealth() {
+    const result = await VPSService.checkAllServicesHealth();
+    return result;
+  }
+
+  // Combined drone data (Supabase + VPS)
+  static async getCombinedDroneData() {
+    try {
+      const [supabaseResult, vpsResult] = await Promise.all([
+        this.getDrones(),
+        this.getVPSDroneStatus()
+      ]);
+
+      const combinedData = {
+        supabase: supabaseResult,
+        vps: vpsResult,
+        timestamp: new Date().toISOString()
+      };
+
+      return { data: combinedData, error: null };
+    } catch (error) {
+      console.error('Combined drone data fetch failed:', error);
+      return { 
+        data: null, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
+    }
   }
 }

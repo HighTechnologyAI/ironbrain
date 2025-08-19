@@ -4,6 +4,8 @@ import { useLanguage } from '@/hooks/use-language';
 import { useMissions } from '@/hooks/use-missions';
 import { useDrones } from '@/hooks/use-drones';
 import { useWeather } from '@/hooks/use-weather';
+import { VPSConnectionMonitor } from '@/components/VPSConnectionMonitor';
+import { VPSStatusDebugger } from '@/components/VPSStatusDebugger';
 import TacticalMapModal from '@/components/TacticalMapModal';
 import MapboxDebugger from '@/components/MapboxDebugger';
 import { EnhancedMissionDetails } from '@/components/MissionConsole/EnhancedMissionDetails';
@@ -28,16 +30,17 @@ import {
   Satellite,
   Target,
   Loader2,
-  Settings
+  Settings,
+  RefreshCw
 } from 'lucide-react';
 
 const MissionControl = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   
-  const { missions, loading: missionsLoading, error: missionsError } = useMissions();
-  const { drones, loading: dronesLoading, error: dronesError } = useDrones();
-  const { weather, loading: weatherLoading, getWindDirection } = useWeather();
+  const { missions, loading: missionsLoading, error: missionsError, refresh: refreshMissions } = useMissions();
+  const { drones, loading: dronesLoading, error: dronesError, refresh: refreshDrones } = useDrones();
+  const { weather, loading: weatherLoading, getWindDirection, refresh: refreshWeather } = useWeather();
 
   if (missionsLoading || dronesLoading || weatherLoading) {
     return (
@@ -139,11 +142,29 @@ const MissionControl = () => {
               Всего единиц: {drones.length}
             </p>
           </div>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => {
+                refreshMissions();
+                refreshDrones();
+                refreshWeather();
+              }}
+              variant="outline"
+              size="sm"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Обновить все данные
+            </Button>
+          </div>
         </div>
 
         {/* Main Mission Control Tabs */}
-        <Tabs defaultValue="extended" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="vps" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="vps" className="flex items-center gap-2">
+              <Satellite className="h-4 w-4" />
+              VPS Status
+            </TabsTrigger>
             <TabsTrigger value="extended" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Enhanced Control
@@ -161,6 +182,13 @@ const MissionControl = () => {
               Tactical Map
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="vps" className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <VPSConnectionMonitor />
+              <VPSStatusDebugger />
+            </div>
+          </TabsContent>
 
           <TabsContent value="extended" className="space-y-6">
             {/* Enhanced Mission Details */}

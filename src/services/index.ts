@@ -6,3 +6,4 @@ export * from './authService';
 export * from './missionService';
 export * from './droneService';
 export * from './configService';
+export * from './vpsService';

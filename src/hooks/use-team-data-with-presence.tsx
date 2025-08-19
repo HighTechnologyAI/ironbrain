@@ -87,10 +87,10 @@ export const useTeamDataWithPresence = () => {
 
     fetchTeamData();
     
-    // Обновляем данные каждые 60 секунд
-    const interval = setInterval(fetchTeamData, 60000);
+    // Disable auto-refresh to prevent constant page updates
+    // const interval = setInterval(fetchTeamData, 60000);
     
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {

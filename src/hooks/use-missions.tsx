@@ -30,43 +30,37 @@ export const useMissions = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchMissions = async () => {
-      try {
-        setLoading(true);
-        
-        const { data, error } = await supabase
-          .from('missions')
-          .select(`
-            *,
-            drone:uav_drones(id, name, model, status, battery_level)
-          `)
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        
-        setMissions((data || []) as Mission[]);
-      } catch (err) {
-        console.error('Error fetching missions:', err);
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchMissions = async () => {
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase
+        .from('missions')
+        .select(`
+          *,
+          drone:uav_drones(id, name, model, status, battery_level)
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      setMissions((data || []) as Mission[]);
+    } catch (err) {
+      console.error('Error fetching missions:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchMissions();
     
-    // Real-time subscription
-    const channel = supabase
-      .channel('missions-changes')
-      .on('postgres_changes', 
-          { event: '*', schema: 'public', table: 'missions' }, 
-          () => fetchMissions()
-      )
-      .subscribe();
+    // Disable real-time subscription to prevent auto-refresh
+    // Real-time updates will be handled manually via refresh button
     
     return () => {
-      supabase.removeChannel(channel);
+      // No cleanup needed since no subscriptions
     };
   }, []);
 
@@ -103,5 +97,9 @@ export const useMissions = () => {
     }
   };
 
-  return { missions, loading, error, createMission, updateMission };
+  const refresh = () => {
+    fetchMissions();
+  };
+
+  return { missions, loading, error, createMission, updateMission, refresh };
 };
