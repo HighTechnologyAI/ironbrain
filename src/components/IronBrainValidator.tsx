@@ -74,9 +74,15 @@ export function IronBrainValidator() {
 
       if (error) throw new Error(error.message);
 
-      // If proxy reported an error shape
-      if (data && typeof data === 'object' && 'error' in data && !('status' in data)) {
+      // If proxy reported an error shape, check if it's actually a valid response
+      if (data && typeof data === 'object' && 'error' in data && !('status' in data) && !('service' in data)) {
         throw new Error((data as any).details || (data as any).error || 'VPS proxy error');
+      }
+
+      // If it's a proxy error response (502), extract the actual error
+      if (data && typeof data === 'object' && 'service' in data && data.error) {
+        console.warn('VPS Service unavailable:', data);
+        return { error: data.error, available: false };
       }
 
       return data;
