@@ -63,27 +63,23 @@ export function IronBrainValidator() {
     ));
   };
 
-  const testVPSEndpoint = async (endpoint: string, timeout = 5000) => {
-    // Используем Edge Function для обхода CORS
+  const testVPSEndpoint = async (endpoint: string, timeout = 10000) => {
     try {
       const { data, error } = await supabase.functions.invoke('vps-supabase-proxy', {
-        body: { 
-          action: 'GET',
-          endpoint: endpoint,
-          vps_ip: '87.120.254.156',
-          vps_port: 5761
+        body: {
+          method: 'GET',
+          endpoint
         }
       });
 
-      if (error) {
-        throw new Error(error.message);
+      if (error) throw new Error(error.message);
+
+      // If proxy reported an error shape
+      if (data && typeof data === 'object' && 'error' in data && !('status' in data)) {
+        throw new Error((data as any).details || (data as any).error || 'VPS proxy error');
       }
 
-      if (!data.success) {
-        throw new Error(data.error || 'VPS request failed');
-      }
-
-      return data.response;
+      return data;
     } catch (error) {
       console.error('VPS Endpoint Error:', error);
       throw error;
@@ -97,7 +93,7 @@ export function IronBrainValidator() {
 
     // 1. VPS Health Check (порт 5761)
     try {
-      const healthData = await testVPSEndpoint('/health');
+      const healthData = await testVPSEndpoint('/api/v1/health');
       
       if (healthData.status === 'ok') {
         updateResult('vps-health', 'ready', `IronBrain активен: ${healthData.service} v${healthData.version}`, healthData);
