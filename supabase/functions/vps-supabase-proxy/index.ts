@@ -6,7 +6,7 @@ const corsHeaders = {
 }
 
 const VPS_HOST = '87.120.254.156'
-const VPS_PORT = 5761
+const VPS_PORT = 80
 const SERVICE = 'supabase-integration'
 
 serve(async (req) => {
