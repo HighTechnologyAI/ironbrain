@@ -6,8 +6,8 @@ const corsHeaders = {
 }
 
 // Ngrok URLs for IronBrain services
-const API_BASE_URL = 'https://46526ae4547c.ngrok-free.app'
-const BRIDGE_BASE_URL = 'https://6c29df3eb97c.ngrok-free.app'
+const API_BASE_URL = 'https://fe813d448e8c.ngrok-free.app'
+const BRIDGE_BASE_URL = 'https://fe813d448e8c.ngrok-free.app'
 const SERVICE = 'supabase-integration'
 
 serve(async (req) => {
@@ -42,16 +42,23 @@ serve(async (req) => {
 
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
     
-    // Route to appropriate service based on endpoint patterns
-    const isBridgeEndpoint = (
-      cleanEndpoint === '/health' ||
-      cleanEndpoint.startsWith('/websocket') ||
-      cleanEndpoint.includes('websocket') ||
-      cleanEndpoint.startsWith('/drones') ||
-      cleanEndpoint.startsWith('/telemetry')
-    )
-    const baseUrl = isBridgeEndpoint ? BRIDGE_BASE_URL : API_BASE_URL
-    const vpsUrl = `${baseUrl}${cleanEndpoint}`
+// Route to appropriate service based on endpoint patterns
+const isBridgeEndpoint = (
+  cleanEndpoint === '/health' ||
+  cleanEndpoint.startsWith('/websocket') ||
+  cleanEndpoint.includes('websocket') ||
+  cleanEndpoint.startsWith('/drones') ||
+  cleanEndpoint.startsWith('/telemetry') ||
+  cleanEndpoint.startsWith('/api/')
+)
+const baseUrl = isBridgeEndpoint ? BRIDGE_BASE_URL : API_BASE_URL
+
+// Normalize to API v2 prefix if not already present (keep websocket paths intact)
+const forwardEndpoint = (cleanEndpoint.includes('websocket') || cleanEndpoint.startsWith('/api/'))
+  ? cleanEndpoint
+  : `/api/v1${cleanEndpoint}`
+
+const vpsUrl = `${baseUrl}${forwardEndpoint}`
 
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 10000)
