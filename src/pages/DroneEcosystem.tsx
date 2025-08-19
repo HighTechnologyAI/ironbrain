@@ -24,7 +24,7 @@ import { DroneEcosystemIntegrated } from '@/components/DroneEcosystemManager/Dro
 import { PerformanceMonitor } from '@/components/PerformanceMonitor';
 import { VPSBridge } from '@/components/VPSBridge';
 import { ManualDroneControl } from '@/components/ManualDroneControl';
-import { JetsonVPSValidator } from '@/components/JetsonVPSValidator';
+import { IronBrainValidator } from '@/components/IronBrainValidator';
 
 const DroneEcosystem: React.FC = () => {
   const { t } = useLanguage();
@@ -164,7 +164,7 @@ const DroneEcosystem: React.FC = () => {
         </TabsList>
 
         <TabsContent value="validation" className="space-y-4">
-          <JetsonVPSValidator />
+          <IronBrainValidator />
         </TabsContent>
 
         <TabsContent value="map" className="space-y-4">
