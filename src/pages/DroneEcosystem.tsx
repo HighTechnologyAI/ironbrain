@@ -24,6 +24,7 @@ import { DroneEcosystemIntegrated } from '@/components/DroneEcosystemManager/Dro
 import { PerformanceMonitor } from '@/components/PerformanceMonitor';
 import { VPSBridge } from '@/components/VPSBridge';
 import { ManualDroneControl } from '@/components/ManualDroneControl';
+import { JetsonVPSValidator } from '@/components/JetsonVPSValidator';
 
 const DroneEcosystem: React.FC = () => {
   const { t } = useLanguage();
@@ -122,8 +123,12 @@ const DroneEcosystem: React.FC = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="map" className="space-y-4">
+      <Tabs defaultValue="validation" className="space-y-4">
         <TabsList className="grid w-full grid-cols-8">
+          <TabsTrigger value="validation" className="flex items-center space-x-2">
+            <Settings className="h-4 w-4" />
+            <span>🔧 Validation</span>
+          </TabsTrigger>
           <TabsTrigger value="map" className="flex items-center space-x-2">
             <Map className="h-4 w-4" />
             <span>Global Map</span>
@@ -157,6 +162,10 @@ const DroneEcosystem: React.FC = () => {
             <span>Swarm</span>
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="validation" className="space-y-4">
+          <JetsonVPSValidator />
+        </TabsContent>
 
         <TabsContent value="map" className="space-y-4">
           <DroneEcosystemIntegrated 
