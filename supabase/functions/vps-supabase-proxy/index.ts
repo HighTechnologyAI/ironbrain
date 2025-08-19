@@ -5,8 +5,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const VPS_HOST = '87.120.254.156'
-const VPS_PORT = 5761
+// Ngrok URLs for IronBrain services
+const API_BASE_URL = 'https://46526ae4547c.ngrok-free.app'
+const BRIDGE_BASE_URL = 'https://6c29df3eb97c.ngrok-free.app'
 const SERVICE = 'supabase-integration'
 
 serve(async (req) => {
@@ -40,7 +41,11 @@ serve(async (req) => {
       : `${Date.now()}-${Math.random().toString(36).slice(2)}`
 
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
-    const vpsUrl = `http://${VPS_HOST}:${VPS_PORT}${cleanEndpoint}`
+    
+    // Route to appropriate service based on endpoint
+    const isBridgeEndpoint = cleanEndpoint === '/health' || cleanEndpoint.startsWith('/websocket')
+    const baseUrl = isBridgeEndpoint ? BRIDGE_BASE_URL : API_BASE_URL
+    const vpsUrl = `${baseUrl}${cleanEndpoint}`
 
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 10000)
