@@ -6,8 +6,8 @@ const corsHeaders = {
 }
 
 // Ngrok URLs for IronBrain services
-const API_BASE_URL = 'https://fe813d448e8c.ngrok-free.app'
-const BRIDGE_BASE_URL = 'https://fe813d448e8c.ngrok-free.app'
+const API_BASE_URL = 'https://ironbrain.ngrok.pro'
+const BRIDGE_BASE_URL = 'https://ironbrain.ngrok.pro'
 const SERVICE = 'supabase-integration'
 
 serve(async (req) => {
