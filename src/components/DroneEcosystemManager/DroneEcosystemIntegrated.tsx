@@ -344,3 +344,5 @@ export const DroneEcosystemIntegrated: React.FC<DroneEcosystemIntegratedProps> =
     </div>
   );
 };
+
+export default DroneEcosystemIntegrated;

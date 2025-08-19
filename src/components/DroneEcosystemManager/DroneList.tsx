@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { 
   Plane, 
   Battery, 
@@ -17,6 +18,8 @@ import {
 import { DroneService } from '@/services/droneService';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { DroneCard } from './DroneCard';
+import { DroneStatusIndicator } from './DroneStatusIndicator';
 
 interface Drone {
   id: string;
@@ -38,12 +41,16 @@ interface DroneListProps {
   onSelectDrone?: (drone: Drone) => void;
   selectedDroneId?: string;
   layout?: 'grid' | 'list';
+  telemetryData?: Record<string, any>;
+  onDroneCommand?: (droneId: string, command: string) => void;
 }
 
 const DroneList: React.FC<DroneListProps> = ({
   onSelectDrone,
   selectedDroneId,
-  layout = 'grid'
+  layout = 'grid',
+  telemetryData,
+  onDroneCommand
 }) => {
   const { t } = useTranslation();
   
