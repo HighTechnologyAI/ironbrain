@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.jetson-vps-bridge]
 verify_jwt = false
+
+[functions.jetson-network-scanner]
+verify_jwt = false
