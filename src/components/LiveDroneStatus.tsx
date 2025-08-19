@@ -51,6 +51,9 @@ export const LiveDroneStatus: React.FC = () => {
       }
 
       if (data && typeof data === 'object' && 'gps' in data) {
+        // If we're getting data, consider it connected (even if data.connected is false)
+        const isActuallyConnected = true; // We're receiving live data
+        
         setTelemetry({
           device_id: 'jetson_nano_real_001',
           battery: data.battery || 0,
@@ -61,7 +64,7 @@ export const LiveDroneStatus: React.FC = () => {
           speed: data.speed || 0,
           heading: data.heading || 0,
           last_update: data.last_update || new Date().toISOString(),
-          connected: data.connected || false
+          connected: isActuallyConnected // Fixed: if we get data, we're connected
         });
         setLastFetchTime(new Date());
       }
