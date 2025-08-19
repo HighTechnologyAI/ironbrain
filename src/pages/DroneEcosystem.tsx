@@ -25,6 +25,7 @@ import { PerformanceMonitor } from '@/components/PerformanceMonitor';
 import { VPSBridge } from '@/components/VPSBridge';
 import { ManualDroneControl } from '@/components/ManualDroneControl';
 import { IronBrainValidator } from '@/components/IronBrainValidator';
+import { LiveDroneStatus } from '@/components/LiveDroneStatus';
 
 const DroneEcosystem: React.FC = () => {
   const { t } = useLanguage();
@@ -123,8 +124,12 @@ const DroneEcosystem: React.FC = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="validation" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-8">
+      <Tabs defaultValue="live" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-9">
+          <TabsTrigger value="live" className="flex items-center space-x-2">
+            <Activity className="h-4 w-4" />
+            <span>🔴 Live Status</span>
+          </TabsTrigger>
           <TabsTrigger value="validation" className="flex items-center space-x-2">
             <Settings className="h-4 w-4" />
             <span>🔧 Validation</span>
@@ -157,11 +162,45 @@ const DroneEcosystem: React.FC = () => {
             <Settings className="h-4 w-4" />
             <span>VPS Bridge</span>
           </TabsTrigger>
-          <TabsTrigger value="swarm" className="flex items-center space-x-2">
-            <Users className="h-4 w-4" />
-            <span>Swarm</span>
-          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="live" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <LiveDroneStatus />
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Быстрые Действия
+                </CardTitle>
+                <CardDescription>
+                  Управление реальным дроном Jetson Nano
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" size="sm">
+                    🚁 ARM
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    🔒 DISARM
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    🚀 TAKEOFF
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    🛬 LAND
+                  </Button>
+                </div>
+                <div className="pt-2 border-t">
+                  <Button variant="secondary" size="sm" className="w-full">
+                    📍 RTL (Return to Launch)
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         <TabsContent value="validation" className="space-y-4">
           <IronBrainValidator />
