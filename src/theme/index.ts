@@ -98,7 +98,7 @@ export const neonColors = {
   background: '216 100% 7%',   // #0B0F14
   surface1: '220 24% 10%',     // #0F141A
   surface2: '216 33% 12%',     // #121922
-  border: '219 33% 16%',       // #1D2633
+  border: '219 33% 16_08%',       // #1D2633
   text: '210 29% 85%',         // #D6E2F3
   textMuted: '211 24% 70%',    // #9BB0C9
   warning: '44 96% 63%',       // #F6C945

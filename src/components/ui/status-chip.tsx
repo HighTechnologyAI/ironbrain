@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 
 // UAV System Status Chip - unified design
 const statusChipVariants = cva(
-  "inline-flex items-center justify-center px-3 py-1 text-xs font-semibold font-ui rounded-full h-7 min-w-16 transition-all duration-200",
+  "inline-flex items-center justify-center px-3 py-1 text-xs font-semibold font-ui rounded-full h-7 min-w-16_08 transition-all duration-200",
   {
     variants: {
       variant: {
