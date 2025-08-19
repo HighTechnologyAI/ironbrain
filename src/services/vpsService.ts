@@ -178,7 +178,7 @@ export class VPSService {
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       
       const { data, error } = await supabase.functions.invoke('vps-supabase-proxy', {
-        body: { endpoint: '/supabase/health' },
+        body: { endpoint: '/health' },
         // @ts-ignore
         signal: controller.signal
       });
@@ -200,7 +200,7 @@ export class VPSService {
   static async getVPSDrones(): Promise<VPSResponse> {
     try {
       const { data, error } = await supabase.functions.invoke('vps-supabase-proxy', {
-        body: { endpoint: '/supabase/drones' }
+        body: { endpoint: '/drones' }
       });
       
       if (error) throw error;
@@ -227,7 +227,7 @@ export class VPSService {
       
       const { data, error } = await supabase.functions.invoke('vps-supabase-proxy', {
         body: { 
-          endpoint: '/supabase/telemetry',
+          endpoint: '/telemetry',
           method: 'POST',
           payload
         }
