@@ -93,7 +93,7 @@ export function IronBrainValidator() {
 
     // 1. VPS Health Check (порт 5761)
     try {
-      const healthData = await testVPSEndpoint('/api/v1/health');
+      const healthData = await testVPSEndpoint('/supabase/health');
       
       if (healthData.status === 'ok') {
         updateResult('vps-health', 'ready', `IronBrain активен: ${healthData.service} v${healthData.version}`, healthData);
@@ -106,9 +106,9 @@ export function IronBrainValidator() {
 
     // 2. VPS API Gateway
     try {
-      const apiData = await testVPSEndpoint('/api/v1/status');
+      const apiData = await testVPSEndpoint('/supabase/api/v1/health');
       
-      if (apiData.api_status === 'active') {
+      if (apiData.api_status === 'active' || apiData.status === 'ok') {
         updateResult('vps-api', 'ready', `API Gateway активен: ${apiData.active_endpoints} endpoints`);
       } else {
         updateResult('vps-api', 'attention', 'API Gateway работает, но не все endpoints активны');
@@ -119,7 +119,7 @@ export function IronBrainValidator() {
 
     // 3. Drone Registry
     try {
-      const dronesData = await testVPSEndpoint('/api/v1/drones');
+      const dronesData = await testVPSEndpoint('/supabase/drones');
       
       if (Array.isArray(dronesData.drones)) {
         const activeDrones = dronesData.drones.filter((d: DroneInfo) => d.status === 'online');
